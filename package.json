@@ -1,0 +1,11 @@
+{
+  "name": "air-quality-dashboard-app",
+  "version": "1.0.0",
+  "description": "Air Quality and Environment Monitoring Dashboard - Full Stack College Project",
+  "scripts": {
+    "install:all": "npm install --prefix client && npm install --prefix server",
+    "client": "npm run dev --prefix client",
+    "server": "npm run start --prefix server"
+  },
+  "keywords": ["air-quality", "dashboard", "environment-monitoring", "react", "express"]
+}
