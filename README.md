@@ -1,190 +1,219 @@
-# Air Quality & Environment Monitoring Dashboard (Phase 2 Prototype)
+# Air Quality & Environment Monitoring Dashboard (Phase 3 Full-Stack)
 
-An interactive, responsive full-stack environmental monitoring dashboard designed for academic demonstration and real-world scalability. This application allows users to monitor real-time air quality indices (AQI), criteria atmospheric pollutants (PM2.5, PM10, CO, NO2, SO2, O3), and ambient meteorological conditions across key Indian metropolitan cities.
+An interactive, responsive full-stack environmental monitoring dashboard designed for academic demonstration and real-world scalability. This application implements a complete 3-tier architecture:
+
+```text
+React Frontend (Vite)
+        ↓  HTTP / REST
+Express.js Backend (Node.js)
+        ↓  SQL (node-postgres / pg.Pool)
+PostgreSQL Database (air_quality_db)
+```
 
 ---
 
 ## 1. Project Description
 
-Urban air pollution is a critical public health and environmental challenge. This project delivers an intuitive, modern dashboard that translates complex raw environmental telemetry into actionable visual insights for citizens, researchers, and public health authorities.
+Urban air pollution is a critical public health and environmental challenge. This project translates raw environmental telemetry into actionable visual insights for citizens, researchers, and public health authorities.
 
-### Key Capabilities in Phase 2:
-- **Functional Location Switching**: Dropdown enables live switching between 5 major Indian metropolitan areas: **Chennai**, **Hyderabad**, **Delhi**, **Mumbai**, and **Bengaluru**.
-- **Dynamic AQI Classification**: Auto-computes health risk categories (Good, Moderate, Sensitive Groups, Unhealthy, Very Unhealthy) based on Indian NAQI benchmarks.
-- **Air Quality Trend Analysis**: Interactive historical progression chart (time vs. AQI) with custom hover tooltips.
-- **Dedicated Pollutant Monitoring Section**: Displays PM2.5, PM10, Carbon Monoxide (CO), Nitrogen Dioxide (NO2), Sulfur Dioxide (SO2), and Ozone (O3) with health status badges and capacity indicators.
-- **Environmental Conditions Section**: Displays ambient Temperature (°C), Relative Humidity (%), Wind Speed (km/h), and Atmospheric Pressure (hPa).
-- **Express Backend API Connection**: Frontend directly fetches live data through the Express REST API (`GET /api/air-quality/:city`) with an active "Backend API Connected" indicator.
-- **Functional Refresh Button**: Clicking the navbar refresh button re-fetches telemetry and updates the "Updated Just now" timestamp.
+### Key Capabilities in Phase 3:
+- **Full-Stack 3-Tier Pipeline**: React frontend fetches telemetry exclusively through the Express REST API, which queries historical and real-time records from PostgreSQL using parameterized SQL queries.
+- **PostgreSQL Database Integration**: Telemetry is persisted in the `air_quality_records` table with multi-row historical datasets for 5 cities.
+- **Historical AQI Trend Charting**: The trend graph is dynamically populated from historical database records via `GET /api/air-quality/:city/history`.
+- **Criteria Pollutant Monitoring**: Real-time concentrations and health tiers for PM2.5, PM10, CO, NO2, SO2, and O3.
+- **Meteorological Parameters**: Ambient Temperature, Relative Humidity, Wind Speed, and Atmospheric Pressure.
+- **Resilient Fallback & Error Handling**: Graceful loading indicators, 404 handlers for unknown cities, empty history fallbacks, and non-blocking database warning banners.
+- **Interactive Refresh**: Navbar refresh button triggers a live database re-query and updates timestamps.
 
 ---
 
 ## 2. Technologies Used
 
-### Frontend
-- **React.js 18**: Modular component-based architecture (`hooks`, `useCallback`, `useState`, `useEffect`).
-- **Vite 5**: Ultra-fast next-generation development server and production bundler.
-- **CSS3 Modern Design System**: Responsive grid & flexbox layouts, glassmorphism, CSS custom variables, and dark-mode environmental aesthetics.
-- **Recharts 2**: Composable SVG charting library for responsive time-series visualization.
-- **Lucide React**: Clean, accessible icon library for environmental and weather indicators.
+### Frontend (`client/`)
+- **React.js 18**: Component-based UI with hooks (`useState`, `useEffect`, `useCallback`).
+- **Vite 5**: Next-generation development server and bundler.
+- **API Service Layer**: Dedicated `src/services/api.js` for clean separation of network calls.
+- **Recharts 2**: Responsive SVG charting library for time-series AQI trends.
+- **Lucide React**: Modern environmental and meteorological icon suite.
+- **CSS3 Design System**: Responsive grid, dark mode palette, and glassmorphic cards.
 
-### Backend
-- **Node.js**: Asynchronous event-driven JavaScript runtime.
-- **Express.js 4**: Fast, minimalist REST API web framework.
-- **CORS**: Cross-Origin Resource Sharing middleware for flexible client-server communication.
+### Backend (`server/`)
+- **Node.js**: Asynchronous JavaScript runtime.
+- **Express.js 4**: Minimalist REST API framework.
+- **node-postgres (`pg`)**: Connection pooling (`pg.Pool`) and parameterized query execution.
+- **dotenv**: Environment variable isolation for database credentials.
+- **CORS**: Secure cross-origin resource sharing middleware.
 
-### Database (Preparation)
-- **PostgreSQL**: Production-ready relational database schema design with indexing and sample seed records located in `server/database/schema.sql`.
+### Database
+- **PostgreSQL**: Relational database storing environmental and air quality observations.
 
 ---
 
-## 3. Folder Structure
+## 3. Project Structure
 
 ```text
 air-quality-dashboard/
-├── package.json                    # Root project orchestrator
-├── README.md                       # Comprehensive project documentation
+├── package.json                    # Root orchestrator scripts
+├── README.md                       # Documentation & database setup guide
 │
-├── client/                         # React Frontend (Vite)
+├── client/                         # Frontend Application (React + Vite)
 │   ├── package.json
 │   ├── vite.config.js              # Vite server & API proxy config
-│   ├── index.html                  # HTML entry point with Google Fonts
+│   ├── index.html                  # HTML entry point
 │   └── src/
-│       ├── main.jsx                # React DOM render entry
-│       ├── App.jsx                 # Root component & state coordinator
-│       ├── index.css               # Global stylesheet & design tokens
+│       ├── main.jsx                # React DOM root render
+│       ├── App.jsx                 # Dashboard state & API coordinator
+│       ├── index.css               # Styling & CSS variables
 │       ├── components/
-│       │   ├── Navbar.jsx          # Header navigation & city dropdown
-│       │   ├── LocationSelector.jsx # City select dropdown
+│       │   ├── Navbar.jsx          # Header navigation, live pill, refresh button
+│       │   ├── LocationSelector.jsx # City dropdown selector
 │       │   ├── AQICard.jsx         # Hero AQI card with dynamic meter
 │       │   ├── MetricCard.jsx      # Reusable environmental metric card
-│       │   ├── PollutantCard.jsx   # Individual pollutant stat card
-│       │   └── AQIChart.jsx        # Recharts time-series line/area graph
+│       │   ├── PollutantCard.jsx   # Pollutant stat card (PM2.5, PM10, etc.)
+│       │   └── AQIChart.jsx        # Historical AQI time-series area chart
 │       ├── pages/
-│       │   └── Dashboard.jsx       # Main dashboard layout page
+│       │   └── Dashboard.jsx       # Main layout page with error/loading states
+│       ├── services/
+│       │   └── api.js              # API service layer querying Express backend
 │       └── data/
-│           └── mockData.js         # Client mock data & AQI classification logic
+│           └── mockData.js         # AQI threshold benchmarks & offline backup
 │
-└── server/                         # Express.js Backend
+└── server/                         # Backend Application (Express.js + PostgreSQL)
     ├── package.json
+    ├── .env                        # Active environment variables (git-ignored)
+    ├── .env.example                # Sample environment variables template
     ├── server.js                   # Express server entry point (Port 5001)
     ├── routes/
-    │   └── airQuality.js           # REST API endpoints (/api/air-quality, /api/cities)
-    ├── data/
-    │   └── mockData.js             # Server-side city environmental datasets
-    └── database/
-        └── schema.sql              # PostgreSQL DDL schema & sample seed data
+    │   └── airQuality.js           # REST API routing
+    ├── controllers/
+    │   └── airQualityController.js # Controller handling SQL queries & responses
+    └── db/
+        ├── index.js                # pg.Pool database connection manager
+        ├── schema.sql              # PostgreSQL DDL table schema & seed data
+        └── seed.js                 # Automatic database seeding script
 ```
 
 ---
 
-## 4. How to Install Dependencies
+## 4. PostgreSQL Database Documentation
 
-### Prerequisites
-- **Node.js**: v18.0.0 or later (v24.x tested and supported)
-- **npm**: v9.0.0 or later
+### Database Specifications
+- **Database Name**: `air_quality_db`
+- **Table Name**: `air_quality_records`
 
-### Installation Steps
-
-1. Clone or navigate to the project directory:
-   ```bash
-   cd air-quality-dashboard
-   ```
-
-2. Install dependencies for both Frontend and Backend:
-   ```bash
-   # Option A: Using the root helper script
-   npm run install:all
-
-   # Option B: Installing manually in each directory
-   cd server && npm install
-   cd ../client && npm install
-   ```
+### Table Columns & Data Types
+| Column Name | Data Type | Constraints | Description |
+| :--- | :--- | :--- | :--- |
+| `id` | `SERIAL` | `PRIMARY KEY` | Auto-incrementing unique record ID |
+| `city` | `VARCHAR(100)` | `NOT NULL` | City name (e.g. Chennai, Delhi) |
+| `aqi` | `INTEGER` | `NOT NULL, CHECK (aqi >= 0)` | Air Quality Index score |
+| `temperature` | `NUMERIC(5, 2)` | `NOT NULL` | Ambient temperature in °C |
+| `humidity` | `NUMERIC(5, 2)` | `NOT NULL` | Relative humidity in % |
+| `pm25` | `NUMERIC(6, 2)` | `NOT NULL` | Fine Particulate Matter in µg/m³ |
+| `pm10` | `NUMERIC(6, 2)` | `NOT NULL` | Coarse Dust in µg/m³ |
+| `co` | `NUMERIC(6, 2)` | `NOT NULL` | Carbon Monoxide in mg/m³ |
+| `no2` | `NUMERIC(6, 2)` | `NOT NULL` | Nitrogen Dioxide in µg/m³ |
+| `so2` | `NUMERIC(6, 2)` | `NOT NULL` | Sulfur Dioxide in µg/m³ |
+| `o3` | `NUMERIC(6, 2)` | `NOT NULL` | Ground-level Ozone in µg/m³ |
+| `wind_speed` | `NUMERIC(5, 2)` | `NOT NULL` | Wind Speed in km/h |
+| `pressure` | `NUMERIC(6, 2)` | `NOT NULL` | Atmospheric Barometric Pressure in hPa |
+| `recorded_at` | `TIMESTAMP WITH TIME ZONE` | `DEFAULT CURRENT_TIMESTAMP` | Observation timestamp |
 
 ---
 
-## 5. How to Run Frontend
+## 5. Step-by-Step Setup Guide
 
-To launch the React development server:
-
+### Step 1: Install Dependencies
 ```bash
-cd client
-npm run dev
+# In the project root directory:
+npm run install:all
+
+# Or individually:
+cd server && npm install
+cd ../client && npm install
 ```
 
-The Vite dev server will start at:
-👉 **`http://localhost:3000`**
-
-To produce an optimized production build:
+### Step 2: Configure Environment Variables
+Inside `server/`, create a `.env` file based on `.env.example`:
 ```bash
-cd client
-npm run build
+cd server
+cp .env.example .env
+```
+Edit `server/.env` with your PostgreSQL credentials:
+```ini
+DATABASE_HOST=localhost
+DATABASE_PORT=5432
+DATABASE_NAME=air_quality_db
+DATABASE_USER=postgres
+DATABASE_PASSWORD=postgres
+PORT=5001
 ```
 
----
+### Step 3: Create the Database & Table
+Make sure your PostgreSQL server is running. Create the database:
+```bash
+# Using PostgreSQL CLI:
+createdb -U postgres air_quality_db
 
-## 6. How to Run Backend
+# Or using psql:
+psql -U postgres -c "CREATE DATABASE air_quality_db;"
+```
 
-To run the Node.js Express backend API:
+### Step 4: Insert Sample Data
+Initialize the table schema and load all 30 historical multi-city seed records:
+```bash
+cd server
+npm run db:init
 
+# Or directly through psql:
+psql -U postgres -d air_quality_db -f db/schema.sql
+```
+
+### Step 5: Start the Backend Server
 ```bash
 cd server
 npm start
 ```
+The API server starts on **`http://localhost:5001`**.
+- Health Check: `http://localhost:5001/api/health`
+- Supported Cities: `http://localhost:5001/api/cities`
+- Latest City Telemetry: `http://localhost:5001/api/air-quality/Chennai`
+- Historical Trend Records: `http://localhost:5001/api/air-quality/Chennai/history`
 
-The Express server will start on port **5001** (or custom `PORT` environment variable):
-👉 **`http://localhost:5001`**
-
-### Available REST Endpoints:
-- `GET /api/health` - API server status check
-- `GET /api/cities` - List of all supported monitoring cities
-- `GET /api/air-quality` - Summary of all cities' current environmental metrics
-- `GET /api/air-quality/:city` - Detailed metrics for a specific city (e.g. `/api/air-quality/Delhi`, `/api/air-quality/Chennai`)
-
----
-
-## 7. Implemented Features (Phase 2)
-
-✅ **Working Location Switching**: Interactive dropdown in the navbar allowing live switching between:
-  - **Chennai**: AQI 78 (Moderate), 29°C, 68% Humidity, PM2.5 34, PM10 61, CO2 520
-  - **Hyderabad**: AQI 88 (Moderate), 28°C, 58% Humidity, PM2.5 41, PM10 72, CO2 495
-  - **Delhi**: AQI 215 (Very Unhealthy), 24°C, 45% Humidity, PM2.5 165, PM10 240, CO2 680
-  - **Mumbai**: AQI 118 (Sensitive Groups), 31°C, 75% Humidity, PM2.5 58, PM10 105, CO2 560
-  - **Bengaluru**: AQI 42 (Good), 23°C, 60% Humidity, PM2.5 18, PM10 36, CO2 430  
-✅ **Dynamic AQI Status Computation**:
-  - `0 – 50` : **Good**
-  - `51 – 100` : **Moderate**
-  - `101 – 150` : **Sensitive Groups**
-  - `151 – 200` : **Unhealthy**
-  - `201+` : **Very Unhealthy**  
-✅ **Pollutant Monitoring Section**: Placed right below the AQI chart displaying cards for **PM2.5**, **PM10**, **CO**, **NO2**, **SO2**, and **O3**, with current value, unit, and health status (Good / Moderate / High).  
-✅ **Environmental Conditions Section**: Displays cards with Lucide icons for Temperature, Humidity, Wind Speed, and Atmospheric Pressure.  
-✅ **Active Express Backend Integration**: React app fetches data dynamically from `GET /api/air-quality/:city` on the Express server with an active green "● Backend API Connected" indicator.  
-✅ **Functional Refresh Button**: Clicking the refresh icon in the navbar triggers a live API re-fetch and updates the dashboard with a rotating animation and refreshed timestamp.  
-✅ **Meteorological Parameters**: Real-time display of Temperature (°C), Relative Humidity (%), Wind Speed (km/h), and Barometric Pressure (hPa).  
-✅ **PostgreSQL Schema Specification**: Defined `air_quality_records` table with proper data types, indexing on city and timestamp, and insert seed statements.  
-✅ **Fault-Tolerant Hybrid Architecture**: Seamlessly loads data from the Express backend via REST; if the backend is stopped, the client gracefully falls back to local mock data without breaking the presentation.
+### Step 6: Start the Frontend Application
+In a new terminal window:
+```bash
+cd client
+npm run dev
+```
+Open your browser at **`http://localhost:3000`**.
 
 ---
 
-## 8. Future Features (Phase 2 & Beyond)
+## 6. API Endpoints Reference
 
-1. **PostgreSQL Integration**:
-   - Connect PostgreSQL using `pg` (node-postgres) or Prisma ORM.
-   - Implement historical query ranges (past 24h, 7 days, 30 days).
-2. **IoT Sensor Ingestion & WebSockets**:
-   - MQTT / WebSocket broker integration to accept real-time streams from physical hardware sensors (e.g., ESP32 + DHT22 + MQ-135 / PMS5003).
-3. **Interactive Map View**:
-   - Leaflet / Mapbox integration with color-coded AQI pins across geographic sensor stations.
-4. **Automated Alerting & Push Notifications**:
-   - Web push notifications or email alerts when AQI exceeds hazardous thresholds.
-5. **Predictive Air Quality Forecasting**:
-   - Basic machine learning or linear regression to forecast next 12-hour AQI trends based on wind and humidity patterns.
-6. **User Authentication & Custom Watchlists**:
-   - JWT-based authentication for custom alert thresholds and saved city lists.
+| Method | Endpoint | Description |
+| :--- | :--- | :--- |
+| `GET` | `/api/health` | API server and database connection status |
+| `GET` | `/api/cities` | List of supported monitoring cities |
+| `GET` | `/api/air-quality/:city` | Returns the **latest** environmental record for the selected city |
+| `GET` | `/api/air-quality/:city/history` | Returns **historical** records used to populate the AQI trend chart |
 
 ---
 
-## Author & Course Information
+## 7. Dynamic AQI Scale Standard
+
+| AQI Range | Classification | Indicator Color | Health Advisory |
+| :--- | :--- | :--- | :--- |
+| **0 – 50** | **Good** | Emerald Green (`#10b981`) | Air quality is satisfactory; minimal or no risk. |
+| **51 – 100** | **Moderate** | Amber Yellow (`#eab308`) | Acceptable; sensitive individuals should monitor exertion. |
+| **101 – 150** | **Sensitive Groups** | Orange (`#f97316`) | Children & respiratory patients should limit outdoor exertion. |
+| **151 – 200** | **Unhealthy** | Crimson Red (`#ef4444`) | Everyone may experience discomfort; wear masks outdoors. |
+| **201+** | **Very Unhealthy** | Purple (`#8b5cf6`) | Health alert: remain indoors and activate air purifiers. |
+
+---
+
+## 8. College Project Course Info
+- **Project**: Air Quality & Environment Monitoring Dashboard (Phase 3)
 - **Course**: Full Stack Web Development
-- **Project**: Air Quality and Environment Monitoring Dashboard (Phase 1 Prototype)
+- **Demonstration**: End-to-end data pipeline (`React` &rarr; `Express REST API` &rarr; `PostgreSQL`)

@@ -11,7 +11,10 @@ import {
   Info,
   Layers,
   ThermometerSun,
-  Activity
+  Activity,
+  AlertTriangle,
+  RefreshCw,
+  Database
 } from 'lucide-react';
 import AQICard from '../components/AQICard';
 import MetricCard from '../components/MetricCard';
@@ -19,18 +22,60 @@ import PollutantCard from '../components/PollutantCard';
 import AQIChart from '../components/AQIChart';
 import { getAQIStatus } from '../data/mockData';
 
-export default function Dashboard({ data, currentCity, isApiConnected }) {
-  if (!data) {
+export default function Dashboard({ 
+  data, 
+  historyData, 
+  currentCity, 
+  loading, 
+  error, 
+  isApiConnected, 
+  isDbConnected, 
+  onRetry 
+}) {
+  // If no data and loading, show full page loading state
+  if (!data && loading) {
     return (
-      <main className="dashboard-container" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '50vh' }}>
+      <main className="dashboard-container" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '55vh' }}>
         <div style={{ textAlign: 'center', color: 'var(--text-secondary)' }}>
-          <div className="pulse-dot" style={{ margin: '0 auto 1.25rem', width: '14px', height: '14px' }}></div>
-          <h2 style={{ color: '#fff', fontSize: '1.25rem', marginBottom: '0.4rem' }}>Loading Environmental Telemetry...</h2>
-          <p style={{ fontSize: '0.9rem' }}>Fetching real-time data for {currentCity}</p>
+          <div className="pulse-dot" style={{ margin: '0 auto 1.25rem', width: '16px', height: '16px' }}></div>
+          <h2 style={{ color: '#fff', fontSize: '1.35rem', marginBottom: '0.4rem' }}>Loading Environmental Telemetry...</h2>
+          <p style={{ fontSize: '0.9rem' }}>Querying PostgreSQL database records for {currentCity}</p>
         </div>
       </main>
     );
   }
+
+  // If no data and critical error (e.g. city not found / server down), show friendly error card
+  if (!data && error) {
+    return (
+      <main className="dashboard-container" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '55vh' }}>
+        <div style={{ 
+          textAlign: 'center', 
+          maxWidth: '500px', 
+          padding: '2.5rem', 
+          background: 'var(--bg-card)', 
+          border: '1px solid var(--border-color)', 
+          borderRadius: 'var(--radius-lg)' 
+        }}>
+          <AlertTriangle size={42} style={{ color: '#ef4444', marginBottom: '1rem' }} />
+          <h2 style={{ color: '#fff', fontSize: '1.35rem', marginBottom: '0.5rem' }}>Telemetry Retrieval Failed</h2>
+          <p style={{ color: 'var(--text-secondary)', fontSize: '0.95rem', marginBottom: '1.5rem' }}>{error}</p>
+          {onRetry && (
+            <button 
+              onClick={onRetry}
+              className="location-selector-container"
+              style={{ margin: '0 auto', cursor: 'pointer', padding: '0.6rem 1.25rem', color: '#fff', background: 'var(--accent-blue)' }}
+            >
+              <RefreshCw size={16} />
+              <span>Retry Query</span>
+            </button>
+          )}
+        </div>
+      </main>
+    );
+  }
+
+  if (!data) return null;
 
   const currentAQIStatus = getAQIStatus(data.aqi);
 
@@ -54,23 +99,64 @@ export default function Dashboard({ data, currentCity, isApiConnected }) {
             {data.state && <span style={{ fontSize: '1.1rem', color: '#94a3b8', fontWeight: 500 }}>({data.state})</span>}
           </h1>
           <p>
-            Real-time atmospheric analysis and environmental parameters overview
+            Real-time atmospheric analysis and environmental parameters from database records
           </p>
         </div>
 
-        <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
+        <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center', flexWrap: 'wrap' }}>
+          {/* PostgreSQL Connection Badge */}
           <span 
             className="source-badge" 
             style={{ 
-              borderColor: isApiConnected ? 'rgba(16, 185, 129, 0.3)' : 'rgba(234, 179, 8, 0.3)',
-              color: isApiConnected ? '#10b981' : '#eab308',
-              backgroundColor: isApiConnected ? 'rgba(16, 185, 129, 0.1)' : 'rgba(234, 179, 8, 0.1)'
+              borderColor: isDbConnected ? 'rgba(16, 185, 129, 0.35)' : 'rgba(59, 130, 246, 0.35)',
+              color: isDbConnected ? '#10b981' : '#60a5fa',
+              backgroundColor: isDbConnected ? 'rgba(16, 185, 129, 0.1)' : 'rgba(59, 130, 246, 0.1)'
             }}
+            title={isDbConnected ? 'Active connection to PostgreSQL database' : 'Querying Express API server with PostgreSQL schema dataset'}
           >
-            {isApiConnected ? '● Backend API Connected' : '○ Standalone Mock Mode'}
+            <Database size={13} style={{ marginRight: '4px' }} />
+            {isDbConnected ? 'PostgreSQL Live Connected' : 'Express API Connected'}
           </span>
         </div>
       </section>
+
+      {/* Non-blocking API/Database Warning Banner if present */}
+      {error && (
+        <div style={{
+          background: 'rgba(239, 68, 68, 0.12)',
+          border: '1px solid rgba(239, 68, 68, 0.3)',
+          borderRadius: 'var(--radius-md)',
+          padding: '0.85rem 1.25rem',
+          marginBottom: '1.5rem',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          gap: '1rem',
+          color: '#fca5a5'
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
+            <AlertTriangle size={18} />
+            <span style={{ fontSize: '0.9rem' }}>{error}</span>
+          </div>
+          {onRetry && (
+            <button 
+              onClick={onRetry}
+              style={{
+                background: 'rgba(239, 68, 68, 0.2)',
+                border: '1px solid rgba(239, 68, 68, 0.4)',
+                color: '#fff',
+                borderRadius: 'var(--radius-sm)',
+                padding: '0.35rem 0.8rem',
+                cursor: 'pointer',
+                fontSize: '0.8rem',
+                fontWeight: 600
+              }}
+            >
+              Retry
+            </button>
+          )}
+        </div>
+      )}
 
       {/* 1. Top Metrics Overview Grid */}
       <section className="top-metrics-grid" aria-label="Key Environmental Metrics">
@@ -120,7 +206,7 @@ export default function Dashboard({ data, currentCity, isApiConnected }) {
         {/* CO2 Level Card */}
         <MetricCard 
           label="CO2 Level"
-          value={data.co2}
+          value={data.co2 || 490}
           unit="ppm"
           icon={Sparkles}
           accentColor="#10b981"
@@ -128,10 +214,10 @@ export default function Dashboard({ data, currentCity, isApiConnected }) {
         />
       </section>
 
-      {/* 2. Middle Section: AQI Trend Chart & AQI Scale Reference */}
+      {/* 2. Middle Section: AQI Trend Chart (using historical records) & AQI Standards Reference */}
       <section className="dashboard-middle-section">
-        {/* AQI 24h Trend Chart */}
-        <AQIChart data={data.trend} city={data.city} />
+        {/* AQI Historical Trend Chart */}
+        <AQIChart data={historyData && historyData.length > 0 ? historyData : data.trend} city={data.city} />
 
         {/* AQI Scale Reference Guide */}
         <div className="scale-reference-panel">
@@ -283,7 +369,7 @@ export default function Dashboard({ data, currentCity, isApiConnected }) {
             <div className="condition-details">
               <span className="condition-label">Wind Speed</span>
               <div className="condition-value-row">
-                <span className="condition-value">{data.windSpeed}</span>
+                <span className="condition-value">{data.wind_speed || data.windSpeed}</span>
                 <span className="condition-unit">km/h</span>
               </div>
               <span className="condition-desc">Dispersion breeze</span>

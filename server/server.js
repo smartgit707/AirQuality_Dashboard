@@ -1,11 +1,13 @@
+require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const airQualityRoutes = require('./routes/airQuality');
+const db = require('./db');
 
 const app = express();
 const PORT = process.env.PORT || 5001;
 
-// Enable CORS for frontend development
+// Enable CORS for React frontend
 app.use(cors());
 app.use(express.json());
 
@@ -23,6 +25,7 @@ app.get('/api/health', (req, res) => {
   res.json({
     status: 'OK',
     message: 'Air Quality Monitoring API is running smoothly',
+    databaseConnected: db.isPostgresConnected(),
     timestamp: new Date().toISOString()
   });
 });
@@ -31,21 +34,26 @@ app.get('/api/health', (req, res) => {
 app.get('/', (req, res) => {
   res.json({
     project: 'Air Quality and Environment Monitoring Dashboard API',
-    version: '1.0.0 (Phase 1 Prototype)',
+    version: '2.0.0 (Phase 3 Full Stack: React -> Express -> PostgreSQL)',
+    databaseConnected: db.isPostgresConnected(),
     endpoints: [
       'GET /api/health',
       'GET /api/cities',
-      'GET /api/air-quality',
-      'GET /api/air-quality/:city'
+      'GET /api/air-quality/:city',
+      'GET /api/air-quality/:city/history'
     ]
   });
 });
 
-// Start Express server
-app.listen(PORT, () => {
+// Start Express server and initialize database connection
+app.listen(PORT, async () => {
   console.log(`===================================================`);
   console.log(`🚀 Air Quality Server is running on port ${PORT}`);
   console.log(`📡 Health Check: http://localhost:${PORT}/api/health`);
-  console.log(`🌍 City Metrics: http://localhost:${PORT}/api/air-quality/Chennai`);
+  console.log(`🌍 City Latest: http://localhost:${PORT}/api/air-quality/Chennai`);
+  console.log(`📈 City History: http://localhost:${PORT}/api/air-quality/Chennai/history`);
   console.log(`===================================================`);
+
+  // Test PostgreSQL connection
+  await db.initConnection();
 });
