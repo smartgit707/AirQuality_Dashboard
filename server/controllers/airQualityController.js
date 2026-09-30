@@ -16,46 +16,22 @@ function formatHour(dateInput) {
 }
 
 /**
- * GET /api/cities
- * Returns supported cities list
+ * Internal helper to fetch live telemetry, store in DB, and retrieve history
  */
-exports.getCities = async (req, res) => {
-  res.json({
-    success: true,
-    cities: supportedCityNames,
-    dbConnected: db.isPostgresConnected()
-  });
-};
-
-/**
- * GET /api/air-quality/:city
- * 1. Validate city
- * 2. Get its coordinates
- * 3. Call Open-Meteo API
- * 4. Process response & calculate AQI
- * 5. Store reading in PostgreSQL (air_quality_records)
- * 6. Return clean JSON to frontend
- */
-exports.getLatestCityRecord = async (req, res) => {
-  const cityName = (req.params.city || '').trim();
+async function fetchAndStoreCityTelemetry(cityName) {
   const cityConfig = getCityConfig(cityName);
-
-  // 1. City validation
-  if (!cityConfig) {
-    return res.status(404).json({
-      success: false,
-      message: `Invalid city '${cityName}'. Supported cities: ${supportedCityNames.join(', ')}`
-    });
-  }
+  if (!cityConfig) return null;
 
   const standardCityName = cityConfig.name;
+  let record = null;
+  let isLive = false;
+  let warning = null;
 
   try {
-    // 2 & 3. Call Open-Meteo external APIs with coordinates
-    console.log(`[Open-Meteo] Fetching live air quality & weather for ${standardCityName} (${cityConfig.latitude}, ${cityConfig.longitude})...`);
     const liveData = await fetchRealEnvironmentalData(cityConfig.latitude, cityConfig.longitude);
+    isLive = true;
 
-    // 4 & 5. Store fresh reading in PostgreSQL database table `air_quality_records`
+    // Persist reading in PostgreSQL
     try {
       const insertSql = `
         INSERT INTO air_quality_records 
@@ -81,16 +57,11 @@ exports.getLatestCityRecord = async (req, res) => {
       ];
 
       await db.query(insertSql, insertParams);
-      console.log(`[Database] Stored fresh Open-Meteo reading for ${standardCityName} (AQI: ${liveData.aqi})`);
 
-      // If database has historical hourly points from Open-Meteo and needs preloading
+      // Preload historical hourly points if fresh
       if (Array.isArray(liveData.recentHourly) && liveData.recentHourly.length > 0) {
-        const checkSql = `SELECT COUNT(*) as count FROM air_quality_records WHERE LOWER(city) = LOWER($1);`;
-        const countRes = await db.query(checkSql, [standardCityName]);
-        const existingCount = Number(countRes.rows[0]?.count || 0);
-
-        if (existingCount <= 1) {
-          // Preload recent hourly points so historical chart immediately has trend data
+        const countRes = await db.query(`SELECT COUNT(*) as count FROM air_quality_records WHERE LOWER(city) = LOWER($1);`, [standardCityName]);
+        if (Number(countRes.rows[0]?.count || 0) <= 1) {
           for (const hp of liveData.recentHourly) {
             await db.query(insertSql, [
               standardCityName,
@@ -111,11 +82,10 @@ exports.getLatestCityRecord = async (req, res) => {
         }
       }
     } catch (dbErr) {
-      console.warn(`[Database] Could not persist reading to PostgreSQL:`, dbErr.message);
+      console.warn(`[Database] Could not persist reading for ${standardCityName}:`, dbErr.message);
     }
 
-    // 6. Return clean, formatted response to React frontend
-    const responsePayload = {
+    record = {
       city: standardCityName,
       state: cityConfig.state,
       aqi: liveData.aqi,
@@ -140,15 +110,10 @@ exports.getLatestCityRecord = async (req, res) => {
       dbConnected: db.isPostgresConnected()
     };
 
-    return res.json({
-      ...responsePayload,
-      data: responsePayload
-    });
-
   } catch (apiErr) {
-    console.error(`[Open-Meteo] External API error for ${standardCityName}:`, apiErr.message);
+    console.error(`[Open-Meteo] External fetch failed for ${standardCityName}:`, apiErr.message);
 
-    // Fallback: Query the latest saved record from PostgreSQL if external API fails
+    // Fallback: Query latest database record
     try {
       const fallbackSql = `
         SELECT id, city, aqi, temperature, humidity, pm25, pm10, co, no2, so2, o3, wind_speed, pressure, recorded_at
@@ -161,7 +126,7 @@ exports.getLatestCityRecord = async (req, res) => {
 
       if (fallbackResult.rows && fallbackResult.rows.length > 0) {
         const row = fallbackResult.rows[0];
-        const record = {
+        record = {
           city: row.city,
           state: cityConfig.state,
           aqi: Number(row.aqi),
@@ -182,33 +147,86 @@ exports.getLatestCityRecord = async (req, res) => {
           lastUpdated: 'Cached Database Record',
           isLive: false,
           isFallback: true,
-          warning: 'Live API temporarily unavailable. Displaying most recent stored record.',
+          warning: 'Live API temporarily unavailable. Displaying stored database reading.',
           source: 'PostgreSQL Stored Record',
           success: true,
           dbConnected: db.isPostgresConnected()
         };
-
-        return res.json({
-          ...record,
-          data: record
-        });
       }
     } catch (cacheErr) {
-      console.error(`[Database] Fallback retrieval also failed:`, cacheErr.message);
+      console.error(`[Database] Cache fallback error:`, cacheErr.message);
     }
+  }
 
-    // If both live API and database cache are unavailable
-    return res.status(503).json({
+  // Retrieve historical records from database for this city
+  let history = [];
+  try {
+    const histSql = `
+      SELECT recorded_at, aqi, temperature, humidity, pm25, pm10
+      FROM air_quality_records
+      WHERE LOWER(city) = LOWER($1)
+      ORDER BY recorded_at ASC;
+    `;
+    const histRes = await db.query(histSql, [standardCityName]);
+    const standardHours = ['8 AM', '10 AM', '12 PM', '2 PM', '4 PM', '6 PM'];
+
+    history = (histRes.rows || []).map((row, idx) => ({
+      time: formatHour(row.recorded_at) || standardHours[idx % standardHours.length],
+      aqi: Number(row.aqi),
+      temperature: Number(row.temperature),
+      humidity: Number(row.humidity),
+      pm25: Number(row.pm25),
+      pm10: Number(row.pm10),
+      recorded_at: row.recorded_at
+    }));
+  } catch (_) {}
+
+  return { record, history };
+}
+
+/**
+ * GET /api/cities
+ * Returns supported cities list
+ */
+exports.getCities = async (req, res) => {
+  res.json({
+    success: true,
+    cities: supportedCityNames,
+    dbConnected: db.isPostgresConnected()
+  });
+};
+
+/**
+ * GET /api/air-quality/:city
+ */
+exports.getLatestCityRecord = async (req, res) => {
+  const cityName = (req.params.city || '').trim();
+  const cityConfig = getCityConfig(cityName);
+
+  if (!cityConfig) {
+    return res.status(404).json({
       success: false,
-      message: 'Unable to fetch the latest environmental data. Please try again.',
-      error: apiErr.message
+      message: `Invalid city '${cityName}'. Supported cities: ${supportedCityNames.join(', ')}`
     });
   }
+
+  const result = await fetchAndStoreCityTelemetry(cityName);
+
+  if (!result || !result.record) {
+    return res.status(503).json({
+      success: false,
+      message: 'Unable to fetch the latest environmental data. Please try again.'
+    });
+  }
+
+  return res.json({
+    ...result.record,
+    data: result.record
+  });
 };
 
 /**
  * GET /api/air-quality/:city/history
- * Returns historical AQI records from PostgreSQL database
  */
 exports.getCityHistory = async (req, res) => {
   const cityName = (req.params.city || '').trim();
@@ -222,49 +240,112 @@ exports.getCityHistory = async (req, res) => {
     });
   }
 
-  const standardCityName = cityConfig.name;
+  const result = await fetchAndStoreCityTelemetry(cityName);
+
+  res.json({
+    success: true,
+    city: cityConfig.name,
+    count: result?.history?.length || 0,
+    history: result?.history || [],
+    trend: result?.history || [],
+    dbConnected: db.isPostgresConnected()
+  });
+};
+
+/**
+ * GET /api/air-quality/compare?city1=...&city2=...
+ * Compares two cities side-by-side with delta analysis and overlaid trend line
+ */
+exports.compareCities = async (req, res) => {
+  const city1Name = (req.query.city1 || 'Delhi').trim();
+  const city2Name = (req.query.city2 || 'Bengaluru').trim();
+
+  const c1Config = getCityConfig(city1Name);
+  const c2Config = getCityConfig(city2Name);
+
+  if (!c1Config || !c2Config) {
+    return res.status(400).json({
+      success: false,
+      message: `Invalid comparison cities. Both must be from: ${supportedCityNames.join(', ')}`
+    });
+  }
 
   try {
-    const sql = `
-      SELECT recorded_at, aqi, temperature, humidity, pm25, pm10
-      FROM air_quality_records
-      WHERE LOWER(city) = LOWER($1)
-      ORDER BY recorded_at ASC;
-    `;
+    // Concurrently fetch/retrieve data and historical readings for both cities
+    const [res1, res2] = await Promise.all([
+      fetchAndStoreCityTelemetry(c1Config.name),
+      fetchAndStoreCityTelemetry(c2Config.name)
+    ]);
 
-    const result = await db.query(sql, [standardCityName]);
+    const d1 = res1?.record;
+    const d2 = res2?.record;
 
-    // Format historical data points for Recharts trend chart
-    const history = (result.rows || []).map((row, index) => {
-      const standardHours = ['8 AM', '10 AM', '12 PM', '2 PM', '4 PM', '6 PM'];
-      const displayTime = formatHour(row.recorded_at) || standardHours[index % standardHours.length];
+    if (!d1 || !d2) {
+      return res.status(503).json({
+        success: false,
+        message: 'Could not retrieve environmental telemetry for one or both comparison cities.'
+      });
+    }
+
+    // Comparison Metrics & Deltas
+    const aqiDiff = d1.aqi - d2.aqi;
+    const cleanerCity = aqiDiff <= 0 ? d1.city : d2.city;
+    const morePollutedCity = aqiDiff > 0 ? d1.city : d2.city;
+    const maxAqi = Math.max(d1.aqi, d2.aqi, 1);
+    const aqiPercentCleaner = Math.round((Math.abs(aqiDiff) / maxAqi) * 100);
+
+    const tempDiff = parseFloat((d1.temperature - d2.temperature).toFixed(1));
+    const humidityDiff = d1.humidity - d2.humidity;
+    const pm25Diff = parseFloat((d1.pm25 - d2.pm25).toFixed(1));
+    const pm10Diff = parseFloat((d1.pm10 - d2.pm10).toFixed(1));
+    const windDiff = parseFloat((d1.windSpeed - d2.windSpeed).toFixed(1));
+
+    // Build synchronized dual-series historical trend for Recharts
+    const hours = ['8 AM', '10 AM', '12 PM', '2 PM', '4 PM', '6 PM'];
+    const h1 = res1.history || [];
+    const h2 = res2.history || [];
+
+    const mergedTrend = hours.map((time, idx) => {
+      const p1 = h1[idx] || {};
+      const p2 = h2[idx] || {};
 
       return {
-        time: displayTime,
-        aqi: Number(row.aqi),
-        temperature: Number(row.temperature),
-        humidity: Number(row.humidity),
-        pm25: Number(row.pm25),
-        pm10: Number(row.pm10),
-        recorded_at: row.recorded_at
+        time,
+        [d1.city]: p1.aqi != null ? p1.aqi : d1.aqi,
+        [d2.city]: p2.aqi != null ? p2.aqi : d2.aqi,
+        [`${d1.city}_pm25`]: p1.pm25 != null ? p1.pm25 : d1.pm25,
+        [`${d2.city}_pm25`]: p2.pm25 != null ? p2.pm25 : d2.pm25,
       };
     });
 
     res.json({
       success: true,
-      city: standardCityName,
-      count: history.length,
-      history,
-      trend: history,
-      dbConnected: db.isPostgresConnected()
+      city1: d1,
+      city2: d2,
+      comparison: {
+        cleanerCity,
+        morePollutedCity,
+        aqiDiff: Math.abs(aqiDiff),
+        aqiPercentCleaner,
+        cleanerMargin: `${cleanerCity} is currently ${aqiPercentCleaner}% cleaner in AQI than ${morePollutedCity}`,
+        tempDiff,
+        humidityDiff,
+        pm25Diff,
+        pm10Diff,
+        windDiff,
+        summary: aqiDiff === 0 
+          ? `Both ${d1.city} and ${d2.city} share an identical AQI level of ${d1.aqi}.`
+          : `${cleanerCity} exhibits significantly superior atmospheric quality compared to ${morePollutedCity} with an AQI difference of ${Math.abs(aqiDiff)} points.`
+      },
+      mergedTrend
     });
+
   } catch (err) {
-    console.error(`Error querying history for ${standardCityName}:`, err);
+    console.error('[Comparison] Error comparing cities:', err);
     res.status(500).json({
       success: false,
-      message: 'Database error fetching historical records',
-      error: err.message,
-      history: []
+      message: 'Failed to generate comparison telemetry',
+      error: err.message
     });
   }
 };

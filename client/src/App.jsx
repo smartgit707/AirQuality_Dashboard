@@ -1,9 +1,11 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import Navbar from './components/Navbar';
 import Dashboard from './pages/Dashboard';
+import CityComparison from './components/CityComparison';
 import { fetchCityLatest, fetchCityHistory } from './services/api';
 
 export default function App() {
+  const [viewMode, setViewMode] = useState('dashboard'); // 'dashboard' | 'compare'
   const [selectedCity, setSelectedCity] = useState('Chennai');
   const [dashboardData, setDashboardData] = useState(null);
   const [historyData, setHistoryData] = useState([]);
@@ -69,31 +71,39 @@ export default function App() {
         onRefresh={handleRefresh}
         loading={loading}
         isApiConnected={isApiConnected}
+        viewMode={viewMode}
+        onViewModeChange={setViewMode}
       />
 
-      {/* Main Dashboard Body */}
-      <Dashboard 
-        data={dashboardData}
-        historyData={historyData}
-        currentCity={selectedCity}
-        loading={loading}
-        error={error}
-        isApiConnected={isApiConnected}
-        isDbConnected={isDbConnected}
-        onRetry={handleRefresh}
-      />
+      {/* Main View: Single City Dashboard vs Dual City Comparison */}
+      {viewMode === 'compare' ? (
+        <main className="dashboard-container">
+          <CityComparison defaultCity1="Delhi" defaultCity2="Bengaluru" />
+        </main>
+      ) : (
+        <Dashboard 
+          data={dashboardData}
+          historyData={historyData}
+          currentCity={selectedCity}
+          loading={loading}
+          error={error}
+          isApiConnected={isApiConnected}
+          isDbConnected={isDbConnected}
+          onRetry={handleRefresh}
+        />
+      )}
 
       {/* Presentation Footer */}
       <footer className="dashboard-footer">
         <div className="footer-content">
           <div>
-            <strong>Air Quality and Environment Monitoring Dashboard</strong> &mdash; Full Stack Project (Phase 4: Open-Meteo Real Data Pipeline)
+            <strong>Air Quality and Environment Monitoring Dashboard</strong> &mdash; Dual City Comparison & Real Data Pipeline
           </div>
           <div className="footer-tags">
-            <span className="footer-tag">Open-Meteo API</span>
-            <span className="footer-tag">Express.js API</span>
-            <span className="footer-tag">PostgreSQL Persistence</span>
-            <span className="footer-tag">React 18</span>
+            <span className="footer-tag">City Comparison Mode</span>
+            <span className="footer-tag">Open-Meteo Live API</span>
+            <span className="footer-tag">PostgreSQL Stored Records</span>
+            <span className="footer-tag">React 18 & Recharts</span>
           </div>
         </div>
       </footer>

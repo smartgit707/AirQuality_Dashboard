@@ -10,6 +10,7 @@ An interactive, responsive full-stack environmental monitoring dashboard that co
 +-------------------------------------------------------------------------+
 |                         React Frontend (Vite)                           |
 |  - City Selector (Chennai, Hyderabad, Delhi, Mumbai, Bengaluru)         |
+|  - City vs. City Dual Comparison Mode (Overlaid Line Charts & Deltas)   |
 |  - Live AQI Card & Dynamic NAQI Health Categorization                   |
 |  - Pollutants Grid (PM2.5, PM10, CO, NO2, SO2, O3)                      |
 |  - Environmental Conditions (Temp, Humidity, Wind Speed, Pressure)      |
@@ -17,11 +18,13 @@ An interactive, responsive full-stack environmental monitoring dashboard that co
 +-------------------------------------------------------------------------+
                                     │
                                     │ 1. HTTP GET /api/air-quality/:city
+                                    │    HTTP GET /api/air-quality/compare?city1=..&city2=..
                                     ▼
 +-------------------------------------------------------------------------+
 |                       Express.js Backend (Node.js)                      |
 |  - City Coordinate Resolution (server/config/cities.js)                 |
 |  - Open-Meteo Integration Service (server/services/openMeteoService.js)|
+|  - Dual-City Delta & Trend Merging Engine                               |
 |  - Standard AQI Calculation & Unit Formatting                           |
 |  - Controller & Error Handling Layer                                    |
 +-------------------------------------------------------------------------+
@@ -86,6 +89,7 @@ Defined in [`server/config/cities.js`](file:///Users/manmohansingh/Downloads/air
 | `GET` | `/api/cities` | List of supported monitoring cities |
 | `GET` | `/api/air-quality/:city` | Validates city, queries Open-Meteo, saves reading to PostgreSQL, and returns live JSON |
 | `GET` | `/api/air-quality/:city/history` | Returns historical observations from PostgreSQL for the trend chart |
+| `GET` | `/api/air-quality/compare` | Compares two cities side-by-side with delta analysis and overlaid trend line (`?city1=..&city2=..`) |
 
 ### Clean JSON Response Format (`GET /api/air-quality/:city`)
 ```json
