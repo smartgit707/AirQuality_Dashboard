@@ -117,7 +117,35 @@ async function query(text, params = []) {
     };
   }
 
-  // 3. Fallback generic filter
+  // 3. INSERT INTO air_quality_records ...
+  if (normalized.startsWith('insert into air_quality_records')) {
+    // Parameters order: [city, aqi, temperature, humidity, pm25, pm10, co, no2, so2, o3, wind_speed, pressure, recorded_at]
+    const [city, aqi, temperature, humidity, pm25, pm10, co, no2, so2, o3, wind_speed, pressure, recorded_at] = params;
+    const newRecord = {
+      id: fallbackRecords.length + 1,
+      city: city || 'Unknown',
+      aqi: Number(aqi) || 0,
+      temperature: Number(temperature) || 0,
+      humidity: Number(humidity) || 0,
+      pm25: Number(pm25) || 0,
+      pm10: Number(pm10) || 0,
+      co: Number(co) || 0,
+      no2: Number(no2) || 0,
+      so2: Number(so2) || 0,
+      o3: Number(o3) || 0,
+      wind_speed: Number(wind_speed) || 0,
+      pressure: Number(pressure) || 0,
+      recorded_at: recorded_at ? new Date(recorded_at) : new Date()
+    };
+
+    fallbackRecords.push(newRecord);
+    return {
+      rows: [newRecord],
+      rowCount: 1
+    };
+  }
+
+  // 4. Fallback generic filter
   return {
     rows: [],
     rowCount: 0

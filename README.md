@@ -1,145 +1,161 @@
-# Air Quality & Environment Monitoring Dashboard (Phase 3 Full-Stack)
+# Air Quality & Environment Monitoring Dashboard (Phase 4 Real Data Pipeline)
 
-An interactive, responsive full-stack environmental monitoring dashboard designed for academic demonstration and real-world scalability. This application implements a complete 3-tier architecture:
+An interactive, responsive full-stack environmental monitoring dashboard that connects directly to **live real-world atmospheric telemetry** through the **Open-Meteo Air Quality & Weather API**, persisting observations into a **PostgreSQL database**, and presenting real-time intelligence through a modern **React.js dashboard**.
+
+---
+
+## 1. System Architecture & Data Flow
 
 ```text
-React Frontend (Vite)
-        ↓  HTTP / REST
-Express.js Backend (Node.js)
-        ↓  SQL (node-postgres / pg.Pool)
-PostgreSQL Database (air_quality_db)
++-------------------------------------------------------------------------+
+|                         React Frontend (Vite)                           |
+|  - City Selector (Chennai, Hyderabad, Delhi, Mumbai, Bengaluru)         |
+|  - Live AQI Card & Dynamic NAQI Health Categorization                   |
+|  - Pollutants Grid (PM2.5, PM10, CO, NO2, SO2, O3)                      |
+|  - Environmental Conditions (Temp, Humidity, Wind Speed, Pressure)      |
+|  - Recharts Historical Trend Line                                       |
++-------------------------------------------------------------------------+
+                                    │
+                                    │ 1. HTTP GET /api/air-quality/:city
+                                    ▼
++-------------------------------------------------------------------------+
+|                       Express.js Backend (Node.js)                      |
+|  - City Coordinate Resolution (server/config/cities.js)                 |
+|  - Open-Meteo Integration Service (server/services/openMeteoService.js)|
+|  - Standard AQI Calculation & Unit Formatting                           |
+|  - Controller & Error Handling Layer                                    |
++-------------------------------------------------------------------------+
+            │                                             │
+            │ 2. Fetch Live Telemetry                     │ 4. Store Observation
+            ▼                                             ▼
++------------------------------------+   +--------------------------------+
+|          Open-Meteo APIs           |   |      PostgreSQL Database       |
+| - Air Quality API (PM2.5, PM10,    |   | - Table: air_quality_records   |
+|   CO, NO2, SO2, O3, US AQI)        |   | - Historical telemetry storage |
+| - Weather API (Temp, Humidity,     |   | - Serves /api/air-quality/     |
+|   Wind Speed, Surface Pressure)    |   |   :city/history to trend chart |
++------------------------------------+   +--------------------------------+
 ```
 
 ---
 
-## 1. Project Description
+## 2. External API Used & Implementation
 
-Urban air pollution is a critical public health and environmental challenge. This project translates raw environmental telemetry into actionable visual insights for citizens, researchers, and public health authorities.
+### Open-Meteo Air Quality & Weather API
+- **Provider**: Open-Meteo (open-source, non-commercial/academic friendly, zero API key required).
+- **APIs Queried by Express Backend**:
+  1. **Air Quality API**:
+     `https://air-quality-api.open-meteo.com/v1/air-quality?latitude={lat}&longitude={lon}&current=pm10,pm2_5,carbon_monoxide,nitrogen_dioxide,sulphur_dioxide,ozone,us_aqi&hourly=us_aqi,pm2_5,pm10&past_days=1&forecast_days=0`
+     - Retrieves live criteria air pollutants: PM2.5, PM10, Carbon Monoxide (CO), Nitrogen Dioxide (NO2), Sulphur Dioxide (SO2), Ozone (O3), and US AQI index.
+  2. **Weather Forecast API**:
+     `https://api.open-meteo.com/v1/forecast?latitude={lat}&longitude={lon}&current=temperature_2m,relative_humidity_2m,surface_pressure,wind_speed_10m`
+     - Retrieves ambient temperature, relative humidity, wind speed, and barometric pressure.
 
-### Key Capabilities in Phase 3:
-- **Full-Stack 3-Tier Pipeline**: React frontend fetches telemetry exclusively through the Express REST API, which queries historical and real-time records from PostgreSQL using parameterized SQL queries.
-- **PostgreSQL Database Integration**: Telemetry is persisted in the `air_quality_records` table with multi-row historical datasets for 5 cities.
-- **Historical AQI Trend Charting**: The trend graph is dynamically populated from historical database records via `GET /api/air-quality/:city/history`.
-- **Criteria Pollutant Monitoring**: Real-time concentrations and health tiers for PM2.5, PM10, CO, NO2, SO2, and O3.
-- **Meteorological Parameters**: Ambient Temperature, Relative Humidity, Wind Speed, and Atmospheric Pressure.
-- **Resilient Fallback & Error Handling**: Graceful loading indicators, 404 handlers for unknown cities, empty history fallbacks, and non-blocking database warning banners.
-- **Interactive Refresh**: Navbar refresh button triggers a live database re-query and updates timestamps.
-
----
-
-## 2. Technologies Used
-
-### Frontend (`client/`)
-- **React.js 18**: Component-based UI with hooks (`useState`, `useEffect`, `useCallback`).
-- **Vite 5**: Next-generation development server and bundler.
-- **API Service Layer**: Dedicated `src/services/api.js` for clean separation of network calls.
-- **Recharts 2**: Responsive SVG charting library for time-series AQI trends.
-- **Lucide React**: Modern environmental and meteorological icon suite.
-- **CSS3 Design System**: Responsive grid, dark mode palette, and glassmorphic cards.
-
-### Backend (`server/`)
-- **Node.js**: Asynchronous JavaScript runtime.
-- **Express.js 4**: Minimalist REST API framework.
-- **node-postgres (`pg`)**: Connection pooling (`pg.Pool`) and parameterized query execution.
-- **dotenv**: Environment variable isolation for database credentials.
-- **CORS**: Secure cross-origin resource sharing middleware.
-
-### Database
-- **PostgreSQL**: Relational database storing environmental and air quality observations.
+### AQI Calculation Logic
+- The backend determines the AQI using Open-Meteo's standard `us_aqi` metric.
+- If unavailable, the backend dynamically calculates AQI from PM2.5 concentrations using the standard **US EPA Piecewise Linear Interpolation Formula**:
+  $$I = \frac{I_{high} - I_{low}}{C_{high} - C_{low}} \times (C - C_{low}) + I_{low}$$
+- The frontend dynamically maps the numerical AQI into Indian National Air Quality Index health tiers:
+  - `0 – 50` : **Good** (Minimal impact)
+  - `51 – 100` : **Moderate** (Minor breathing discomfort to sensitive individuals)
+  - `101 – 150` : **Sensitive Groups** (Children & elderly at risk)
+  - `151 – 200` : **Unhealthy** (Breathing discomfort to general public)
+  - `201+` : **Very Unhealthy** (Emergency respiratory warning)
 
 ---
 
-## 3. Project Structure
+## 3. Supported Cities & Coordinates
 
-```text
-air-quality-dashboard/
-├── package.json                    # Root orchestrator scripts
-├── README.md                       # Documentation & database setup guide
-│
-├── client/                         # Frontend Application (React + Vite)
-│   ├── package.json
-│   ├── vite.config.js              # Vite server & API proxy config
-│   ├── index.html                  # HTML entry point
-│   └── src/
-│       ├── main.jsx                # React DOM root render
-│       ├── App.jsx                 # Dashboard state & API coordinator
-│       ├── index.css               # Styling & CSS variables
-│       ├── components/
-│       │   ├── Navbar.jsx          # Header navigation, live pill, refresh button
-│       │   ├── LocationSelector.jsx # City dropdown selector
-│       │   ├── AQICard.jsx         # Hero AQI card with dynamic meter
-│       │   ├── MetricCard.jsx      # Reusable environmental metric card
-│       │   ├── PollutantCard.jsx   # Pollutant stat card (PM2.5, PM10, etc.)
-│       │   └── AQIChart.jsx        # Historical AQI time-series area chart
-│       ├── pages/
-│       │   └── Dashboard.jsx       # Main layout page with error/loading states
-│       ├── services/
-│       │   └── api.js              # API service layer querying Express backend
-│       └── data/
-│           └── mockData.js         # AQI threshold benchmarks & offline backup
-│
-└── server/                         # Backend Application (Express.js + PostgreSQL)
-    ├── package.json
-    ├── .env                        # Active environment variables (git-ignored)
-    ├── .env.example                # Sample environment variables template
-    ├── server.js                   # Express server entry point (Port 5001)
-    ├── routes/
-    │   └── airQuality.js           # REST API routing
-    ├── controllers/
-    │   └── airQualityController.js # Controller handling SQL queries & responses
-    └── db/
-        ├── index.js                # pg.Pool database connection manager
-        ├── schema.sql              # PostgreSQL DDL table schema & seed data
-        └── seed.js                 # Automatic database seeding script
+Defined in [`server/config/cities.js`](file:///Users/manmohansingh/Downloads/air-quality-dashboard/server/config/cities.js):
+
+| City | State / Region | Latitude | Longitude |
+| :--- | :--- | :--- | :--- |
+| **Chennai** | Tamil Nadu | `13.0827` | `80.2707` |
+| **Hyderabad** | Telangana | `17.3850` | `78.4867` |
+| **Delhi** | National Capital Region | `28.6139` | `77.2090` |
+| **Mumbai** | Maharashtra | `19.0760` | `72.8777` |
+| **Bengaluru** | Karnataka | `12.9716` | `77.5946` |
+
+---
+
+## 4. Backend API Endpoints
+
+| Method | Endpoint | Description |
+| :--- | :--- | :--- |
+| `GET` | `/api/health` | Server health check and PostgreSQL connectivity status |
+| `GET` | `/api/cities` | List of supported monitoring cities |
+| `GET` | `/api/air-quality/:city` | Validates city, queries Open-Meteo, saves reading to PostgreSQL, and returns live JSON |
+| `GET` | `/api/air-quality/:city/history` | Returns historical observations from PostgreSQL for the trend chart |
+
+### Clean JSON Response Format (`GET /api/air-quality/:city`)
+```json
+{
+  "city": "Chennai",
+  "state": "Tamil Nadu",
+  "aqi": 181,
+  "temperature": 30.7,
+  "humidity": 74,
+  "pm25": 32.8,
+  "pm10": 36.8,
+  "co": 0.28,
+  "no2": 7.1,
+  "so2": 13.0,
+  "o3": 171.0,
+  "windSpeed": 6.9,
+  "pressure": 1008,
+  "updatedAt": "2026-09-30T12:00:00.000Z",
+  "isLive": true,
+  "source": "Open-Meteo Live API",
+  "success": true
+}
 ```
 
 ---
 
-## 4. PostgreSQL Database Documentation
+## 5. PostgreSQL Database Architecture
 
-### Database Specifications
 - **Database Name**: `air_quality_db`
 - **Table Name**: `air_quality_records`
 
-### Table Columns & Data Types
-| Column Name | Data Type | Constraints | Description |
-| :--- | :--- | :--- | :--- |
-| `id` | `SERIAL` | `PRIMARY KEY` | Auto-incrementing unique record ID |
-| `city` | `VARCHAR(100)` | `NOT NULL` | City name (e.g. Chennai, Delhi) |
-| `aqi` | `INTEGER` | `NOT NULL, CHECK (aqi >= 0)` | Air Quality Index score |
-| `temperature` | `NUMERIC(5, 2)` | `NOT NULL` | Ambient temperature in °C |
-| `humidity` | `NUMERIC(5, 2)` | `NOT NULL` | Relative humidity in % |
-| `pm25` | `NUMERIC(6, 2)` | `NOT NULL` | Fine Particulate Matter in µg/m³ |
-| `pm10` | `NUMERIC(6, 2)` | `NOT NULL` | Coarse Dust in µg/m³ |
-| `co` | `NUMERIC(6, 2)` | `NOT NULL` | Carbon Monoxide in mg/m³ |
-| `no2` | `NUMERIC(6, 2)` | `NOT NULL` | Nitrogen Dioxide in µg/m³ |
-| `so2` | `NUMERIC(6, 2)` | `NOT NULL` | Sulfur Dioxide in µg/m³ |
-| `o3` | `NUMERIC(6, 2)` | `NOT NULL` | Ground-level Ozone in µg/m³ |
-| `wind_speed` | `NUMERIC(5, 2)` | `NOT NULL` | Wind Speed in km/h |
-| `pressure` | `NUMERIC(6, 2)` | `NOT NULL` | Atmospheric Barometric Pressure in hPa |
-| `recorded_at` | `TIMESTAMP WITH TIME ZONE` | `DEFAULT CURRENT_TIMESTAMP` | Observation timestamp |
+### Schema Definition
+```sql
+CREATE TABLE air_quality_records (
+    id SERIAL PRIMARY KEY,
+    city VARCHAR(100) NOT NULL,
+    aqi INTEGER NOT NULL CHECK (aqi >= 0),
+    temperature NUMERIC(5, 2) NOT NULL,
+    humidity NUMERIC(5, 2) NOT NULL,
+    pm25 NUMERIC(6, 2) NOT NULL,
+    pm10 NUMERIC(6, 2) NOT NULL,
+    co NUMERIC(6, 2) NOT NULL,
+    no2 NUMERIC(6, 2) NOT NULL,
+    so2 NUMERIC(6, 2) NOT NULL,
+    o3 NUMERIC(6, 2) NOT NULL,
+    wind_speed NUMERIC(5, 2) NOT NULL,
+    pressure NUMERIC(6, 2) NOT NULL,
+    recorded_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX idx_air_quality_city_recorded_at ON air_quality_records(city, recorded_at DESC);
+```
+
+Every fresh reading fetched from Open-Meteo is persisted via `INSERT INTO air_quality_records (...) VALUES (...)`.
 
 ---
 
-## 5. Step-by-Step Setup Guide
+## 6. How to Run the Project Locally
 
 ### Step 1: Install Dependencies
 ```bash
-# In the project root directory:
 npm run install:all
-
-# Or individually:
-cd server && npm install
-cd ../client && npm install
 ```
 
 ### Step 2: Configure Environment Variables
-Inside `server/`, create a `.env` file based on `.env.example`:
+Inside `server/`:
 ```bash
-cd server
-cp .env.example .env
+cp server/.env.example server/.env
 ```
-Edit `server/.env` with your PostgreSQL credentials:
+Default `.env` configuration:
 ```ini
 DATABASE_HOST=localhost
 DATABASE_PORT=5432
@@ -149,71 +165,37 @@ DATABASE_PASSWORD=postgres
 PORT=5001
 ```
 
-### Step 3: Create the Database & Table
-Make sure your PostgreSQL server is running. Create the database:
-```bash
-# Using PostgreSQL CLI:
-createdb -U postgres air_quality_db
-
-# Or using psql:
-psql -U postgres -c "CREATE DATABASE air_quality_db;"
-```
-
-### Step 4: Insert Sample Data
-Initialize the table schema and load all 30 historical multi-city seed records:
+### Step 3: Initialize Database (Optional)
+If PostgreSQL is running locally, apply the schema and baseline records:
 ```bash
 cd server
 npm run db:init
-
-# Or directly through psql:
-psql -U postgres -d air_quality_db -f db/schema.sql
 ```
 
-### Step 5: Start the Backend Server
+### Step 4: Start the Backend Server
 ```bash
 cd server
 npm start
 ```
-The API server starts on **`http://localhost:5001`**.
-- Health Check: `http://localhost:5001/api/health`
-- Supported Cities: `http://localhost:5001/api/cities`
-- Latest City Telemetry: `http://localhost:5001/api/air-quality/Chennai`
-- Historical Trend Records: `http://localhost:5001/api/air-quality/Chennai/history`
+*API runs at `http://localhost:5001`*
 
-### Step 6: Start the Frontend Application
-In a new terminal window:
+### Step 5: Start the Frontend Application
+In a separate terminal:
 ```bash
 cd client
 npm run dev
 ```
-Open your browser at **`http://localhost:3000`**.
+*Dashboard opens at `http://localhost:3000`*
 
 ---
 
-## 6. API Endpoints Reference
+## 7. Troubleshooting & Error Handling
 
-| Method | Endpoint | Description |
-| :--- | :--- | :--- |
-| `GET` | `/api/health` | API server and database connection status |
-| `GET` | `/api/cities` | List of supported monitoring cities |
-| `GET` | `/api/air-quality/:city` | Returns the **latest** environmental record for the selected city |
-| `GET` | `/api/air-quality/:city/history` | Returns **historical** records used to populate the AQI trend chart |
-
----
-
-## 7. Dynamic AQI Scale Standard
-
-| AQI Range | Classification | Indicator Color | Health Advisory |
-| :--- | :--- | :--- | :--- |
-| **0 – 50** | **Good** | Emerald Green (`#10b981`) | Air quality is satisfactory; minimal or no risk. |
-| **51 – 100** | **Moderate** | Amber Yellow (`#eab308`) | Acceptable; sensitive individuals should monitor exertion. |
-| **101 – 150** | **Sensitive Groups** | Orange (`#f97316`) | Children & respiratory patients should limit outdoor exertion. |
-| **151 – 200** | **Unhealthy** | Crimson Red (`#ef4444`) | Everyone may experience discomfort; wear masks outdoors. |
-| **201+** | **Very Unhealthy** | Purple (`#8b5cf6`) | Health alert: remain indoors and activate air purifiers. |
-
----
-
-## 8. College Project Course Info
-- **Project**: Air Quality & Environment Monitoring Dashboard (Phase 3)
-- **Course**: Full Stack Web Development
-- **Demonstration**: End-to-end data pipeline (`React` &rarr; `Express REST API` &rarr; `PostgreSQL`)
+- **External API Downtime or Network Timeout**:
+  If Open-Meteo is unreachable, the backend automatically queries the most recent recorded reading from PostgreSQL and serves it with an indicator: `○ Stored DB Reading (Fallback)` and an alert banner.
+- **City Not Found**:
+  Entering or requesting an unsupported city returns a clean HTTP 404 with a helpful message: `Invalid city. Supported cities: Chennai, Hyderabad, Delhi, Mumbai, Bengaluru`.
+- **Database Disconnected**:
+  If PostgreSQL is not running on the host machine, the backend seamlessly switches to an in-memory schema repository so the live Open-Meteo telemetry continues displaying with zero crashes.
+- **Duplicate Refresh Prevention**:
+  The refresh button disables itself and displays a rotating spinner while a network fetch is in-flight, preventing race conditions or duplicate database entries.

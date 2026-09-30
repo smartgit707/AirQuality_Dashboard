@@ -104,6 +104,19 @@ export default function Dashboard({
         </div>
 
         <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center', flexWrap: 'wrap' }}>
+          {/* Live Open-Meteo API Indicator */}
+          <span 
+            className="source-badge" 
+            style={{ 
+              borderColor: data.isLive ? 'rgba(16, 185, 129, 0.35)' : 'rgba(234, 179, 8, 0.35)',
+              color: data.isLive ? '#10b981' : '#facc15',
+              backgroundColor: data.isLive ? 'rgba(16, 185, 129, 0.1)' : 'rgba(234, 179, 8, 0.1)'
+            }}
+            title={data.isLive ? 'Real-time telemetry fetched directly via Open-Meteo Air Quality API' : 'Displaying latest saved reading from database'}
+          >
+            {data.isLive ? '● Live Open-Meteo Data' : '○ Stored DB Reading (Fallback)'}
+          </span>
+
           {/* PostgreSQL Connection Badge */}
           <span 
             className="source-badge" 
@@ -119,6 +132,24 @@ export default function Dashboard({
           </span>
         </div>
       </section>
+
+      {/* Fallback data warning banner if external API failed */}
+      {data.warning && (
+        <div style={{
+          background: 'rgba(234, 179, 8, 0.12)',
+          border: '1px solid rgba(234, 179, 8, 0.3)',
+          borderRadius: 'var(--radius-md)',
+          padding: '0.75rem 1.25rem',
+          marginBottom: '1.25rem',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '0.65rem',
+          color: '#fef08a'
+        }}>
+          <AlertTriangle size={18} style={{ color: '#eab308', flexShrink: 0 }} />
+          <span style={{ fontSize: '0.9rem' }}>{data.warning}</span>
+        </div>
+      )}
 
       {/* Non-blocking API/Database Warning Banner if present */}
       {error && (

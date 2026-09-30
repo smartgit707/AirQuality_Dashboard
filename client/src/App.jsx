@@ -2,7 +2,6 @@ import React, { useState, useEffect, useCallback } from 'react';
 import Navbar from './components/Navbar';
 import Dashboard from './pages/Dashboard';
 import { fetchCityLatest, fetchCityHistory } from './services/api';
-import { mockCityData } from './data/mockData';
 
 export default function App() {
   const [selectedCity, setSelectedCity] = useState('Chennai');
@@ -27,7 +26,7 @@ export default function App() {
       ]);
 
       setDashboardData(latest);
-      setHistoryData(history);
+      setHistoryData(history || []);
       setIsApiConnected(true);
       setIsDbConnected(Boolean(latest.dbConnected));
       setLastRefreshedAt(isRefresh ? 'Just now' : (latest.lastUpdated || 'Just now'));
@@ -36,13 +35,7 @@ export default function App() {
       console.warn(`[API] Telemetry fetch issue for ${city}:`, err.message);
       setIsApiConnected(false);
       setIsDbConnected(false);
-      setError(`Database/API Notice: ${err.message}. Using offline telemetry view.`);
-      
-      // Fallback to client mock data so dashboard remains interactive
-      const fallback = mockCityData[city] || mockCityData['Chennai'];
-      setDashboardData(fallback);
-      setHistoryData(fallback.trend || []);
-      setLastRefreshedAt('Just now (Cached)');
+      setError("Unable to fetch the latest environmental data. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -55,12 +48,14 @@ export default function App() {
 
   // Handle location dropdown change
   const handleCityChange = (newCity) => {
+    if (loading) return; // Prevent duplicate requests
     setSelectedCity(newCity);
     loadCityData(newCity, false);
   };
 
   // Handle refresh action button
   const handleRefresh = () => {
+    if (loading) return; // Prevent accidental duplicate requests during refresh
     loadCityData(selectedCity, true);
   };
 
@@ -92,13 +87,13 @@ export default function App() {
       <footer className="dashboard-footer">
         <div className="footer-content">
           <div>
-            <strong>Air Quality and Environment Monitoring Dashboard</strong> &mdash; Full Stack College Project (Phase 3: React &rarr; Express &rarr; PostgreSQL)
+            <strong>Air Quality and Environment Monitoring Dashboard</strong> &mdash; Full Stack Project (Phase 4: Open-Meteo Real Data Pipeline)
           </div>
           <div className="footer-tags">
-            <span className="footer-tag">React 18</span>
+            <span className="footer-tag">Open-Meteo API</span>
             <span className="footer-tag">Express.js API</span>
-            <span className="footer-tag">PostgreSQL Records</span>
-            <span className="footer-tag">Recharts 2</span>
+            <span className="footer-tag">PostgreSQL Persistence</span>
+            <span className="footer-tag">React 18</span>
           </div>
         </div>
       </footer>

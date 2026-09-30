@@ -1,7 +1,6 @@
 const db = require('../db');
-
-// List of supported cities
-const SUPPORTED_CITIES = ['Chennai', 'Hyderabad', 'Delhi', 'Mumbai', 'Bengaluru'];
+const { getCityConfig, supportedCityNames } = require('../config/cities');
+const { fetchRealEnvironmentalData } = require('../services/openMeteoService');
 
 /**
  * Format timestamp into display hour (e.g. "8 AM", "2 PM")
@@ -12,7 +11,7 @@ function formatHour(dateInput) {
   let hours = d.getHours();
   const ampm = hours >= 12 ? 'PM' : 'AM';
   hours = hours % 12;
-  hours = hours ? hours : 12; // 0 becomes 12
+  hours = hours ? hours : 12;
   return `${hours} ${ampm}`;
 }
 
@@ -23,84 +22,207 @@ function formatHour(dateInput) {
 exports.getCities = async (req, res) => {
   res.json({
     success: true,
-    cities: SUPPORTED_CITIES,
+    cities: supportedCityNames,
     dbConnected: db.isPostgresConnected()
   });
 };
 
 /**
  * GET /api/air-quality/:city
- * Returns latest environmental record for a specific city from PostgreSQL
+ * 1. Validate city
+ * 2. Get its coordinates
+ * 3. Call Open-Meteo API
+ * 4. Process response & calculate AQI
+ * 5. Store reading in PostgreSQL (air_quality_records)
+ * 6. Return clean JSON to frontend
  */
 exports.getLatestCityRecord = async (req, res) => {
-  const cityName = req.params.city.trim();
+  const cityName = (req.params.city || '').trim();
+  const cityConfig = getCityConfig(cityName);
+
+  // 1. City validation
+  if (!cityConfig) {
+    return res.status(404).json({
+      success: false,
+      message: `Invalid city '${cityName}'. Supported cities: ${supportedCityNames.join(', ')}`
+    });
+  }
+
+  const standardCityName = cityConfig.name;
 
   try {
-    const sql = `
-      SELECT id, city, aqi, temperature, humidity, pm25, pm10, co, no2, so2, o3, wind_speed, pressure, recorded_at
-      FROM air_quality_records
-      WHERE LOWER(city) = LOWER($1)
-      ORDER BY recorded_at DESC
-      LIMIT 1;
-    `;
+    // 2 & 3. Call Open-Meteo external APIs with coordinates
+    console.log(`[Open-Meteo] Fetching live air quality & weather for ${standardCityName} (${cityConfig.latitude}, ${cityConfig.longitude})...`);
+    const liveData = await fetchRealEnvironmentalData(cityConfig.latitude, cityConfig.longitude);
 
-    const result = await db.query(sql, [cityName]);
+    // 4 & 5. Store fresh reading in PostgreSQL database table `air_quality_records`
+    try {
+      const insertSql = `
+        INSERT INTO air_quality_records 
+          (city, aqi, temperature, humidity, pm25, pm10, co, no2, so2, o3, wind_speed, pressure, recorded_at)
+        VALUES 
+          ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
+        RETURNING *;
+      `;
+      const insertParams = [
+        standardCityName,
+        liveData.aqi,
+        liveData.temperature,
+        liveData.humidity,
+        liveData.pm25,
+        liveData.pm10,
+        liveData.co,
+        liveData.no2,
+        liveData.so2,
+        liveData.o3,
+        liveData.windSpeed,
+        liveData.pressure,
+        liveData.recorded_at
+      ];
 
-    if (!result.rows || result.rows.length === 0) {
-      return res.status(404).json({
-        success: false,
-        message: `City '${cityName}' not found in database records. Available cities: ${SUPPORTED_CITIES.join(', ')}`
-      });
+      await db.query(insertSql, insertParams);
+      console.log(`[Database] Stored fresh Open-Meteo reading for ${standardCityName} (AQI: ${liveData.aqi})`);
+
+      // If database has historical hourly points from Open-Meteo and needs preloading
+      if (Array.isArray(liveData.recentHourly) && liveData.recentHourly.length > 0) {
+        const checkSql = `SELECT COUNT(*) as count FROM air_quality_records WHERE LOWER(city) = LOWER($1);`;
+        const countRes = await db.query(checkSql, [standardCityName]);
+        const existingCount = Number(countRes.rows[0]?.count || 0);
+
+        if (existingCount <= 1) {
+          // Preload recent hourly points so historical chart immediately has trend data
+          for (const hp of liveData.recentHourly) {
+            await db.query(insertSql, [
+              standardCityName,
+              hp.aqi,
+              hp.temperature,
+              hp.humidity,
+              hp.pm25,
+              hp.pm10,
+              liveData.co,
+              liveData.no2,
+              liveData.so2,
+              liveData.o3,
+              liveData.windSpeed,
+              liveData.pressure,
+              hp.recorded_at
+            ]);
+          }
+        }
+      }
+    } catch (dbErr) {
+      console.warn(`[Database] Could not persist reading to PostgreSQL:`, dbErr.message);
     }
 
-    const row = result.rows[0];
-
-    // Compute approximate CO2 baseline for display consistency
-    const estimatedCo2 = Math.round(Number(row.co) * 450 + 160);
-
-    const record = {
-      id: row.id,
-      city: row.city,
-      aqi: Number(row.aqi),
-      temperature: Number(row.temperature),
-      humidity: Number(row.humidity),
-      pm25: Number(row.pm25),
-      pm10: Number(row.pm10),
-      co: Number(row.co),
-      co2: estimatedCo2,
-      no2: Number(row.no2),
-      so2: Number(row.so2),
-      o3: Number(row.o3),
-      wind_speed: Number(row.wind_speed),
-      windSpeed: Number(row.wind_speed),
-      pressure: Number(row.pressure),
-      recorded_at: row.recorded_at,
+    // 6. Return clean, formatted response to React frontend
+    const responsePayload = {
+      city: standardCityName,
+      state: cityConfig.state,
+      aqi: liveData.aqi,
+      temperature: liveData.temperature,
+      humidity: liveData.humidity,
+      pm25: liveData.pm25,
+      pm10: liveData.pm10,
+      co: liveData.co,
+      co2: liveData.co2,
+      no2: liveData.no2,
+      so2: liveData.so2,
+      o3: liveData.o3,
+      windSpeed: liveData.windSpeed,
+      wind_speed: liveData.windSpeed,
+      pressure: liveData.pressure,
+      updatedAt: liveData.recorded_at,
+      recorded_at: liveData.recorded_at,
       lastUpdated: 'Just now',
-      source: db.isPostgresConnected() ? 'PostgreSQL Database' : 'PostgreSQL Schema Store (Local Fallback)'
+      isLive: true,
+      source: 'Open-Meteo Live API',
+      success: true,
+      dbConnected: db.isPostgresConnected()
     };
 
-    res.json({
-      ...record,
-      success: true,
-      data: record,
-      dbConnected: db.isPostgresConnected()
+    return res.json({
+      ...responsePayload,
+      data: responsePayload
     });
-  } catch (err) {
-    console.error(`Error querying latest record for ${cityName}:`, err);
-    res.status(500).json({
+
+  } catch (apiErr) {
+    console.error(`[Open-Meteo] External API error for ${standardCityName}:`, apiErr.message);
+
+    // Fallback: Query the latest saved record from PostgreSQL if external API fails
+    try {
+      const fallbackSql = `
+        SELECT id, city, aqi, temperature, humidity, pm25, pm10, co, no2, so2, o3, wind_speed, pressure, recorded_at
+        FROM air_quality_records
+        WHERE LOWER(city) = LOWER($1)
+        ORDER BY recorded_at DESC
+        LIMIT 1;
+      `;
+      const fallbackResult = await db.query(fallbackSql, [standardCityName]);
+
+      if (fallbackResult.rows && fallbackResult.rows.length > 0) {
+        const row = fallbackResult.rows[0];
+        const record = {
+          city: row.city,
+          state: cityConfig.state,
+          aqi: Number(row.aqi),
+          temperature: Number(row.temperature),
+          humidity: Number(row.humidity),
+          pm25: Number(row.pm25),
+          pm10: Number(row.pm10),
+          co: Number(row.co),
+          co2: Math.round(Number(row.co) * 450 + 160),
+          no2: Number(row.no2),
+          so2: Number(row.so2),
+          o3: Number(row.o3),
+          windSpeed: Number(row.wind_speed),
+          wind_speed: Number(row.wind_speed),
+          pressure: Number(row.pressure),
+          updatedAt: row.recorded_at,
+          recorded_at: row.recorded_at,
+          lastUpdated: 'Cached Database Record',
+          isLive: false,
+          isFallback: true,
+          warning: 'Live API temporarily unavailable. Displaying most recent stored record.',
+          source: 'PostgreSQL Stored Record',
+          success: true,
+          dbConnected: db.isPostgresConnected()
+        };
+
+        return res.json({
+          ...record,
+          data: record
+        });
+      }
+    } catch (cacheErr) {
+      console.error(`[Database] Fallback retrieval also failed:`, cacheErr.message);
+    }
+
+    // If both live API and database cache are unavailable
+    return res.status(503).json({
       success: false,
-      message: 'Database query failure while retrieving city telemetry',
-      error: err.message
+      message: 'Unable to fetch the latest environmental data. Please try again.',
+      error: apiErr.message
     });
   }
 };
 
 /**
  * GET /api/air-quality/:city/history
- * Returns historical AQI records for that city from PostgreSQL
+ * Returns historical AQI records from PostgreSQL database
  */
 exports.getCityHistory = async (req, res) => {
-  const cityName = req.params.city.trim();
+  const cityName = (req.params.city || '').trim();
+  const cityConfig = getCityConfig(cityName);
+
+  if (!cityConfig) {
+    return res.status(404).json({
+      success: false,
+      message: `Invalid city '${cityName}'`,
+      history: []
+    });
+  }
+
+  const standardCityName = cityConfig.name;
 
   try {
     const sql = `
@@ -110,21 +232,12 @@ exports.getCityHistory = async (req, res) => {
       ORDER BY recorded_at ASC;
     `;
 
-    const result = await db.query(sql, [cityName]);
+    const result = await db.query(sql, [standardCityName]);
 
-    if (!result.rows || result.rows.length === 0) {
-      return res.status(404).json({
-        success: false,
-        message: `No historical records found for '${cityName}'`,
-        history: []
-      });
-    }
-
-    // Format historical data points for Recharts trend line
-    const history = result.rows.map((row, index) => {
-      // Create readable standard hours if available (e.g., 8 AM, 10 AM, 12 PM, 2 PM, 4 PM, 6 PM)
+    // Format historical data points for Recharts trend chart
+    const history = (result.rows || []).map((row, index) => {
       const standardHours = ['8 AM', '10 AM', '12 PM', '2 PM', '4 PM', '6 PM'];
-      const displayTime = standardHours[index] || formatHour(row.recorded_at);
+      const displayTime = formatHour(row.recorded_at) || standardHours[index % standardHours.length];
 
       return {
         time: displayTime,
@@ -139,18 +252,19 @@ exports.getCityHistory = async (req, res) => {
 
     res.json({
       success: true,
-      city: cityName,
+      city: standardCityName,
       count: history.length,
       history,
-      trend: history, // Support both `history` and `trend` aliases
+      trend: history,
       dbConnected: db.isPostgresConnected()
     });
   } catch (err) {
-    console.error(`Error querying history for ${cityName}:`, err);
+    console.error(`Error querying history for ${standardCityName}:`, err);
     res.status(500).json({
       success: false,
       message: 'Database error fetching historical records',
-      error: err.message
+      error: err.message,
+      history: []
     });
   }
 };
