@@ -1,6 +1,19 @@
 import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { LogIn, Shield, User, Lock, Mail, ArrowRight, AlertCircle, Sparkles, CheckCircle2 } from 'lucide-react';
+import {
+  Wind,
+  LogIn,
+  Lock,
+  Mail,
+  ArrowRight,
+  AlertCircle,
+  Activity,
+  Droplets,
+  Thermometer,
+  Shield,
+  User,
+  Sparkles
+} from 'lucide-react';
 
 export default function LoginPage({ onNavigate }) {
   const { login } = useAuth();
@@ -8,7 +21,7 @@ export default function LoginPage({ onNavigate }) {
   const [password, setPassword] = useState('');
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [activeTab, setActiveTab] = useState('user'); // 'user' or 'admin' demo helper
+  const [showAdminDemo, setShowAdminDemo] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -21,7 +34,6 @@ export default function LoginPage({ onNavigate }) {
     try {
       setLoading(true);
       const res = await login(email, password);
-      // Navigate to respective dashboard
       if (res.user.role === 'ADMIN') {
         onNavigate('admin');
       } else {
@@ -34,314 +46,281 @@ export default function LoginPage({ onNavigate }) {
     }
   };
 
-  const handleDemoFill = (role) => {
+  const handleQuickFill = (role) => {
     setError(null);
     if (role === 'admin') {
       setEmail('admin@ecosense.gov');
       setPassword('admin123');
-      setActiveTab('admin');
     } else {
       setEmail('user@ecosense.org');
       setPassword('user123');
-      setActiveTab('user');
     }
   };
 
   return (
-    <div style={{
-      minHeight: '85vh',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      padding: '24px 16px'
-    }}>
-      <div style={{
-        maxWidth: '480px',
-        width: '100%',
-        background: 'rgba(23, 27, 38, 0.85)',
-        backdropFilter: 'blur(20px)',
-        border: '1px solid rgba(255, 255, 255, 0.08)',
-        borderRadius: '24px',
-        padding: '36px 32px',
-        boxShadow: '0 25px 60px -15px rgba(0, 0, 0, 0.7), 0 0 40px rgba(16, 185, 129, 0.1)',
-        position: 'relative',
-        overflow: 'hidden'
-      }}>
-        {/* Glow ambient background accent */}
-        <div style={{
-          position: 'absolute',
-          top: '-60px',
-          right: '-60px',
-          width: '180px',
-          height: '180px',
-          borderRadius: '50%',
-          background: 'radial-gradient(circle, rgba(16, 185, 129, 0.25) 0%, transparent 70%)',
-          pointerEvents: 'none'
-        }} />
-
-        {/* Brand Header */}
-        <div style={{ textAlign: 'center', marginBottom: '28px' }}>
-          <div style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            width: '56px',
-            height: '56px',
-            borderRadius: '16px',
-            background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.2), rgba(59, 130, 246, 0.2))',
-            border: '1px solid rgba(16, 185, 129, 0.4)',
-            marginBottom: '16px',
-            boxShadow: '0 8px 20px rgba(16, 185, 129, 0.25)'
-          }}>
-            <LogIn size={28} color="#10b981" />
+    <div className="auth-split-wrapper">
+      <div className="auth-split-container">
+        {/* ============================================================
+            LEFT PANEL: ATMOSPHERIC ENVIRONMENTAL VISUAL
+            ============================================================ */}
+        <div
+          className="auth-visual-panel"
+          style={{
+            backgroundImage: "url('/images/ecosense-login.jpg')"
+          }}
+          role="img"
+          aria-label="EcoSense Atmospheric Smart City Environment"
+        >
+          {/* Top Brand Tag */}
+          <div className="auth-visual-content">
+            <div className="auth-brand-badge">
+              <div className="auth-brand-icon-box">
+                <Wind size={16} />
+              </div>
+              <span style={{ fontSize: '0.85rem', fontWeight: 800, color: '#f8fafc', letterSpacing: '0.02em' }}>
+                EcoSense <span style={{ color: '#10b981', fontWeight: 600 }}>Intelligence</span>
+              </span>
+            </div>
           </div>
 
-          <h2 style={{
-            fontSize: '1.6rem',
-            fontWeight: 700,
-            color: '#f8fafc',
-            margin: '0 0 6px 0',
-            letterSpacing: '-0.02em'
-          }}>
-            Welcome Back
-          </h2>
-          <p style={{
-            fontSize: '0.9rem',
-            color: '#94a3b8',
-            margin: 0
-          }}>
-            Sign in to access your personalized EcoSense portal
-          </p>
-        </div>
+          {/* Central Environmental Statement & Floating Glass Telemetry */}
+          <div className="auth-visual-content" style={{ marginTop: 'auto', marginBottom: '12px' }}>
+            <h1 className="auth-hero-title">
+              Understand the air <span>around you.</span>
+            </h1>
+            <p className="auth-hero-desc">
+              Monitor air quality, environmental trends, pollution patterns, and real-time conditions across urban corridors.
+            </p>
 
-        {/* Quick Demo Pre-fill Bar */}
-        <div style={{
-          background: 'rgba(30, 41, 59, 0.6)',
-          border: '1px solid rgba(255, 255, 255, 0.06)',
-          borderRadius: '14px',
-          padding: '10px 12px',
-          marginBottom: '24px'
-        }}>
-          <div style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            marginBottom: '8px'
-          }}>
-            <span style={{ fontSize: '0.78rem', color: '#cbd5e1', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '6px' }}>
-              <Sparkles size={14} color="#f59e0b" /> Academic Review Quick Fill:
-            </span>
-          </div>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
-            <button
-              type="button"
-              onClick={() => handleDemoFill('user')}
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: '6px',
-                padding: '7px 10px',
-                borderRadius: '8px',
-                border: activeTab === 'user' ? '1px solid #10b981' : '1px solid rgba(255, 255, 255, 0.08)',
-                background: activeTab === 'user' ? 'rgba(16, 185, 129, 0.15)' : 'rgba(15, 23, 42, 0.5)',
-                color: activeTab === 'user' ? '#34d399' : '#94a3b8',
-                fontSize: '0.78rem',
-                fontWeight: 600,
-                cursor: 'pointer',
-                transition: 'all 0.2s'
-              }}
-            >
-              <User size={13} /> Citizen User
-            </button>
-            <button
-              type="button"
-              onClick={() => handleDemoFill('admin')}
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: '6px',
-                padding: '7px 10px',
-                borderRadius: '8px',
-                border: activeTab === 'admin' ? '1px solid #6366f1' : '1px solid rgba(255, 255, 255, 0.08)',
-                background: activeTab === 'admin' ? 'rgba(99, 102, 241, 0.15)' : 'rgba(15, 23, 42, 0.5)',
-                color: activeTab === 'admin' ? '#818cf8' : '#94a3b8',
-                fontSize: '0.78rem',
-                fontWeight: 600,
-                cursor: 'pointer',
-                transition: 'all 0.2s'
-              }}
-            >
-              <Shield size={13} /> Administrator
-            </button>
+            {/* Floating Glass Telemetry Badges */}
+            <div className="auth-telemetry-cluster">
+              {/* Card 1: Live Composite AQI */}
+              <div className="auth-glass-card">
+                <div className="auth-glass-metric-left">
+                  <div className="auth-glass-icon" style={{ background: 'rgba(234, 179, 8, 0.15)', border: '1px solid rgba(234, 179, 8, 0.3)' }}>
+                    <Activity size={18} color="#facc15" />
+                  </div>
+                  <div>
+                    <div style={{ fontSize: '0.72rem', color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                      Atmospheric Index
+                    </div>
+                    <div style={{ fontSize: '1.05rem', fontWeight: 800, color: '#ffffff' }}>
+                      AQI 72
+                    </div>
+                  </div>
+                </div>
+                <span style={{
+                  padding: '3px 9px',
+                  borderRadius: '6px',
+                  background: 'rgba(234, 179, 8, 0.18)',
+                  color: '#facc15',
+                  fontSize: '0.72rem',
+                  fontWeight: 700,
+                  letterSpacing: '0.04em'
+                }}>
+                  MODERATE
+                </span>
+              </div>
+
+              {/* Card 2: Fine Particulate Matter */}
+              <div className="auth-glass-card">
+                <div className="auth-glass-metric-left">
+                  <div className="auth-glass-icon" style={{ background: 'rgba(56, 189, 248, 0.15)', border: '1px solid rgba(56, 189, 248, 0.3)' }}>
+                    <Wind size={18} color="#38bdf8" />
+                  </div>
+                  <div>
+                    <div style={{ fontSize: '0.72rem', color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                      Particulate Matter
+                    </div>
+                    <div style={{ fontSize: '1.05rem', fontWeight: 800, color: '#ffffff' }}>
+                      PM2.5 31 <span style={{ fontSize: '0.75rem', fontWeight: 500, color: '#94a3b8' }}>µg/m³</span>
+                    </div>
+                  </div>
+                </div>
+                <span style={{
+                  padding: '3px 9px',
+                  borderRadius: '6px',
+                  background: 'rgba(56, 189, 248, 0.15)',
+                  color: '#38bdf8',
+                  fontSize: '0.72rem',
+                  fontWeight: 700
+                }}>
+                  CLEAN BURDEN
+                </span>
+              </div>
+
+              {/* Card 3: Ambient Weather Factors */}
+              <div className="auth-glass-card">
+                <div className="auth-glass-metric-left">
+                  <div className="auth-glass-icon" style={{ background: 'rgba(16, 185, 129, 0.15)', border: '1px solid rgba(16, 185, 129, 0.3)' }}>
+                    <Thermometer size={18} color="#34d399" />
+                  </div>
+                  <div>
+                    <div style={{ fontSize: '0.72rem', color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                      Micro-Climate
+                    </div>
+                    <div style={{ fontSize: '1.05rem', fontWeight: 800, color: '#ffffff' }}>
+                      28°C <span style={{ fontSize: '0.78rem', fontWeight: 500, color: '#94a3b8' }}>• 64% Humidity</span>
+                    </div>
+                  </div>
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '4px', color: '#34d399', fontSize: '0.75rem' }}>
+                  <Droplets size={13} /> Stable
+                </div>
+              </div>
+            </div>
           </div>
         </div>
 
-        {/* Error Alert */}
-        {error && (
-          <div style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '10px',
-            padding: '12px 14px',
-            background: 'rgba(239, 68, 68, 0.12)',
-            border: '1px solid rgba(239, 68, 68, 0.3)',
-            borderRadius: '12px',
-            color: '#fca5a5',
-            fontSize: '0.85rem',
-            marginBottom: '20px'
-          }}>
-            <AlertCircle size={18} style={{ flexShrink: 0 }} />
-            <span>{error}</span>
-          </div>
-        )}
-
-        {/* Form */}
-        <form onSubmit={handleSubmit}>
-          {/* Email */}
-          <div style={{ marginBottom: '18px' }}>
-            <label style={{
-              display: 'block',
-              fontSize: '0.82rem',
-              fontWeight: 500,
-              color: '#cbd5e1',
-              marginBottom: '6px'
-            }}>
-              Email Address
-            </label>
-            <div style={{ position: 'relative' }}>
+        {/* ============================================================
+            RIGHT PANEL: ACCESSIBLE AUTHENTICATION FORM
+            ============================================================ */}
+        <div className="auth-form-panel">
+          {/* Header */}
+          <div className="auth-form-header">
+            <div className="auth-form-brand-row">
               <div style={{
-                position: 'absolute',
-                left: '14px',
-                top: '50%',
-                transform: 'translateY(-50%)',
-                color: '#64748b'
+                width: '38px',
+                height: '38px',
+                borderRadius: '12px',
+                background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.2), rgba(56, 189, 248, 0.2))',
+                border: '1px solid rgba(16, 185, 129, 0.4)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: '#10b981'
               }}>
-                <Mail size={17} />
+                <LogIn size={20} />
               </div>
-              <input
-                type="email"
-                required
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="name@ecosense.gov"
-                style={{
-                  width: '100%',
-                  boxSizing: 'border-box',
-                  padding: '12px 14px 12px 42px',
-                  background: 'rgba(15, 23, 42, 0.65)',
-                  border: '1px solid rgba(255, 255, 255, 0.1)',
-                  borderRadius: '12px',
-                  color: '#f8fafc',
-                  fontSize: '0.9rem',
-                  outline: 'none',
-                  transition: 'border-color 0.2s'
-                }}
-              />
+              <span style={{ fontSize: '1.15rem', fontWeight: 800, color: '#f8fafc', letterSpacing: '0.02em' }}>
+                EcoSense
+              </span>
             </div>
+
+            <h2 className="auth-form-title">
+              Welcome back
+            </h2>
+            <p className="auth-form-subtitle">
+              Sign in to continue monitoring your environment.
+            </p>
           </div>
 
-          {/* Password */}
-          <div style={{ marginBottom: '24px' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
-              <label style={{
-                fontSize: '0.82rem',
-                fontWeight: 500,
-                color: '#cbd5e1'
-              }}>
-                Password
-              </label>
-            </div>
-            <div style={{ position: 'relative' }}>
-              <div style={{
-                position: 'absolute',
-                left: '14px',
-                top: '50%',
-                transform: 'translateY(-50%)',
-                color: '#64748b'
-              }}>
-                <Lock size={17} />
-              </div>
-              <input
-                type="password"
-                required
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="••••••••••••"
-                style={{
-                  width: '100%',
-                  boxSizing: 'border-box',
-                  padding: '12px 14px 12px 42px',
-                  background: 'rgba(15, 23, 42, 0.65)',
-                  border: '1px solid rgba(255, 255, 255, 0.1)',
-                  borderRadius: '12px',
-                  color: '#f8fafc',
-                  fontSize: '0.9rem',
-                  outline: 'none',
-                  transition: 'border-color 0.2s'
-                }}
-              />
-            </div>
-          </div>
-
-          {/* Submit Button */}
-          <button
-            type="submit"
-            disabled={loading}
-            style={{
-              width: '100%',
-              padding: '13px',
-              borderRadius: '12px',
-              background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
-              border: 'none',
-              color: '#ffffff',
-              fontSize: '0.95rem',
-              fontWeight: 600,
-              cursor: loading ? 'not-allowed' : 'pointer',
+          {/* Error Banner */}
+          {error && (
+            <div style={{
               display: 'flex',
               alignItems: 'center',
-              justifyContent: 'center',
-              gap: '8px',
-              boxShadow: '0 4px 16px rgba(16, 185, 129, 0.35)',
-              transition: 'transform 0.15s, opacity 0.2s',
-              opacity: loading ? 0.7 : 1
-            }}
-          >
-            {loading ? 'Authenticating...' : (
-              <>
-                <span>Sign In to Platform</span>
-                <ArrowRight size={17} />
-              </>
-            )}
-          </button>
-        </form>
+              gap: '10px',
+              padding: '12px 14px',
+              background: 'rgba(239, 68, 68, 0.12)',
+              border: '1px solid rgba(239, 68, 68, 0.3)',
+              borderRadius: '12px',
+              color: '#fca5a5',
+              fontSize: '0.85rem',
+              marginBottom: '20px'
+            }}>
+              <AlertCircle size={18} style={{ flexShrink: 0 }} />
+              <span>{error}</span>
+            </div>
+          )}
 
-        {/* Navigation to Register */}
-        <div style={{
-          marginTop: '24px',
-          textAlign: 'center',
-          borderTop: '1px solid rgba(255, 255, 255, 0.08)',
-          paddingTop: '18px'
-        }}>
-          <p style={{ fontSize: '0.86rem', color: '#94a3b8', margin: 0 }}>
-            Don't have an EcoSense account?{' '}
+          {/* Form */}
+          <form onSubmit={handleSubmit} noValidate>
+            {/* Email Field */}
+            <div className="auth-input-group">
+              <label htmlFor="login-email" className="auth-label">
+                Email Address
+              </label>
+              <div className="auth-input-wrapper">
+                <div className="auth-input-icon">
+                  <Mail size={17} />
+                </div>
+                <input
+                  id="login-email"
+                  type="email"
+                  required
+                  autoComplete="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="name@ecosense.gov"
+                  className="auth-input"
+                />
+              </div>
+            </div>
+
+            {/* Password Field */}
+            <div className="auth-input-group">
+              <label htmlFor="login-password" className="auth-label">
+                Password
+              </label>
+              <div className="auth-input-wrapper">
+                <div className="auth-input-icon">
+                  <Lock size={17} />
+                </div>
+                <input
+                  id="login-password"
+                  type="password"
+                  required
+                  autoComplete="current-password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="••••••••••••"
+                  className="auth-input"
+                />
+              </div>
+            </div>
+
+            {/* Submit Button */}
+            <button
+              type="submit"
+              disabled={loading}
+              className="auth-submit-btn"
+            >
+              {loading ? 'Authenticating...' : (
+                <>
+                  <span>Sign In</span>
+                  <ArrowRight size={17} />
+                </>
+              )}
+            </button>
+          </form>
+
+          {/* Subtle Demo Quick Fill Bar & Admin Access Trigger */}
+          <div className="auth-subtle-tools">
+            <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+              <Sparkles size={12} color="#f59e0b" /> Academic Quick Fill:
+            </span>
+            <div style={{ display: 'flex', gap: '6px' }}>
+              <button
+                type="button"
+                onClick={() => handleQuickFill('user')}
+                className="auth-subtle-link"
+                title="Pre-fill Citizen Observer credentials"
+              >
+                <User size={12} /> Citizen
+              </button>
+              <button
+                type="button"
+                onClick={() => handleQuickFill('admin')}
+                className="auth-subtle-link"
+                title="Pre-fill Administrator credentials"
+              >
+                <Shield size={12} /> Admin
+              </button>
+            </div>
+          </div>
+
+          {/* Navigation to Register */}
+          <div className="auth-bottom-nav">
+            Don't have an account?{' '}
             <button
               type="button"
               onClick={() => onNavigate('register')}
-              style={{
-                background: 'none',
-                border: 'none',
-                color: '#34d399',
-                fontWeight: 600,
-                cursor: 'pointer',
-                padding: 0,
-                textDecoration: 'underline'
-              }}
+              className="auth-switch-link"
             >
-              Create Account
+              Create account
             </button>
-          </p>
+          </div>
         </div>
       </div>
     </div>

@@ -1,6 +1,17 @@
 import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { UserPlus, User, Lock, Mail, ArrowRight, AlertCircle, CheckCircle2, ShieldCheck } from 'lucide-react';
+import {
+  Wind,
+  UserPlus,
+  User,
+  Lock,
+  Mail,
+  ArrowRight,
+  AlertCircle,
+  Activity,
+  ShieldCheck,
+  CheckCircle2
+} from 'lucide-react';
 
 export default function RegisterPage({ onNavigate }) {
   const { register } = useAuth();
@@ -50,322 +61,260 @@ export default function RegisterPage({ onNavigate }) {
   };
 
   return (
-    <div style={{
-      minHeight: '85vh',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      padding: '24px 16px'
-    }}>
-      <div style={{
-        maxWidth: '500px',
-        width: '100%',
-        background: 'rgba(23, 27, 38, 0.85)',
-        backdropFilter: 'blur(20px)',
-        border: '1px solid rgba(255, 255, 255, 0.08)',
-        borderRadius: '24px',
-        padding: '36px 32px',
-        boxShadow: '0 25px 60px -15px rgba(0, 0, 0, 0.7), 0 0 40px rgba(59, 130, 246, 0.1)',
-        position: 'relative',
-        overflow: 'hidden'
-      }}>
-        {/* Glow ambient background accent */}
-        <div style={{
-          position: 'absolute',
-          top: '-60px',
-          left: '-60px',
-          width: '180px',
-          height: '180px',
-          borderRadius: '50%',
-          background: 'radial-gradient(circle, rgba(59, 130, 246, 0.25) 0%, transparent 70%)',
-          pointerEvents: 'none'
-        }} />
-
-        {/* Brand Header */}
-        <div style={{ textAlign: 'center', marginBottom: '28px' }}>
-          <div style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            width: '56px',
-            height: '56px',
-            borderRadius: '16px',
-            background: 'linear-gradient(135deg, rgba(59, 130, 246, 0.2), rgba(16, 185, 129, 0.2))',
-            border: '1px solid rgba(59, 130, 246, 0.4)',
-            marginBottom: '16px',
-            boxShadow: '0 8px 20px rgba(59, 130, 246, 0.25)'
-          }}>
-            <UserPlus size={28} color="#60a5fa" />
+    <div className="auth-split-wrapper">
+      <div className="auth-split-container">
+        {/* ============================================================
+            LEFT PANEL: ATMOSPHERIC ENVIRONMENTAL VISUAL
+            ============================================================ */}
+        <div
+          className="auth-visual-panel"
+          style={{
+            backgroundImage: "url('/images/ecosense-login.jpg')"
+          }}
+          role="img"
+          aria-label="EcoSense Atmospheric Smart City Environment"
+        >
+          {/* Top Brand Tag */}
+          <div className="auth-visual-content">
+            <div className="auth-brand-badge">
+              <div className="auth-brand-icon-box">
+                <Wind size={16} />
+              </div>
+              <span style={{ fontSize: '0.85rem', fontWeight: 800, color: '#f8fafc', letterSpacing: '0.02em' }}>
+                EcoSense <span style={{ color: '#10b981', fontWeight: 600 }}>Citizen Portal</span>
+              </span>
+            </div>
           </div>
 
-          <h2 style={{
-            fontSize: '1.6rem',
-            fontWeight: 700,
-            color: '#f8fafc',
-            margin: '0 0 6px 0',
-            letterSpacing: '-0.02em'
-          }}>
-            Create Your Account
-          </h2>
-          <p style={{
-            fontSize: '0.9rem',
-            color: '#94a3b8',
-            margin: 0
-          }}>
-            Join EcoSense to track your air quality and configure alerts
-          </p>
+          {/* Central Environmental Statement & Floating Glass Telemetry */}
+          <div className="auth-visual-content" style={{ marginTop: 'auto', marginBottom: '12px' }}>
+            <h1 className="auth-hero-title">
+              Start understanding <span>your environment.</span>
+            </h1>
+            <p className="auth-hero-desc">
+              Join observers, researchers, and citizens tracking real-time air quality, micro-climates, and pollution trends.
+            </p>
+
+            {/* Floating Glass Badges */}
+            <div className="auth-telemetry-cluster">
+              {/* Card 1: Citizen Observer Benefits */}
+              <div className="auth-glass-card">
+                <div className="auth-glass-metric-left">
+                  <div className="auth-glass-icon" style={{ background: 'rgba(16, 185, 129, 0.15)', border: '1px solid rgba(16, 185, 129, 0.3)' }}>
+                    <ShieldCheck size={18} color="#34d399" />
+                  </div>
+                  <div>
+                    <div style={{ fontSize: '0.72rem', color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                      Personalized Protection
+                    </div>
+                    <div style={{ fontSize: '0.98rem', fontWeight: 700, color: '#ffffff' }}>
+                      Custom AQI Alert Thresholds
+                    </div>
+                  </div>
+                </div>
+                <CheckCircle2 size={16} color="#34d399" />
+              </div>
+
+              {/* Card 2: Favorite Stations */}
+              <div className="auth-glass-card">
+                <div className="auth-glass-metric-left">
+                  <div className="auth-glass-icon" style={{ background: 'rgba(56, 189, 248, 0.15)', border: '1px solid rgba(56, 189, 248, 0.3)' }}>
+                    <Activity size={18} color="#38bdf8" />
+                  </div>
+                  <div>
+                    <div style={{ fontSize: '0.72rem', color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                      Station Monitoring
+                    </div>
+                    <div style={{ fontSize: '0.98rem', fontWeight: 700, color: '#ffffff' }}>
+                      Pin Custom Cities & Trends
+                    </div>
+                  </div>
+                </div>
+                <span style={{ fontSize: '0.72rem', color: '#38bdf8', fontWeight: 600 }}>
+                  5 CITIES
+                </span>
+              </div>
+            </div>
+          </div>
         </div>
 
-        {/* Error Alert */}
-        {error && (
-          <div style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '10px',
-            padding: '12px 14px',
-            background: 'rgba(239, 68, 68, 0.12)',
-            border: '1px solid rgba(239, 68, 68, 0.3)',
-            borderRadius: '12px',
-            color: '#fca5a5',
-            fontSize: '0.85rem',
-            marginBottom: '20px'
-          }}>
-            <AlertCircle size={18} style={{ flexShrink: 0 }} />
-            <span>{error}</span>
-          </div>
-        )}
-
-        {/* Form */}
-        <form onSubmit={handleSubmit}>
-          {/* Full Name */}
-          <div style={{ marginBottom: '16px' }}>
-            <label style={{
-              display: 'block',
-              fontSize: '0.82rem',
-              fontWeight: 500,
-              color: '#cbd5e1',
-              marginBottom: '6px'
-            }}>
-              Full Name
-            </label>
-            <div style={{ position: 'relative' }}>
+        {/* ============================================================
+            RIGHT PANEL: REGISTRATION FORM
+            ============================================================ */}
+        <div className="auth-form-panel">
+          {/* Header */}
+          <div className="auth-form-header">
+            <div className="auth-form-brand-row">
               <div style={{
-                position: 'absolute',
-                left: '14px',
-                top: '50%',
-                transform: 'translateY(-50%)',
-                color: '#64748b'
+                width: '38px',
+                height: '38px',
+                borderRadius: '12px',
+                background: 'linear-gradient(135deg, rgba(56, 189, 248, 0.2), rgba(16, 185, 129, 0.2))',
+                border: '1px solid rgba(56, 189, 248, 0.4)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: '#38bdf8'
               }}>
-                <User size={17} />
+                <UserPlus size={20} />
               </div>
-              <input
-                type="text"
-                name="name"
-                required
-                value={formData.name}
-                onChange={handleChange}
-                placeholder="Dr. Samantha Rao"
-                style={{
-                  width: '100%',
-                  boxSizing: 'border-box',
-                  padding: '12px 14px 12px 42px',
-                  background: 'rgba(15, 23, 42, 0.65)',
-                  border: '1px solid rgba(255, 255, 255, 0.1)',
-                  borderRadius: '12px',
-                  color: '#f8fafc',
-                  fontSize: '0.9rem',
-                  outline: 'none'
-                }}
-              />
+              <span style={{ fontSize: '1.15rem', fontWeight: 800, color: '#f8fafc', letterSpacing: '0.02em' }}>
+                EcoSense
+              </span>
             </div>
+
+            <h2 className="auth-form-title">
+              Create your account
+            </h2>
+            <p className="auth-form-subtitle">
+              Join EcoSense to configure personal environmental alerts.
+            </p>
           </div>
 
-          {/* Email */}
-          <div style={{ marginBottom: '16px' }}>
-            <label style={{
-              display: 'block',
-              fontSize: '0.82rem',
-              fontWeight: 500,
-              color: '#cbd5e1',
-              marginBottom: '6px'
-            }}>
-              Email Address
-            </label>
-            <div style={{ position: 'relative' }}>
-              <div style={{
-                position: 'absolute',
-                left: '14px',
-                top: '50%',
-                transform: 'translateY(-50%)',
-                color: '#64748b'
-              }}>
-                <Mail size={17} />
-              </div>
-              <input
-                type="email"
-                name="email"
-                required
-                value={formData.email}
-                onChange={handleChange}
-                placeholder="user@ecosense.org"
-                style={{
-                  width: '100%',
-                  boxSizing: 'border-box',
-                  padding: '12px 14px 12px 42px',
-                  background: 'rgba(15, 23, 42, 0.65)',
-                  border: '1px solid rgba(255, 255, 255, 0.1)',
-                  borderRadius: '12px',
-                  color: '#f8fafc',
-                  fontSize: '0.9rem',
-                  outline: 'none'
-                }}
-              />
-            </div>
-          </div>
-
-          {/* Password */}
-          <div style={{ marginBottom: '16px' }}>
-            <label style={{
-              display: 'block',
-              fontSize: '0.82rem',
-              fontWeight: 500,
-              color: '#cbd5e1',
-              marginBottom: '6px'
-            }}>
-              Password (min. 6 characters)
-            </label>
-            <div style={{ position: 'relative' }}>
-              <div style={{
-                position: 'absolute',
-                left: '14px',
-                top: '50%',
-                transform: 'translateY(-50%)',
-                color: '#64748b'
-              }}>
-                <Lock size={17} />
-              </div>
-              <input
-                type="password"
-                name="password"
-                required
-                value={formData.password}
-                onChange={handleChange}
-                placeholder="••••••••••••"
-                style={{
-                  width: '100%',
-                  boxSizing: 'border-box',
-                  padding: '12px 14px 12px 42px',
-                  background: 'rgba(15, 23, 42, 0.65)',
-                  border: '1px solid rgba(255, 255, 255, 0.1)',
-                  borderRadius: '12px',
-                  color: '#f8fafc',
-                  fontSize: '0.9rem',
-                  outline: 'none'
-                }}
-              />
-            </div>
-          </div>
-
-          {/* Confirm Password */}
-          <div style={{ marginBottom: '24px' }}>
-            <label style={{
-              display: 'block',
-              fontSize: '0.82rem',
-              fontWeight: 500,
-              color: '#cbd5e1',
-              marginBottom: '6px'
-            }}>
-              Confirm Password
-            </label>
-            <div style={{ position: 'relative' }}>
-              <div style={{
-                position: 'absolute',
-                left: '14px',
-                top: '50%',
-                transform: 'translateY(-50%)',
-                color: '#64748b'
-              }}>
-                <ShieldCheck size={17} />
-              </div>
-              <input
-                type="password"
-                name="confirmPassword"
-                required
-                value={formData.confirmPassword}
-                onChange={handleChange}
-                placeholder="••••••••••••"
-                style={{
-                  width: '100%',
-                  boxSizing: 'border-box',
-                  padding: '12px 14px 12px 42px',
-                  background: 'rgba(15, 23, 42, 0.65)',
-                  border: '1px solid rgba(255, 255, 255, 0.1)',
-                  borderRadius: '12px',
-                  color: '#f8fafc',
-                  fontSize: '0.9rem',
-                  outline: 'none'
-                }}
-              />
-            </div>
-          </div>
-
-          {/* Submit Button */}
-          <button
-            type="submit"
-            disabled={loading}
-            style={{
-              width: '100%',
-              padding: '13px',
-              borderRadius: '12px',
-              background: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)',
-              border: 'none',
-              color: '#ffffff',
-              fontSize: '0.95rem',
-              fontWeight: 600,
-              cursor: loading ? 'not-allowed' : 'pointer',
+          {/* Error Banner */}
+          {error && (
+            <div style={{
               display: 'flex',
               alignItems: 'center',
-              justifyContent: 'center',
-              gap: '8px',
-              boxShadow: '0 4px 16px rgba(59, 130, 246, 0.35)',
-              transition: 'transform 0.15s, opacity 0.2s',
-              opacity: loading ? 0.7 : 1
-            }}
-          >
-            {loading ? 'Creating Account...' : (
-              <>
-                <span>Create EcoSense Account</span>
-                <ArrowRight size={17} />
-              </>
-            )}
-          </button>
-        </form>
+              gap: '10px',
+              padding: '12px 14px',
+              background: 'rgba(239, 68, 68, 0.12)',
+              border: '1px solid rgba(239, 68, 68, 0.3)',
+              borderRadius: '12px',
+              color: '#fca5a5',
+              fontSize: '0.85rem',
+              marginBottom: '20px'
+            }}>
+              <AlertCircle size={18} style={{ flexShrink: 0 }} />
+              <span>{error}</span>
+            </div>
+          )}
 
-        {/* Navigation to Login */}
-        <div style={{
-          marginTop: '24px',
-          textAlign: 'center',
-          borderTop: '1px solid rgba(255, 255, 255, 0.08)',
-          paddingTop: '18px'
-        }}>
-          <p style={{ fontSize: '0.86rem', color: '#94a3b8', margin: 0 }}>
+          {/* Form */}
+          <form onSubmit={handleSubmit} noValidate>
+            {/* Full Name */}
+            <div className="auth-input-group">
+              <label htmlFor="reg-name" className="auth-label">
+                Full Name
+              </label>
+              <div className="auth-input-wrapper">
+                <div className="auth-input-icon">
+                  <User size={17} />
+                </div>
+                <input
+                  id="reg-name"
+                  type="text"
+                  name="name"
+                  required
+                  autoComplete="name"
+                  value={formData.name}
+                  onChange={handleChange}
+                  placeholder="Dr. Samantha Rao"
+                  className="auth-input"
+                />
+              </div>
+            </div>
+
+            {/* Email Field */}
+            <div className="auth-input-group">
+              <label htmlFor="reg-email" className="auth-label">
+                Email Address
+              </label>
+              <div className="auth-input-wrapper">
+                <div className="auth-input-icon">
+                  <Mail size={17} />
+                </div>
+                <input
+                  id="reg-email"
+                  type="email"
+                  name="email"
+                  required
+                  autoComplete="email"
+                  value={formData.email}
+                  onChange={handleChange}
+                  placeholder="user@ecosense.org"
+                  className="auth-input"
+                />
+              </div>
+            </div>
+
+            {/* Password Field */}
+            <div className="auth-input-group">
+              <label htmlFor="reg-password" className="auth-label">
+                Password (min. 6 characters)
+              </label>
+              <div className="auth-input-wrapper">
+                <div className="auth-input-icon">
+                  <Lock size={17} />
+                </div>
+                <input
+                  id="reg-password"
+                  type="password"
+                  name="password"
+                  required
+                  autoComplete="new-password"
+                  value={formData.password}
+                  onChange={handleChange}
+                  placeholder="••••••••••••"
+                  className="auth-input"
+                />
+              </div>
+            </div>
+
+            {/* Confirm Password Field */}
+            <div className="auth-input-group">
+              <label htmlFor="reg-confirm" className="auth-label">
+                Confirm Password
+              </label>
+              <div className="auth-input-wrapper">
+                <div className="auth-input-icon">
+                  <ShieldCheck size={17} />
+                </div>
+                <input
+                  id="reg-confirm"
+                  type="password"
+                  name="confirmPassword"
+                  required
+                  autoComplete="new-password"
+                  value={formData.confirmPassword}
+                  onChange={handleChange}
+                  placeholder="••••••••••••"
+                  className="auth-input"
+                />
+              </div>
+            </div>
+
+            {/* Submit Button */}
+            <button
+              type="submit"
+              disabled={loading}
+              className="auth-submit-btn"
+              style={{
+                background: 'linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%)',
+                borderColor: 'rgba(56, 189, 248, 0.3)',
+                boxShadow: '0 6px 20px -3px rgba(14, 165, 233, 0.35)'
+              }}
+            >
+              {loading ? 'Creating Account...' : (
+                <>
+                  <span>Create Account</span>
+                  <ArrowRight size={17} />
+                </>
+              )}
+            </button>
+          </form>
+
+          {/* Navigation to Login */}
+          <div className="auth-bottom-nav">
             Already have an account?{' '}
             <button
               type="button"
               onClick={() => onNavigate('login')}
-              style={{
-                background: 'none',
-                border: 'none',
-                color: '#60a5fa',
-                fontWeight: 600,
-                cursor: 'pointer',
-                padding: 0,
-                textDecoration: 'underline'
-              }}
+              className="auth-switch-link"
             >
-              Sign In
+              Sign in
             </button>
-          </p>
+          </div>
         </div>
       </div>
     </div>
