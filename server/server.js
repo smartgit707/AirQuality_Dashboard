@@ -2,6 +2,9 @@ require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const airQualityRoutes = require('./routes/airQuality');
+const authRoutes = require('./routes/auth');
+const userRoutes = require('./routes/user');
+const adminRoutes = require('./routes/admin');
 const airQualityController = require('./controllers/airQualityController');
 const { startDataCollector } = require('./jobs/dataCollector');
 const db = require('./db');
@@ -20,6 +23,9 @@ app.use((req, res, next) => {
 });
 
 // Mount EcoSense API routes
+app.use('/api/auth', authRoutes);
+app.use('/api/user', userRoutes);
+app.use('/api/admin', adminRoutes);
 app.use('/api', airQualityRoutes);
 
 // Health check endpoint

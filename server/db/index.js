@@ -84,6 +84,65 @@ const fallbackAlerts = [
   { id: 5, city: 'Chennai', severity: 'INFO', metric: 'Humidity', value: 68.0, message: 'Coastal humidity peak detected with stable wind circulation.', created_at: new Date(Date.now() - 240 * 60 * 1000), is_read: true }
 ];
 
+// Fallback users dataset (pre-seeded with bcrypt hashes)
+const fallbackUsers = [
+  {
+    id: 1,
+    name: 'System Administrator',
+    email: 'admin@ecosense.gov',
+    password_hash: '$2b$10$d.XyCpMMXuyRtlFrAMIeleVUUYDKo03/5B0esxtUO7NLy2vmSNjz2', // admin123
+    role: 'ADMIN',
+    is_active: true,
+    created_at: new Date(Date.now() - 30 * 24 * 3600 * 1000),
+    updated_at: new Date()
+  },
+  {
+    id: 2,
+    name: 'Citizen Observer',
+    email: 'user@ecosense.org',
+    password_hash: '$2b$10$efaoM93xBbKZMwW//2HvkuNg8ZNXWpEohJfLEKZ.ukrpcFZyN8xmm', // user123
+    role: 'USER',
+    is_active: true,
+    created_at: new Date(Date.now() - 15 * 24 * 3600 * 1000),
+    updated_at: new Date()
+  }
+];
+
+// Fallback user preferences
+const fallbackPreferences = [
+  {
+    id: 1,
+    user_id: 1,
+    default_city: 'Delhi',
+    alert_aqi_threshold: 150,
+    email_notifications: true,
+    push_notifications: true,
+    updated_at: new Date()
+  },
+  {
+    id: 2,
+    user_id: 2,
+    default_city: 'Chennai',
+    alert_aqi_threshold: 100,
+    email_notifications: true,
+    push_notifications: false,
+    updated_at: new Date()
+  }
+];
+
+// Fallback favorite cities
+const fallbackFavorites = [
+  { id: 1, user_id: 1, city: 'Delhi', added_at: new Date() },
+  { id: 2, user_id: 1, city: 'Mumbai', added_at: new Date() },
+  { id: 3, user_id: 2, city: 'Chennai', added_at: new Date() },
+  { id: 4, user_id: 2, city: 'Bengaluru', added_at: new Date() }
+];
+
+// Fallback audit logs
+const fallbackAuditLogs = [
+  { id: 1, user_id: 1, action: 'AUTH_INIT', details: 'System security initialized', ip_address: '127.0.0.1', created_at: new Date() }
+];
+
 /**
  * Execute query with automatic fallback
  */
@@ -98,17 +157,244 @@ async function query(text, params = []) {
   }
 
   // If PostgreSQL is not connected, simulate SQL query on fallback schema records
-  const normalized = text.toLowerCase().replace(/\s+/g, ' ');
+  const normalized = text.toLowerCase().replace(/\s+/g, ' ').trim();
   
-  // 1. SELECT COUNT(*) ...
+  // 1. COUNT QUERIES
   if (normalized.includes('count(*)')) {
+    if (normalized.includes('users')) {
+      return { rows: [{ count: fallbackUsers.length }], rowCount: 1 };
+    }
     if (normalized.includes('alerts')) {
       return { rows: [{ count: fallbackAlerts.length }], rowCount: 1 };
     }
     return { rows: [{ count: fallbackRecords.length }], rowCount: 1 };
   }
 
-  // 2. ALERTS QUERIES
+  // 2. USERS QUERIES
+  // SELECT ... FROM users WHERE email = $1
+  if (normalized.includes('from users') && normalized.includes('where email =')) {
+    const emailToFind = (params[0] || '').toLowerCase().trim();
+    const user = fallbackUsers.find(u => u.email.toLowerCase() === emailToFind);
+    return {
+      rows: user ? [{ ...user }] : [],
+      rowCount: user ? 1 : 0
+    };
+  }
+
+  // SELECT ... FROM users WHERE id = $1
+  if (normalized.includes('from users') && normalized.includes('where id =')) {
+    const idToFind = parseInt(params[0], 10);
+    const user = fallbackUsers.find(u => u.id === idToFind);
+    return {
+      rows: user ? [{ ...user }] : [],
+      rowCount: user ? 1 : 0
+    };
+  }
+
+  // SELECT ... FROM users (list all users)
+  if (normalized.includes('from users')) {
+    const userList = fallbackUsers.map(u => ({
+      id: u.id,
+      name: u.name,
+      email: u.email,
+      role: u.role,
+      is_active: u.is_active,
+      created_at: u.created_at,
+      updated_at: u.updated_at
+    })).sort((a, b) => b.id - a.id);
+    return {
+      rows: userList,
+      rowCount: userList.length
+    };
+  }
+
+  // INSERT INTO users
+  if (normalized.startsWith('insert into users')) {
+    const [name, email, password_hash, role] = params;
+    const newUser = {
+      id: fallbackUsers.length + 1,
+      name,
+      email: email.toLowerCase().trim(),
+      password_hash,
+      role: role || 'USER',
+      is_active: true,
+      created_at: new Date(),
+      updated_at: new Date()
+    };
+    fallbackUsers.push(newUser);
+    // Also create default preferences
+    fallbackPreferences.push({
+      id: fallbackPreferences.length + 1,
+      user_id: newUser.id,
+      default_city: 'Chennai',
+      alert_aqi_threshold: 100,
+      email_notifications: true,
+      push_notifications: false,
+      updated_at: new Date()
+    });
+    return {
+      rows: [{
+        id: newUser.id,
+        name: newUser.name,
+        email: newUser.email,
+        role: newUser.role,
+        is_active: newUser.is_active,
+        created_at: newUser.created_at
+      }],
+      rowCount: 1
+    };
+  }
+
+  // UPDATE users
+  if (normalized.startsWith('update users')) {
+    if (normalized.includes('set password_hash =')) {
+      const [newHash, userId] = params;
+      const user = fallbackUsers.find(u => u.id === parseInt(userId, 10));
+      if (user) {
+        user.password_hash = newHash;
+        user.updated_at = new Date();
+        return { rows: [user], rowCount: 1 };
+      }
+    } else if (normalized.includes('set name =')) {
+      const [name, userId] = params;
+      const user = fallbackUsers.find(u => u.id === parseInt(userId, 10));
+      if (user) {
+        user.name = name;
+        user.updated_at = new Date();
+        return { rows: [{ id: user.id, name: user.name, email: user.email, role: user.role }], rowCount: 1 };
+      }
+    } else if (normalized.includes('set role =')) {
+      const [role, userId] = params;
+      const user = fallbackUsers.find(u => u.id === parseInt(userId, 10));
+      if (user) {
+        user.role = role;
+        user.updated_at = new Date();
+        return { rows: [{ id: user.id, name: user.name, email: user.email, role: user.role }], rowCount: 1 };
+      }
+    } else if (normalized.includes('is_active = not is_active') || normalized.includes('is_active =')) {
+      const userId = parseInt(params[0], 10);
+      const user = fallbackUsers.find(u => u.id === userId);
+      if (user) {
+        user.is_active = !user.is_active;
+        user.updated_at = new Date();
+        return { rows: [user], rowCount: 1 };
+      }
+    }
+    return { rows: [], rowCount: 0 };
+  }
+
+  // DELETE FROM users WHERE id = $1
+  if (normalized.startsWith('delete from users')) {
+    const userId = parseInt(params[0], 10);
+    const index = fallbackUsers.findIndex(u => u.id === userId);
+    if (index !== -1) {
+      fallbackUsers.splice(index, 1);
+      return { rows: [], rowCount: 1 };
+    }
+    return { rows: [], rowCount: 0 };
+  }
+
+  // 3. USER PREFERENCES QUERIES
+  // SELECT FROM user_preferences WHERE user_id = $1
+  if (normalized.includes('from user_preferences') && normalized.includes('where user_id =')) {
+    const userId = parseInt(params[0], 10);
+    const pref = fallbackPreferences.find(p => p.user_id === userId);
+    return {
+      rows: pref ? [{ ...pref }] : [],
+      rowCount: pref ? 1 : 0
+    };
+  }
+
+  // INSERT INTO / UPDATE user_preferences
+  if (normalized.startsWith('insert into user_preferences') || normalized.startsWith('update user_preferences')) {
+    const [userId, defaultCity, threshold, emailNotif, pushNotif] = params;
+    const uId = parseInt(userId, 10);
+    let pref = fallbackPreferences.find(p => p.user_id === uId);
+    if (pref) {
+      if (defaultCity !== undefined) pref.default_city = defaultCity;
+      if (threshold !== undefined) pref.alert_aqi_threshold = Number(threshold);
+      if (emailNotif !== undefined) pref.email_notifications = Boolean(emailNotif);
+      if (pushNotif !== undefined) pref.push_notifications = Boolean(pushNotif);
+      pref.updated_at = new Date();
+    } else {
+      pref = {
+        id: fallbackPreferences.length + 1,
+        user_id: uId,
+        default_city: defaultCity || 'Chennai',
+        alert_aqi_threshold: Number(threshold) || 100,
+        email_notifications: emailNotif !== undefined ? Boolean(emailNotif) : true,
+        push_notifications: pushNotif !== undefined ? Boolean(pushNotif) : false,
+        updated_at: new Date()
+      };
+      fallbackPreferences.push(pref);
+    }
+    return { rows: [pref], rowCount: 1 };
+  }
+
+  // 4. FAVORITE CITIES QUERIES
+  // SELECT FROM favorite_cities WHERE user_id = $1
+  if (normalized.includes('from favorite_cities') && normalized.includes('where user_id =')) {
+    const userId = parseInt(params[0], 10);
+    const favs = fallbackFavorites.filter(f => f.user_id === userId);
+    return {
+      rows: favs,
+      rowCount: favs.length
+    };
+  }
+
+  // INSERT INTO favorite_cities
+  if (normalized.startsWith('insert into favorite_cities')) {
+    const [userId, city] = params;
+    const uId = parseInt(userId, 10);
+    const exists = fallbackFavorites.find(f => f.user_id === uId && f.city.toLowerCase() === city.toLowerCase());
+    if (exists) {
+      return { rows: [exists], rowCount: 1 };
+    }
+    const newFav = {
+      id: fallbackFavorites.length + 1,
+      user_id: uId,
+      city,
+      added_at: new Date()
+    };
+    fallbackFavorites.push(newFav);
+    return { rows: [newFav], rowCount: 1 };
+  }
+
+  // DELETE FROM favorite_cities WHERE user_id = $1 AND city = $2
+  if (normalized.startsWith('delete from favorite_cities')) {
+    const [userId, city] = params;
+    const uId = parseInt(userId, 10);
+    const idx = fallbackFavorites.findIndex(f => f.user_id === uId && f.city.toLowerCase() === city.toLowerCase());
+    if (idx !== -1) {
+      fallbackFavorites.splice(idx, 1);
+      return { rows: [], rowCount: 1 };
+    }
+    return { rows: [], rowCount: 0 };
+  }
+
+  // 5. AUDIT LOGS
+  if (normalized.startsWith('insert into audit_logs')) {
+    const [userId, action, details, ip] = params;
+    const newLog = {
+      id: fallbackAuditLogs.length + 1,
+      user_id: userId ? parseInt(userId, 10) : null,
+      action: action || 'ACTION',
+      details: details || '',
+      ip_address: ip || '127.0.0.1',
+      created_at: new Date()
+    };
+    fallbackAuditLogs.unshift(newLog);
+    return { rows: [newLog], rowCount: 1 };
+  }
+
+  if (normalized.includes('from audit_logs')) {
+    return {
+      rows: fallbackAuditLogs.slice(0, 50),
+      rowCount: fallbackAuditLogs.length
+    };
+  }
+
+  // 6. ALERTS QUERIES
   if (normalized.includes('from alerts')) {
     if (normalized.includes('order by created_at desc')) {
       return {
@@ -147,7 +433,7 @@ async function query(text, params = []) {
     return { rows: [newAlert], rowCount: 1 };
   }
 
-  // 3. SELECT * ... ORDER BY recorded_at DESC LIMIT 1 (get latest city record)
+  // 7. SELECT * ... ORDER BY recorded_at DESC LIMIT 1 (get latest city record)
   if (normalized.includes('order by recorded_at desc limit 1') || normalized.includes('desc limit 1')) {
     const cityName = (params[0] || '').toLowerCase();
     const cityRecords = fallbackRecords
@@ -160,7 +446,7 @@ async function query(text, params = []) {
     };
   }
 
-  // 4. SELECT ... ORDER BY recorded_at ASC / DESC (get historical records)
+  // 8. SELECT ... ORDER BY recorded_at ASC / DESC (get historical records)
   if (normalized.includes('order by recorded_at')) {
     const cityName = (params[0] || '').toLowerCase();
     let cityRecords = fallbackRecords;
@@ -181,7 +467,7 @@ async function query(text, params = []) {
     };
   }
 
-  // 5. INSERT INTO air_quality_records ...
+  // 9. INSERT INTO air_quality_records ...
   if (normalized.startsWith('insert into air_quality_records')) {
     const [city, aqi, temperature, humidity, pm25, pm10, co, no2, so2, o3, wind_speed, pressure, recorded_at] = params;
     const newRecord = {
@@ -222,7 +508,8 @@ module.exports = {
   isPostgresConnected: () => isPostgresConnected,
   getFallbackStats: () => ({
     totalRecords: fallbackRecords.length,
-    totalAlerts: fallbackAlerts.length
+    totalAlerts: fallbackAlerts.length,
+    totalUsers: fallbackUsers.length
   })
 };
 

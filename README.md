@@ -179,6 +179,8 @@ cd AirQuality_Dashboard
 Inside `server/.env`:
 ```env
 PORT=5001
+JWT_SECRET=ecosense_jwt_secure_key_2026_capstone_demo
+JWT_EXPIRES_IN=7d
 DATABASE_HOST=localhost
 DATABASE_PORT=5432
 DATABASE_NAME=air_quality_db
@@ -216,23 +218,97 @@ npm run dev
 
 ---
 
-## 9. Faculty Viva / Demo Script Walkthrough
+## 9. User & Admin Authentication & RBAC
 
-During your evaluation or project review, showcase the complete workflow in this order:
+EcoSense implements a complete native authentication and Role-Based Access Control (RBAC) architecture without third-party platforms:
 
-1. **Overview Dashboard**: Demonstrate city switching (Delhi $\leftrightarrow$ Bengaluru). Show how AQI, Health Score, Pollutants, and Weather update dynamically.
-2. **Environmental Health Score**: Explain the 60/25/15 rule-based calculation and how it gives citizens a clear wellness rating.
-3. **Live Pollution Map**: Click the **Map** tab. Point out the Leaflet GIS layer with color-coded AQI severity badges and click a city popup to navigate directly to its details.
-4. **Multi-City Comparison**: Open **Compare**. Select 3 or 4 cities (Delhi, Bengaluru, Mumbai, Chennai). Show automated winner badges and overlaid Recharts curves.
-5. **Analytics**: Open **Analytics**. Switch between parameters (PM2.5, Humidity) and time horizons (24h, 7d, 30d) to show min/max/average stats.
-6. **24-Hour Forecast**: Open **Forecast**. Explain the diurnal atmospheric curve and highlight the non-clinical estimation disclaimer.
-7. **Smart Alerts**: Open **Alerts**. Filter by CRITICAL/WARNING, demonstrate the interactive "Mark Read" feature.
-8. **Printable Dossier**: Open **Reports**. Show the formal academic layout and click **Print / Save PDF**.
-9. **System Status**: Open **System**. Show live API gateway uptime, PostgreSQL connectivity, total stored records, and the background collector sync interval.
+### Roles & Access Control:
+* **`USER` (Citizen Observer)**:
+  * Personal Portal (`/dashboard` / `user-dashboard`): Pin favorite cities, view station telemetry, personalized threshold alerts.
+  * My Station (`/my-environment`): Dedicated environmental readout for primary locality.
+  * Preferences & Settings (`/settings`): Alert AQI threshold slider, email/push toggles, name, and password update.
+* **`ADMIN` (Platform Administrator)**:
+  * Admin Console (`/admin`): Live platform KPI metrics, collector worker status, database record counters.
+  * User Management (`/admin/users`): Inspect all registered accounts, activate/deactivate accounts, promote/demote roles.
+  * Monitored Stations (`/admin/cities`): Sensor station health, GPS coordinates, gateway sync state, manual refresh.
+  * Advisory Broadcast (`/admin/alerts`): Dispatch manual emergency alerts and environmental advisories.
+  * Database Inspector (`/admin/data`): Query raw `air_quality_records` table with city/limit filters and CSV export.
+  * Infrastructure Diagnostics (`/admin/system`): Hardware CPU load, RSS memory usage, host uptime, security audit trail.
+
+### Security Highlights:
+* **Password Hashing**: Pure `bcryptjs` (salt rounds: 10). Stored as `password_hash`, never in plain text, stripped from all responses.
+* **Token Authentication**: Signed JSON Web Tokens (`jsonwebtoken`) transmitted in `Authorization: Bearer <token>` headers.
+* **RBAC Gate**: Strict `requireAdmin` backend verification returning `403 Forbidden` if unauthorized roles attempt to access admin endpoints.
+
+### Seed Review Credentials:
+| Role | Email | Password | Pre-configured Settings |
+|---|---|---|---|
+| **Administrator** | `admin@ecosense.gov` | `admin123` | Full privileges, Station: Delhi, Threshold: 150 AQI |
+| **Citizen User** | `user@ecosense.org` | `user123` | Citizen Observer, Station: Chennai, Threshold: 100 AQI |
+
+*(One-click demo buttons are available on the Sign In page for rapid faculty testing).*
 
 ---
 
-## 10. Future Improvements
+## 10. Complete API Reference
+
+| Endpoint | Method | Access | Purpose |
+|---|---|---|---|
+| `/api/auth/register` | `POST` | Public | Create new citizen account |
+| `/api/auth/login` | `POST` | Public | Authenticate user & return JWT |
+| `/api/auth/me` | `GET` | Authenticated | Retrieve current user profile & preferences |
+| `/api/auth/profile` | `PUT` | Authenticated | Update user display name |
+| `/api/auth/change-password` | `PUT` | Authenticated | Update account password |
+| `/api/user/preferences` | `GET`, `PUT` | Authenticated | Manage threshold and notification toggles |
+| `/api/user/favorites` | `GET`, `POST` | Authenticated | View and pin monitored favorite cities |
+| `/api/user/favorites/:city` | `DELETE` | Authenticated | Unpin a favorite city |
+| `/api/user/alerts` | `GET` | Authenticated | Retrieve personalized threshold alerts |
+| `/api/admin/users` | `GET` | Admin Only | View full user registry |
+| `/api/admin/users/:id/toggle-status`| `PATCH` | Admin Only | Activate or deactivate an account |
+| `/api/admin/users/:id/role` | `PATCH` | Admin Only | Change user role between USER and ADMIN |
+| `/api/admin/users/:id` | `DELETE` | Admin Only | Permanently delete user |
+| `/api/admin/cities` | `GET` | Admin Only | Real-time station telemetry health |
+| `/api/admin/alerts/broadcast` | `POST` | Admin Only | Dispatch platform-wide advisory |
+| `/api/admin/data` | `GET` | Admin Only | Query raw PostgreSQL database records |
+| `/api/admin/system` | `GET` | Admin Only | System diagnostics and audit event trail |
+| `/api/air-quality/:city` | `GET` | Public | Latest city telemetry & health score |
+| `/api/air-quality/:city/history`| `GET` | Public | 24-hour historical readings |
+| `/api/comparison` | `GET` | Public | Multi-city comparison matrix |
+| `/api/analytics/:city` | `GET` | Public | Parameter trends across 24h, 7d, 30d |
+| `/api/forecast/:city` | `GET` | Public | 24-hour diurnal AQI forecast |
+| `/api/alerts` | `GET` | Public | Global active alert feed |
+| `/api/recommendations/:city` | `GET` | Public | Health and outdoor activity advisories |
+| `/api/system/status` | `GET` | Public | Public infrastructure uptime and status |
+
+---
+
+## 11. Faculty Viva / Demo Script Walkthrough
+
+During your evaluation or project review, showcase the complete workflow in this order:
+
+1. **Public Environmental Monitoring**:
+   * Demonstrate city switching on the **Overview** dashboard. Show how AQI, Health Score, Pollutants, and Weather update dynamically.
+   * Open the **Map** tab and point out the Leaflet GIS layer with color-coded markers.
+   * Open **Compare** and select 3 or 4 cities to show automated winner detection and overlaid curves.
+2. **Citizen Registration & Login**:
+   * Click **Sign In** in the top navigation.
+   * Click the **Citizen User** Quick Fill button (`user@ecosense.org` / `user123`) and log in.
+   * Point out the user welcome banner, primary station card, and **Monitored Favorite Cities** grid.
+   * Add a new favorite city (e.g., Mumbai) using the dropdown and show it appear immediately.
+   * Open **My Station** (`/my-environment`) to show the dedicated micro-station view with outdoor recommendations.
+   * Open **Settings** (`/settings`) and adjust the **Alert AQI Threshold** slider to show preferences persistence.
+3. **Admin Console & Role-Based Access Control**:
+   * Click **Sign Out** and log in using the **Administrator** Quick Fill button (`admin@ecosense.gov` / `admin123`).
+   * Show that the **Admin Console** tab appears exclusively for Administrators.
+   * In **User Management**, search accounts, toggle active status, and demonstrate role elevation.
+   * In **Advisory Broadcast**, dispatch a manual alert for Delhi with CRITICAL severity.
+   * In **Database Inspector**, filter records by city and click **Export CSV**.
+   * In **Infrastructure & Logs**, explain the real-time Security Audit Trail, Node memory metrics, and background worker status.
+   * Show that a regular user attempting to access `/admin` is stopped with a **403 Forbidden** security barrier.
+
+---
+
+## 12. Future Improvements
 
 * Mobile companion application with push notification capabilities.
 * Ingestion from IoT hardware sensor nodes (ESP32/Arduino via MQTT/WebSockets).

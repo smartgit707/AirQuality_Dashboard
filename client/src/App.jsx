@@ -9,9 +9,27 @@ import AlertsPage from './pages/AlertsPage';
 import TrendsPage from './pages/TrendsPage';
 import ReportsPage from './pages/ReportsPage';
 import SystemStatusPage from './pages/SystemStatusPage';
+
+// Auth & User Portal Pages
+import LoginPage from './pages/LoginPage';
+import RegisterPage from './pages/RegisterPage';
+import UserDashboard from './pages/UserDashboard';
+import MyEnvironmentPage from './pages/MyEnvironmentPage';
+import SettingsPage from './pages/SettingsPage';
+
+// Admin Portal Pages
+import AdminDashboard from './pages/admin/AdminDashboard';
+import AdminUsersPage from './pages/admin/AdminUsersPage';
+import AdminCitiesPage from './pages/admin/AdminCitiesPage';
+import AdminAlertsPage from './pages/admin/AdminAlertsPage';
+import AdminDataPage from './pages/admin/AdminDataPage';
+import AdminSystemPage from './pages/admin/AdminSystemPage';
+
+import { useAuth } from './context/AuthContext';
 import { fetchCityLatest, fetchCityHistory, refreshCityTelemetry } from './services/api';
 
 export default function App() {
+  const { user, isAuthenticated, isAdmin } = useAuth();
   const [viewMode, setViewMode] = useState('dashboard');
   const [selectedCity, setSelectedCity] = useState('Delhi');
   const [dashboardData, setDashboardData] = useState(null);
@@ -61,7 +79,7 @@ export default function App() {
 
   // Handle location dropdown change
   const handleCityChange = (newCity) => {
-    if (loading) return; // Prevent duplicate requests
+    if (loading) return;
     setSelectedCity(newCity);
     loadCityData(newCity, false);
   };
@@ -77,6 +95,107 @@ export default function App() {
     setSelectedCity(targetCity);
     loadCityData(targetCity, false);
     setViewMode('dashboard');
+  };
+
+  // Route Guarding Helper
+  const renderCurrentView = () => {
+    // 1. Authentication Pages
+    if (viewMode === 'login') {
+      return <LoginPage onNavigate={setViewMode} />;
+    }
+    if (viewMode === 'register') {
+      return <RegisterPage onNavigate={setViewMode} />;
+    }
+
+    // 2. User Protected Views
+    if (viewMode === 'user-dashboard') {
+      if (!isAuthenticated) return <LoginPage onNavigate={setViewMode} />;
+      return <UserDashboard onNavigate={setViewMode} onSelectCity={handleCityChange} />;
+    }
+    if (viewMode === 'my-environment') {
+      if (!isAuthenticated) return <LoginPage onNavigate={setViewMode} />;
+      return <MyEnvironmentPage onNavigate={setViewMode} />;
+    }
+    if (viewMode === 'settings') {
+      if (!isAuthenticated) return <LoginPage onNavigate={setViewMode} />;
+      return <SettingsPage />;
+    }
+
+    // 3. Admin Protected Views
+    if (viewMode.startsWith('admin')) {
+      if (!isAuthenticated) return <LoginPage onNavigate={setViewMode} />;
+      if (!isAdmin) {
+        return (
+          <div style={{ textAlign: 'center', padding: '80px 20px', color: '#f8fafc' }}>
+            <h2 style={{ fontSize: '1.8rem', color: '#ef4444', marginBottom: '10px' }}>403 — Unauthorized Access</h2>
+            <p style={{ color: '#94a3b8', maxWidth: '480px', margin: '0 auto 24px auto' }}>
+              Administrative privileges are required to view this console. Your current role is <strong>{user?.role}</strong>.
+            </p>
+            <button
+              onClick={() => setViewMode('dashboard')}
+              style={{
+                background: '#3b82f6',
+                color: '#fff',
+                border: 'none',
+                padding: '10px 20px',
+                borderRadius: '10px',
+                cursor: 'pointer',
+                fontWeight: 600
+              }}
+            >
+              Return to Public Dashboard
+            </button>
+          </div>
+        );
+      }
+
+      if (viewMode === 'admin') return <AdminDashboard onNavigateAdmin={setViewMode} />;
+      if (viewMode === 'admin-users') return <AdminUsersPage onBack={() => setViewMode('admin')} />;
+      if (viewMode === 'admin-cities') return <AdminCitiesPage onBack={() => setViewMode('admin')} />;
+      if (viewMode === 'admin-alerts') return <AdminAlertsPage onBack={() => setViewMode('admin')} />;
+      if (viewMode === 'admin-data') return <AdminDataPage onBack={() => setViewMode('admin')} />;
+      if (viewMode === 'admin-system') return <AdminSystemPage onBack={() => setViewMode('admin')} />;
+    }
+
+    // 4. Public Environmental Views
+    if (viewMode === 'map') {
+      return <MapPage onSelectCityForDashboard={handleSelectCityFromMap} />;
+    }
+    if (viewMode === 'analytics') {
+      return <AnalyticsPage defaultCity={selectedCity} />;
+    }
+    if (viewMode === 'compare') {
+      return <ComparePage />;
+    }
+    if (viewMode === 'forecast') {
+      return <ForecastPage defaultCity={selectedCity} />;
+    }
+    if (viewMode === 'alerts') {
+      return <AlertsPage />;
+    }
+    if (viewMode === 'trends') {
+      return <TrendsPage defaultCity={selectedCity} />;
+    }
+    if (viewMode === 'reports') {
+      return <ReportsPage defaultCity={selectedCity} />;
+    }
+    if (viewMode === 'system') {
+      return <SystemStatusPage />;
+    }
+
+    // Default Overview
+    return (
+      <Dashboard 
+        data={dashboardData}
+        historyData={historyData}
+        currentCity={selectedCity}
+        loading={loading}
+        error={error}
+        isApiConnected={isApiConnected}
+        isDbConnected={isDbConnected}
+        onRetry={handleRefresh}
+      />
+    );
   };
 
   return (
@@ -95,50 +214,7 @@ export default function App() {
 
       {/* Main View Router */}
       <main className="main-content-area">
-        {viewMode === 'dashboard' && (
-          <Dashboard 
-            data={dashboardData}
-            historyData={historyData}
-            currentCity={selectedCity}
-            loading={loading}
-            error={error}
-            isApiConnected={isApiConnected}
-            isDbConnected={isDbConnected}
-            onRetry={handleRefresh}
-          />
-        )}
-
-        {viewMode === 'map' && (
-          <MapPage onSelectCityForDashboard={handleSelectCityFromMap} />
-        )}
-
-        {viewMode === 'analytics' && (
-          <AnalyticsPage defaultCity={selectedCity} />
-        )}
-
-        {viewMode === 'compare' && (
-          <ComparePage />
-        )}
-
-        {viewMode === 'forecast' && (
-          <ForecastPage defaultCity={selectedCity} />
-        )}
-
-        {viewMode === 'alerts' && (
-          <AlertsPage />
-        )}
-
-        {viewMode === 'trends' && (
-          <TrendsPage defaultCity={selectedCity} />
-        )}
-
-        {viewMode === 'reports' && (
-          <ReportsPage defaultCity={selectedCity} />
-        )}
-
-        {viewMode === 'system' && (
-          <SystemStatusPage />
-        )}
+        {renderCurrentView()}
       </main>
 
       {/* Presentation Footer */}

@@ -115,3 +115,81 @@ VALUES
     ('Hyderabad', 'INFO', 'AQI', 88.0, 'Moderate air quality prevailing. Atmospheric parameters remain within expected bounds.', NOW() - INTERVAL '3 hours', true),
     ('Chennai', 'INFO', 'Humidity', 68.0, 'Coastal humidity peak detected with stable wind circulation.', NOW() - INTERVAL '4 hours', true);
 
+-- ==============================================================================
+-- 4. User Authentication & Role-Based Access Control (RBAC) Tables
+-- ==============================================================================
+DROP TABLE IF EXISTS audit_logs CASCADE;
+DROP TABLE IF EXISTS favorite_cities CASCADE;
+DROP TABLE IF EXISTS user_preferences CASCADE;
+DROP TABLE IF EXISTS users CASCADE;
+
+-- Users Table
+CREATE TABLE users (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(120) NOT NULL,
+    email VARCHAR(255) UNIQUE NOT NULL,
+    password_hash VARCHAR(255) NOT NULL,
+    role VARCHAR(20) NOT NULL DEFAULT 'USER' CHECK (role IN ('USER', 'ADMIN')),
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX idx_users_email ON users(email);
+
+-- User Preferences Table
+CREATE TABLE user_preferences (
+    id SERIAL PRIMARY KEY,
+    user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    default_city VARCHAR(100) DEFAULT 'Hyderabad',
+    aqi_threshold INTEGER DEFAULT 100 CHECK (aqi_threshold >= 20),
+    notifications_enabled BOOLEAN DEFAULT TRUE,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT uq_user_preferences_user UNIQUE (user_id)
+);
+
+-- Favorite Cities Table
+CREATE TABLE favorite_cities (
+    id SERIAL PRIMARY KEY,
+    user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    city VARCHAR(100) NOT NULL,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT uq_user_favorite_city UNIQUE (user_id, city)
+);
+
+CREATE INDEX idx_favorite_cities_user ON favorite_cities(user_id);
+
+-- Audit Logs Table
+CREATE TABLE audit_logs (
+    id SERIAL PRIMARY KEY,
+    user_id INTEGER REFERENCES users(id) ON DELETE SET NULL,
+    action VARCHAR(100) NOT NULL,
+    metadata TEXT,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Initial Seed Accounts
+-- Passwords:
+-- Admin: admin@ecosense.gov / admin123
+-- User:  user@ecosense.org / user123
+INSERT INTO users (id, name, email, password_hash, role)
+VALUES
+    (1, 'EcoSense Administrator', 'admin@ecosense.gov', '$2b$10$d.XyCpMMXuyRtlFrAMIeleVUUYDKo03/5B0esxtUO7NLy2vmSNjz2', 'ADMIN'),
+    (2, 'Dr. Sarah Mitchell', 'user@ecosense.org', '$2b$10$efaoM93xBbKZMwW//2HvkuNg8ZNXWpEohJfLEKZ.ukrpcFZyN8xmm', 'USER');
+
+SELECT setval('users_id_seq', 2);
+
+-- Seed Preferences
+INSERT INTO user_preferences (user_id, default_city, aqi_threshold, notifications_enabled)
+VALUES
+    (1, 'Delhi', 120, true),
+    (2, 'Hyderabad', 90, true);
+
+-- Seed Favorite Cities for User 2
+INSERT INTO favorite_cities (user_id, city)
+VALUES
+    (2, 'Hyderabad'),
+    (2, 'Bengaluru'),
+    (2, 'Chennai');
+
+

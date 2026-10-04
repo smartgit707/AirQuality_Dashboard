@@ -5,21 +5,52 @@
 
 const BACKEND_BASE_URL = 'http://localhost:5001';
 
+// Token storage helpers
+export function getAuthToken() {
+  return localStorage.getItem('ecosense_token');
+}
+
+export function setAuthToken(token) {
+  if (token) {
+    localStorage.setItem('ecosense_token', token);
+  } else {
+    localStorage.removeItem('ecosense_token');
+  }
+}
+
 async function request(endpoint, options = {}) {
   let response;
   const fullUrl = `${BACKEND_BASE_URL}${endpoint}`;
+  
+  const headers = {
+    'Content-Type': 'application/json',
+    ...(options.headers || {})
+  };
+
+  const token = getAuthToken();
+  if (token && !headers['Authorization']) {
+    headers['Authorization'] = `Bearer ${token}`;
+  }
+
+  const fetchOptions = {
+    ...options,
+    headers
+  };
+
   try {
-    response = await fetch(fullUrl, options);
+    response = await fetch(fullUrl, fetchOptions);
   } catch (err) {
     // Relative fallback if proxied or served together
-    response = await fetch(endpoint, options);
+    response = await fetch(endpoint, fetchOptions);
   }
 
   if (!response.ok) {
     let errMessage = `Error ${response.status}: Request failed`;
     try {
       const errJson = await response.json();
-      if (errJson && errJson.message) errMessage = errJson.message;
+      if (errJson && (errJson.error || errJson.message)) {
+        errMessage = errJson.error || errJson.message;
+      }
     } catch (_) {}
     const error = new Error(errMessage);
     error.status = response.status;
@@ -124,3 +155,135 @@ export async function fetchSystemStatus() {
 export async function fetchHealth() {
   return await request('/api/health');
 }
+
+/**
+ * ============================================================
+ * AUTHENTICATION API
+ * ============================================================
+ */
+export async function apiLogin(email, password) {
+  const res = await request('/api/auth/login', {
+    method: 'POST',
+    body: JSON.stringify({ email, password })
+  });
+  if (res.token) setAuthToken(res.token);
+  return res;
+}
+
+export async function apiRegister(userData) {
+  const res = await request('/api/auth/register', {
+    method: 'POST',
+    body: JSON.stringify(userData)
+  });
+  if (res.token) setAuthToken(res.token);
+  return res;
+}
+
+export async function apiGetMe() {
+  return await request('/api/auth/me');
+}
+
+export async function apiUpdateProfile(data) {
+  return await request('/api/auth/profile', {
+    method: 'PUT',
+    body: JSON.stringify(data)
+  });
+}
+
+export async function apiChangePassword(data) {
+  return await request('/api/auth/change-password', {
+    method: 'PUT',
+    body: JSON.stringify(data)
+  });
+}
+
+export function apiLogout() {
+  setAuthToken(null);
+}
+
+/**
+ * ============================================================
+ * USER DASHBOARD & PREFERENCES API
+ * ============================================================
+ */
+export async function apiGetUserPreferences() {
+  return await request('/api/user/preferences');
+}
+
+export async function apiUpdateUserPreferences(preferences) {
+  return await request('/api/user/preferences', {
+    method: 'PUT',
+    body: JSON.stringify(preferences)
+  });
+}
+
+export async function apiGetUserFavorites() {
+  return await request('/api/user/favorites');
+}
+
+export async function apiAddUserFavorite(city) {
+  return await request('/api/user/favorites', {
+    method: 'POST',
+    body: JSON.stringify({ city })
+  });
+}
+
+export async function apiRemoveUserFavorite(city) {
+  const encoded = encodeURIComponent(city.trim());
+  return await request(`/api/user/favorites/${encoded}`, {
+    method: 'DELETE'
+  });
+}
+
+export async function apiGetUserAlerts() {
+  return await request('/api/user/alerts');
+}
+
+/**
+ * ============================================================
+ * ADMIN PORTAL API
+ * ============================================================
+ */
+export async function apiGetAdminUsers() {
+  return await request('/api/admin/users');
+}
+
+export async function apiToggleUserStatus(userId) {
+  return await request(`/api/admin/users/${userId}/toggle-status`, {
+    method: 'PATCH'
+  });
+}
+
+export async function apiChangeUserRole(userId, role) {
+  return await request(`/api/admin/users/${userId}/role`, {
+    method: 'PATCH',
+    body: JSON.stringify({ role })
+  });
+}
+
+export async function apiDeleteUser(userId) {
+  return await request(`/api/admin/users/${userId}`, {
+    method: 'DELETE'
+  });
+}
+
+export async function apiGetAdminCities() {
+  return await request('/api/admin/cities');
+}
+
+export async function apiBroadcastAlert(alertData) {
+  return await request('/api/admin/alerts/broadcast', {
+    method: 'POST',
+    body: JSON.stringify(alertData)
+  });
+}
+
+export async function apiGetAdminHistoricalData(city = 'all', limit = 50) {
+  const encoded = encodeURIComponent(city);
+  return await request(`/api/admin/data?city=${encoded}&limit=${limit}`);
+}
+
+export async function apiGetAdminSystemMetrics() {
+  return await request('/api/admin/system');
+}
+
