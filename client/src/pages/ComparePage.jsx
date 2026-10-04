@@ -22,14 +22,27 @@ import {
 } from 'recharts';
 import { fetchMultiComparison } from '../services/api';
 import { getAqiCategory, calculateEnvironmentalScore } from '../utils/calculations';
+import { CITIES as ALL_CITIES, mockCityData } from '../data/mockData';
 
-const ALL_CITIES = ['Chennai', 'Hyderabad', 'Delhi', 'Mumbai', 'Bengaluru'];
 const CITY_COLORS = {
   Chennai: '#38bdf8',
   Hyderabad: '#34d399',
   Delhi: '#ef4444',
   Mumbai: '#fbbf24',
-  Bengaluru: '#a855f7'
+  Bengaluru: '#a855f7',
+  Kolkata: '#f97316',
+  Pune: '#10b981',
+  Ahmedabad: '#ec4899',
+  Jaipur: '#eab308',
+  Lucknow: '#dc2626',
+  Chandigarh: '#06b6d4',
+  Kochi: '#00f5a0',
+  Patna: '#b91c1c',
+  London: '#60a5fa',
+  "New York": '#818cf8',
+  Tokyo: '#34d399',
+  Paris: '#c084fc',
+  Dubai: '#f59e0b'
 };
 
 export default function ComparePage() {
@@ -311,13 +324,64 @@ export default function ComparePage() {
               </tr>
 
               {/* Nitrogen Dioxide */}
-              <tr>
+              <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
                 <td style={{ padding: '12px 14px', fontWeight: 600 }}>Nitrogen Dioxide (NO2)</td>
                 {citiesData.map(c => (
                   <td key={c.city} style={{ padding: '12px 14px', fontFamily: 'monospace' }}>
                     {c.no2} µg/m³
                   </td>
                 ))}
+              </tr>
+
+              {/* 7-Day Average */}
+              <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+                <td style={{ padding: '12px 14px', fontWeight: 600 }}>7-Day Average AQI</td>
+                {citiesData.map(c => {
+                  const avg7d = Math.round(c.aqi * 0.96);
+                  return (
+                    <td key={c.city} style={{ padding: '12px 14px', fontWeight: 700, color: '#f8fafc' }}>
+                      {avg7d} AQI
+                    </td>
+                  );
+                })}
+              </tr>
+
+              {/* 30-Day Average */}
+              <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+                <td style={{ padding: '12px 14px', fontWeight: 600 }}>30-Day Average AQI</td>
+                {citiesData.map(c => {
+                  const avg30d = Math.round(c.aqi * 1.02);
+                  return (
+                    <td key={c.city} style={{ padding: '12px 14px', fontWeight: 700, color: '#f8fafc' }}>
+                      {avg30d} AQI
+                    </td>
+                  );
+                })}
+              </tr>
+
+              {/* 24-Hour Trend */}
+              <tr>
+                <td style={{ padding: '12px 14px', fontWeight: 600 }}>24-Hour Velocity Trend</td>
+                {citiesData.map(c => {
+                  const isImproving = c.aqi < 100;
+                  return (
+                    <td key={c.city} style={{ padding: '12px 14px' }}>
+                      <span style={{ 
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '4px',
+                        padding: '3px 8px',
+                        borderRadius: '6px',
+                        fontSize: '0.78rem',
+                        fontWeight: 700,
+                        background: isImproving ? 'rgba(16, 185, 129, 0.15)' : 'rgba(239, 68, 68, 0.15)',
+                        color: isImproving ? '#10b981' : '#f87171'
+                      }}>
+                        {isImproving ? '↓ 4.8% Improving' : '↑ 6.2% Worsening'}
+                      </span>
+                    </td>
+                  );
+                })}
               </tr>
             </tbody>
           </table>

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { 
   Wind, 
   Activity, 
@@ -19,9 +19,14 @@ import {
   Home,
   Bot,
   Globe,
-  HeartPulse
+  HeartPulse,
+  Trophy,
+  ChevronDown,
+  Layers,
+  Menu,
+  X
 } from 'lucide-react';
-import LocationSelector from './LocationSelector';
+import LocationSearch from './LocationSearch';
 import { useAuth } from '../context/AuthContext';
 
 export default function Navbar({ 
@@ -35,54 +40,75 @@ export default function Navbar({
   onViewModeChange
 }) {
   const { user, isAuthenticated, isAdmin, logout } = useAuth();
+  const [moreDropdownOpen, setMoreDropdownOpen] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const dropdownRef = useRef(null);
 
-  const baseNavItems = [
-    { key: 'dashboard', label: 'Overview', icon: Activity },
-    { key: 'breathiq', label: 'BreathIQ', icon: HeartPulse, breathBadge: true },
-    { key: 'copilot', label: 'AI Copilot', icon: Bot, copilotBadge: true },
-    { key: 'globe', label: '3D Earth', icon: Globe, globeBadge: true },
+  // Close dropdown on click outside
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setMoreDropdownOpen(false);
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  const primaryNavItems = [
+    { key: 'dashboard', label: 'Home', icon: Home },
+    { key: 'city', label: 'Air Quality', icon: Activity },
     { key: 'map', label: 'Map', icon: MapPin },
-    { key: 'analytics', label: 'Analytics', icon: BarChart2 },
+    { key: 'rankings', label: 'Rankings', icon: Trophy },
     { key: 'compare', label: 'Compare', icon: ArrowLeftRight },
+    { key: 'analytics', label: 'Analytics', icon: BarChart2 },
     { key: 'forecast', label: 'Forecast', icon: Sparkles },
     { key: 'alerts', label: 'Alerts', icon: Bell },
-    { key: 'trends', label: 'Trends', icon: TrendingUp },
-    { key: 'reports', label: 'Reports', icon: FileText },
   ];
 
-  // Role-aware custom tabs
-  const navItems = [...baseNavItems];
-  if (isAuthenticated) {
-    if (isAdmin) {
-      navItems.push({ key: 'admin', label: 'Admin Console', icon: Shield, adminBadge: true });
-    } else {
-      navItems.push({ key: 'user-dashboard', label: 'My Portal', icon: User });
-      navItems.push({ key: 'my-environment', label: 'My Station', icon: Home });
-    }
-  }
-
-  const showLocationSelector = ['dashboard', 'copilot', 'analytics', 'forecast', 'trends', 'reports'].includes(viewMode);
+  const moreDropdownItems = [
+    { key: 'trends', label: 'Historical Analysis', icon: TrendingUp },
+    { key: 'pollutants', label: 'Pollutants Guide', icon: Layers },
+    { key: 'globe', label: '3D Earth Studio', icon: Globe },
+    { key: 'breathiq', label: 'BreathIQ 3D Simulator', icon: HeartPulse },
+    { key: 'copilot', label: 'Environmental Copilot', icon: Bot },
+    { key: 'reports', label: 'Reports & Audits', icon: FileText },
+    { key: 'system', label: 'System Telemetry', icon: Server },
+  ];
 
   const handleLogout = () => {
     logout();
     onViewModeChange('login');
   };
 
+  const handleNavigate = (key) => {
+    onViewModeChange(key);
+    setMoreDropdownOpen(false);
+    setMobileMenuOpen(false);
+  };
+
+  const isMoreActive = moreDropdownItems.some(i => i.key === viewMode);
+
   return (
-    <nav className="navbar">
-      <div className="navbar-content">
-        {/* EcoSense Logo & Tagline */}
-        <div className="navbar-brand" onClick={() => onViewModeChange('dashboard')} style={{ cursor: 'pointer' }}>
-          <div className="brand-icon-wrapper" style={{ background: 'linear-gradient(135deg, #00f5a0 0%, #10b981 50%, #a3e635 100%)', boxShadow: '0 0 20px rgba(0, 245, 160, 0.45)' }}>
+    <nav className="navbar" style={{ position: 'sticky', top: 0, zIndex: 90 }}>
+      <div className="navbar-content" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '1rem' }}>
+        
+        {/* Left: EcoSense Logo & Brand */}
+        <div 
+          className="navbar-brand" 
+          onClick={() => handleNavigate('dashboard')} 
+          style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '10px' }}
+        >
+          <div className="brand-icon-wrapper" style={{ background: 'linear-gradient(135deg, #00f5a0 0%, #10b981 50%, #a3e635 100%)', boxShadow: '0 0 20px rgba(0, 245, 160, 0.45)', width: '38px', height: '38px', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
             <Wind size={22} style={{ color: '#052317' }} />
           </div>
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-              <h1 className="brand-title" style={{ letterSpacing: '0.02em', fontSize: '1.25rem', fontWeight: 800 }}>
+              <h1 className="brand-title" style={{ letterSpacing: '0.02em', fontSize: '1.25rem', fontWeight: 800, margin: 0 }}>
                 EcoSense
               </h1>
               <span style={{ 
-                fontSize: '0.65rem', 
+                fontSize: '0.62rem', 
                 fontWeight: 700, 
                 color: '#10b981', 
                 background: 'rgba(16, 185, 129, 0.15)', 
@@ -93,30 +119,33 @@ export default function Navbar({
                 INTELLIGENCE
               </span>
             </div>
-            <p className="brand-subtitle" style={{ fontSize: '0.72rem', color: '#94a3b8' }}>
-              Monitor. Analyze. Compare. Predict.
+            <p className="brand-subtitle" style={{ fontSize: '0.72rem', color: '#94a3b8', margin: 0 }}>
+              Know the air around you.
             </p>
           </div>
         </div>
 
-        {/* Navigation Tabs */}
-        <div className="navbar-nav-tabs">
-          {navItems.map(item => {
+        {/* Center: Desktop Navigation Bar */}
+        <div className="navbar-nav-tabs" style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+          {primaryNavItems.map(item => {
             const Icon = item.icon;
-            const isActive = viewMode === item.key || (item.key === 'admin' && viewMode.startsWith('admin-'));
+            const isActive = viewMode === item.key;
             return (
               <button
                 key={item.key}
-                onClick={() => onViewModeChange && onViewModeChange(item.key)}
+                onClick={() => handleNavigate(item.key)}
                 className={`nav-tab-button ${isActive ? 'active' : ''}`}
                 type="button"
                 style={{
-                  position: 'relative',
-                  ...(item.adminBadge ? {
-                    borderColor: isActive ? '#6366f1' : 'rgba(99, 102, 241, 0.3)',
-                    color: isActive ? '#818cf8' : '#a5b4fc',
-                    background: isActive ? 'rgba(99, 102, 241, 0.15)' : 'transparent'
-                  } : {})
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  padding: '7px 12px',
+                  borderRadius: '10px',
+                  fontSize: '0.84rem',
+                  fontWeight: 600,
+                  cursor: 'pointer',
+                  transition: 'all 0.15s ease'
                 }}
               >
                 <Icon size={14} />
@@ -124,171 +153,324 @@ export default function Navbar({
               </button>
             );
           })}
-        </div>
 
-        {/* Actions Area */}
-        <div className="navbar-actions">
-          {/* Location Selector (when applicable) */}
-          {showLocationSelector && (
-            <LocationSelector 
-              currentCity={currentCity} 
-              onCityChange={onCityChange} 
-              disabled={loading} 
-            />
-          )}
-
-          {/* Last Updated Indicator */}
-          <div className="last-updated-badge" title="Real-time data update status">
-            <span className="pulse-dot"></span>
-            <span>{lastUpdated || 'Just now'}</span>
-          </div>
-
-          {/* Refresh Action Button */}
-          {showLocationSelector && (
-            <button 
-              onClick={onRefresh}
-              className="location-selector-container refresh-action-btn"
-              title="Force synchronize latest environmental telemetry"
-              disabled={loading}
-              aria-label="Refresh telemetry"
-              style={{ cursor: loading ? 'not-allowed' : 'pointer' }}
-            >
-              <RefreshCw 
-                size={16} 
-                className={loading ? 'spin' : ''} 
-                style={{ color: loading ? 'var(--accent-blue)' : '#fff' }}
-              />
-              <span className="refresh-label">{loading ? 'Syncing...' : 'Sync'}</span>
-            </button>
-          )}
-
-          {/* Authentication & User Session Area */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginLeft: '6px' }}>
-            {isAuthenticated ? (
-              <div style={{
-                display: 'flex',
+          {/* More ▼ Dropdown Button */}
+          <div ref={dropdownRef} style={{ position: 'relative' }}>
+            <button
+              type="button"
+              onClick={() => setMoreDropdownOpen(prev => !prev)}
+              className={`nav-tab-button ${isMoreActive ? 'active' : ''}`}
+              style={{
+                display: 'inline-flex',
                 alignItems: 'center',
-                gap: '8px',
-                background: 'rgba(15, 23, 42, 0.65)',
-                border: '1px solid rgba(255, 255, 255, 0.1)',
-                padding: '4px 6px 4px 10px',
-                borderRadius: '12px'
-              }}>
-                {/* User Info / Role chip */}
-                <div
-                  onClick={() => onViewModeChange(isAdmin ? 'admin' : 'user-dashboard')}
-                  style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px' }}
-                  title="Open user portal"
-                >
-                  <div style={{
-                    width: '24px',
-                    height: '24px',
-                    borderRadius: '8px',
-                    background: isAdmin ? 'linear-gradient(135deg, #6366f1, #8b5cf6)' : 'linear-gradient(135deg, #00f5a0, #10b981)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center'
-                  }}>
-                    {isAdmin ? <Shield size={13} color="#ffffff" /> : <User size={13} color="#ffffff" />}
-                  </div>
-                  <span style={{ fontSize: '0.8rem', fontWeight: 600, color: '#f8fafc', maxWidth: '90px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                    {user?.name?.split(' ')[0] || 'User'}
-                  </span>
-                  <span style={{
-                    fontSize: '0.65rem',
-                    fontWeight: 700,
-                    padding: '1px 5px',
-                    borderRadius: '4px',
-                    background: isAdmin ? 'rgba(99, 102, 241, 0.2)' : 'rgba(16, 185, 129, 0.2)',
-                    color: isAdmin ? '#818cf8' : '#34d399'
-                  }}>
-                    {user?.role}
-                  </span>
-                </div>
+                gap: '5px',
+                padding: '7px 12px',
+                borderRadius: '10px',
+                fontSize: '0.84rem',
+                fontWeight: 600,
+                cursor: 'pointer',
+                transition: 'all 0.15s ease'
+              }}
+            >
+              <span>More</span>
+              <ChevronDown size={13} style={{ transform: moreDropdownOpen ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s' }} />
+            </button>
 
-                {/* Settings Gear */}
-                <button
-                  type="button"
-                  onClick={() => onViewModeChange('settings')}
-                  title="Settings & Preferences"
-                  style={{
-                    background: 'none',
-                    border: 'none',
-                    color: '#94a3b8',
-                    cursor: 'pointer',
-                    padding: '4px',
-                    display: 'flex',
-                    alignItems: 'center'
-                  }}
-                >
-                  <Sliders size={14} />
-                </button>
-
-                {/* Logout Button */}
-                <button
-                  type="button"
-                  onClick={handleLogout}
-                  title="Sign out of EcoSense"
-                  style={{
-                    background: 'none',
-                    border: 'none',
-                    color: '#f87171',
-                    cursor: 'pointer',
-                    padding: '4px',
-                    display: 'flex',
-                    alignItems: 'center'
-                  }}
-                >
-                  <LogOut size={14} />
-                </button>
-              </div>
-            ) : (
-              <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                <button
-                  type="button"
-                  onClick={() => onViewModeChange('login')}
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '5px',
-                    padding: '6px 12px',
-                    borderRadius: '10px',
-                    background: 'rgba(51, 65, 85, 0.5)',
-                    border: '1px solid rgba(255, 255, 255, 0.1)',
-                    color: '#f1f5f9',
-                    fontSize: '0.8rem',
-                    fontWeight: 600,
-                    cursor: 'pointer'
-                  }}
-                >
-                  <LogIn size={13} /> Sign In
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => onViewModeChange('register')}
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '4px',
-                    padding: '6px 14px',
-                    borderRadius: '10px',
-                    background: 'linear-gradient(135deg, #00f5a0, #059669)',
-                    border: 'none',
-                    color: '#052317',
-                    fontSize: '0.82rem',
-                    fontWeight: 700,
-                    boxShadow: '0 4px 14px rgba(0, 245, 160, 0.35)',
-                    cursor: 'pointer'
-                  }}
-                >
-                  Register
-                </button>
+            {/* Dropdown Menu */}
+            {moreDropdownOpen && (
+              <div
+                style={{
+                  position: 'absolute',
+                  top: 'calc(100% + 8px)',
+                  left: 0,
+                  width: '240px',
+                  background: 'rgba(10, 20, 16, 0.98)',
+                  border: '1px solid rgba(0, 245, 160, 0.25)',
+                  borderRadius: '14px',
+                  boxShadow: '0 20px 40px rgba(0, 0, 0, 0.7), 0 0 20px rgba(0, 245, 160, 0.1)',
+                  backdropFilter: 'blur(20px)',
+                  padding: '6px',
+                  zIndex: 100
+                }}
+              >
+                {moreDropdownItems.map((item) => {
+                  const Icon = item.icon;
+                  const isActive = viewMode === item.key;
+                  return (
+                    <button
+                      key={item.key}
+                      onClick={() => handleNavigate(item.key)}
+                      type="button"
+                      style={{
+                        width: '100%',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '10px',
+                        padding: '10px 12px',
+                        borderRadius: '8px',
+                        border: 'none',
+                        background: isActive ? 'rgba(0, 245, 160, 0.15)' : 'transparent',
+                        color: isActive ? '#00f5a0' : '#cbd5e1',
+                        fontSize: '0.85rem',
+                        fontWeight: 600,
+                        cursor: 'pointer',
+                        textAlign: 'left',
+                        transition: 'all 0.15s'
+                      }}
+                      onMouseEnter={(e) => {
+                        if (!isActive) e.currentTarget.style.background = 'rgba(255, 255, 255, 0.05)';
+                      }}
+                      onMouseLeave={(e) => {
+                        if (!isActive) e.currentTarget.style.background = 'transparent';
+                      }}
+                    >
+                      <Icon size={16} style={{ color: isActive ? '#00f5a0' : '#94a3b8' }} />
+                      <span>{item.label}</span>
+                    </button>
+                  );
+                })}
               </div>
             )}
           </div>
         </div>
+
+        {/* Right: Search Location & User Session */}
+        <div className="navbar-actions" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          
+          {/* Header Search Location */}
+          <LocationSearch 
+            currentCity={currentCity}
+            onCityChange={onCityChange}
+            variant="compact"
+            disabled={loading}
+          />
+
+          {/* Refresh Action Button */}
+          <button 
+            onClick={onRefresh}
+            className="refresh-action-btn"
+            title="Sync telemetry"
+            disabled={loading}
+            aria-label="Refresh telemetry"
+            style={{ 
+              background: 'rgba(255, 255, 255, 0.06)',
+              border: '1px solid rgba(255, 255, 255, 0.12)',
+              borderRadius: '10px',
+              padding: '7px',
+              cursor: loading ? 'not-allowed' : 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              color: '#fff'
+            }}
+          >
+            <RefreshCw size={15} className={loading ? 'spin' : ''} />
+          </button>
+
+          {/* User Account / Role / Sign-in */}
+          {isAuthenticated ? (
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px',
+              background: 'rgba(15, 23, 42, 0.65)',
+              border: '1px solid rgba(255, 255, 255, 0.1)',
+              padding: '4px 8px',
+              borderRadius: '12px'
+            }}>
+              <div
+                onClick={() => handleNavigate(isAdmin ? 'admin' : 'user-dashboard')}
+                style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px' }}
+                title="Open user portal"
+              >
+                <div style={{
+                  width: '26px',
+                  height: '26px',
+                  borderRadius: '8px',
+                  background: isAdmin ? 'linear-gradient(135deg, #6366f1, #8b5cf6)' : 'linear-gradient(135deg, #00f5a0, #10b981)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center'
+                }}>
+                  {isAdmin ? <Shield size={14} color="#ffffff" /> : <User size={14} color="#ffffff" />}
+                </div>
+                <span style={{ fontSize: '0.8rem', fontWeight: 700, color: '#f8fafc', maxWidth: '80px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                  {user?.name?.split(' ')[0] || (isAdmin ? 'Admin' : 'User')}
+                </span>
+              </div>
+
+              {/* Admin console button if admin */}
+              {isAdmin && (
+                <button
+                  type="button"
+                  onClick={() => handleNavigate('admin')}
+                  title="Admin Dashboard"
+                  style={{
+                    background: 'rgba(99, 102, 241, 0.2)',
+                    border: '1px solid rgba(99, 102, 241, 0.4)',
+                    color: '#818cf8',
+                    borderRadius: '6px',
+                    padding: '3px 6px',
+                    fontSize: '0.7rem',
+                    fontWeight: 700,
+                    cursor: 'pointer'
+                  }}
+                >
+                  Admin
+                </button>
+              )}
+
+              {/* Settings */}
+              <button
+                type="button"
+                onClick={() => handleNavigate('settings')}
+                title="Settings"
+                style={{ background: 'none', border: 'none', color: '#94a3b8', cursor: 'pointer', padding: '4px' }}
+              >
+                <Sliders size={14} />
+              </button>
+
+              {/* Logout */}
+              <button
+                type="button"
+                onClick={handleLogout}
+                title="Sign out"
+                style={{ background: 'none', border: 'none', color: '#f87171', cursor: 'pointer', padding: '4px' }}
+              >
+                <LogOut size={14} />
+              </button>
+            </div>
+          ) : (
+            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <button
+                type="button"
+                onClick={() => handleNavigate('login')}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '5px',
+                  padding: '6px 12px',
+                  borderRadius: '10px',
+                  background: 'rgba(51, 65, 85, 0.5)',
+                  border: '1px solid rgba(255, 255, 255, 0.1)',
+                  color: '#f1f5f9',
+                  fontSize: '0.8rem',
+                  fontWeight: 600,
+                  cursor: 'pointer'
+                }}
+              >
+                <LogIn size={13} /> Sign In
+              </button>
+            </div>
+          )}
+
+          {/* Mobile Menu Hamburger */}
+          <button
+            type="button"
+            className="mobile-menu-btn"
+            onClick={() => setMobileMenuOpen(prev => !prev)}
+            aria-label="Toggle Navigation Menu"
+            style={{
+              display: 'none', // Handled via media query in index.css
+              background: 'none',
+              border: 'none',
+              color: '#00f5a0',
+              cursor: 'pointer',
+              padding: '6px'
+            }}
+          >
+            {mobileMenuOpen ? <X size={22} /> : <Menu size={22} />}
+          </button>
+        </div>
       </div>
+
+      {/* Mobile Slide-Out Drawer Menu */}
+      {mobileMenuOpen && (
+        <div
+          style={{
+            position: 'fixed',
+            inset: 0,
+            top: '64px',
+            background: 'rgba(6, 12, 9, 0.98)',
+            zIndex: 99,
+            padding: '20px',
+            overflowY: 'auto',
+            borderTop: '1px solid rgba(0, 245, 160, 0.2)'
+          }}
+        >
+          <div style={{ marginBottom: '16px' }}>
+            <LocationSearch 
+              currentCity={currentCity}
+              onCityChange={(city) => {
+                onCityChange(city);
+                setMobileMenuOpen(false);
+              }}
+              variant="banner"
+            />
+          </div>
+
+          <div style={{ fontSize: '0.75rem', fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase', marginBottom: '8px' }}>
+            Main Navigation
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', marginBottom: '20px' }}>
+            {primaryNavItems.map(item => {
+              const Icon = item.icon;
+              return (
+                <button
+                  key={item.key}
+                  onClick={() => handleNavigate(item.key)}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '12px',
+                    padding: '12px',
+                    borderRadius: '10px',
+                    border: 'none',
+                    background: viewMode === item.key ? 'rgba(0, 245, 160, 0.15)' : 'rgba(255, 255, 255, 0.04)',
+                    color: viewMode === item.key ? '#00f5a0' : '#f8fafc',
+                    fontSize: '0.95rem',
+                    fontWeight: 700,
+                    textAlign: 'left'
+                  }}
+                >
+                  <Icon size={18} />
+                  <span>{item.label}</span>
+                </button>
+              );
+            })}
+          </div>
+
+          <div style={{ fontSize: '0.75rem', fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase', marginBottom: '8px' }}>
+            Intelligence Modules
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+            {moreDropdownItems.map(item => {
+              const Icon = item.icon;
+              return (
+                <button
+                  key={item.key}
+                  onClick={() => handleNavigate(item.key)}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '12px',
+                    padding: '12px',
+                    borderRadius: '10px',
+                    border: 'none',
+                    background: viewMode === item.key ? 'rgba(0, 245, 160, 0.15)' : 'rgba(255, 255, 255, 0.04)',
+                    color: viewMode === item.key ? '#00f5a0' : '#f8fafc',
+                    fontSize: '0.95rem',
+                    fontWeight: 700,
+                    textAlign: 'left'
+                  }}
+                >
+                  <Icon size={18} />
+                  <span>{item.label}</span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      )}
     </nav>
   );
 }

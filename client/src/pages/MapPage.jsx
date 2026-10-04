@@ -21,14 +21,10 @@ import {
   Wind
 } from 'lucide-react';
 
+import { mockCityData } from '../data/mockData';
+
 // Default station coordinates with baseline data to guarantee immediate rendering
-const INITIAL_STATIONS = [
-  { city: 'Chennai', state: 'Tamil Nadu', latitude: 13.0827, longitude: 80.2707, aqi: 78, temperature: 29.0, pm25: 34, pm10: 61, lastUpdated: 'Synchronized' },
-  { city: 'Hyderabad', state: 'Telangana', latitude: 17.3850, longitude: 78.4867, aqi: 88, temperature: 28.0, pm25: 41, pm10: 72, lastUpdated: 'Synchronized' },
-  { city: 'Delhi', state: 'National Capital Region', latitude: 28.6139, longitude: 77.2090, aqi: 180, temperature: 29.1, pm25: 116.4, pm10: 178, lastUpdated: 'Synchronized' },
-  { city: 'Mumbai', state: 'Maharashtra', latitude: 19.0760, longitude: 72.8777, aqi: 118, temperature: 31.0, pm25: 58, pm10: 105, lastUpdated: 'Synchronized' },
-  { city: 'Bengaluru', state: 'Karnataka', latitude: 12.9716, longitude: 77.5946, aqi: 42, temperature: 23.0, pm25: 18, pm10: 36, lastUpdated: 'Synchronized' },
-];
+const INITIAL_STATIONS = Object.values(mockCityData);
 
 // EcoRoute Urban Corridors
 const ECOROUTE_CORRIDORS = {
@@ -219,16 +215,63 @@ function MapFlyController({ center, zoom }) {
   return null;
 }
 
-// Custom glowing AQI marker icon
-function createAqiMarkerIcon(aqi, cityName) {
+// Helper to compute color and formatted label for active map metric layer
+function getMetricDisplay(metricType, station) {
+  if (metricType === 'pm25') {
+    const val = station.pm25 != null ? station.pm25 : '--';
+    let color = '#10b981';
+    if (val > 15) color = '#fbbf24';
+    if (val > 35) color = '#f97316';
+    if (val > 55) color = '#ef4444';
+    if (val > 150) color = '#8b5cf6';
+    return { val: `${val}`, unit: 'µg/m³', label: 'PM2.5', color };
+  }
+
+  if (metricType === 'pm10') {
+    const val = station.pm10 != null ? station.pm10 : '--';
+    let color = '#10b981';
+    if (val > 45) color = '#fbbf24';
+    if (val > 100) color = '#f97316';
+    if (val > 150) color = '#ef4444';
+    if (val > 250) color = '#8b5cf6';
+    return { val: `${val}`, unit: 'µg/m³', label: 'PM10', color };
+  }
+
+  if (metricType === 'temperature') {
+    const val = station.temperature != null ? station.temperature : '--';
+    let color = '#06b6d4';
+    if (val > 24) color = '#10b981';
+    if (val > 30) color = '#f97316';
+    if (val > 38) color = '#ef4444';
+    return { val: `${val}`, unit: '°C', label: 'Temp', color };
+  }
+
+  if (metricType === 'humidity') {
+    const val = station.humidity != null ? station.humidity : '--';
+    let color = '#06b6d4';
+    if (val > 65) color = '#3b82f6';
+    if (val > 80) color = '#8b5cf6';
+    return { val: `${val}`, unit: '%', label: 'Humidity', color };
+  }
+
+  // Default: AQI
+  const aqi = station.aqi != null ? station.aqi : 50;
   const { color } = getAqiCategory(aqi);
+  return { val: `${aqi}`, unit: 'AQI', label: 'AQI', color };
+}
+
+// Custom glowing metric marker icon
+function createMetricMarkerIcon(metricType, station) {
+  const { val, unit, label, color } = getMetricDisplay(metricType, station);
+  const cityName = station.city;
+
   const html = `
     <div style="display: flex; flex-direction: column; align-items: center; cursor: pointer; user-select: none;">
       <div style="
         background: ${color};
         color: #0b0f19;
         font-weight: 800;
-        font-size: 12px;
+        font-size: 11px;
         padding: 3px 8px;
         border-radius: 9999px;
         box-shadow: 0 0 16px ${color}aa, 0 4px 6px rgba(0,0,0,0.6);
@@ -238,8 +281,8 @@ function createAqiMarkerIcon(aqi, cityName) {
         align-items: center;
         gap: 3px;
       ">
-        <span>${aqi}</span>
-        <span style="font-size: 9px; opacity: 0.9;">AQI</span>
+        <span>${val}</span>
+        <span style="font-size: 9px; opacity: 0.9;">${unit}</span>
       </div>
       <div style="
         color: #ffffff;
@@ -269,8 +312,8 @@ function createAqiMarkerIcon(aqi, cityName) {
   return L.divIcon({
     className: 'custom-aqi-leaflet-marker',
     html,
-    iconSize: [80, 52],
-    iconAnchor: [40, 52],
+    iconSize: [85, 52],
+    iconAnchor: [42, 52],
     popupAnchor: [0, -52]
   });
 }
@@ -310,6 +353,9 @@ export default function MapPage({ onSelectCityForDashboard }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [tileSource, setTileSource] = useState('dark'); // Default to sleek dark map
+  const [metricLayer, setMetricLayer] = useState('aqi'); // 'aqi' | 'pm25' | 'pm10' | 'temperature' | 'humidity'
+  const [userPos, setUserPos] = useState(null);
+  const [locatingUser, setLocatingUser] = useState(false);
   
   // EcoRoute States
   const [ecoRouteActive, setEcoRouteActive] = useState(false);
@@ -318,6 +364,19 @@ export default function MapPage({ onSelectCityForDashboard }) {
   const [voiceDispatched, setVoiceDispatched] = useState(false);
 
   const activeCorridor = ECOROUTE_CORRIDORS[selectedCityCorridor] || ECOROUTE_CORRIDORS.Hyderabad;
+
+  const handleLocateMe = () => {
+    if (!navigator.geolocation) return;
+    setLocatingUser(true);
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        setLocatingUser(false);
+        setUserPos([pos.coords.latitude, pos.coords.longitude]);
+      },
+      () => setLocatingUser(false),
+      { timeout: 8000 }
+    );
+  };
 
   const loadAllCities = async () => {
     setLoading(true);
@@ -382,6 +441,42 @@ export default function MapPage({ onSelectCityForDashboard }) {
         </div>
 
         <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center', flexWrap: 'wrap' }}>
+          {/* Map Layer Filter Dropdown */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', background: 'rgba(12, 24, 18, 0.85)', padding: '5px 12px', borderRadius: '10px', border: '1px solid rgba(0, 245, 160, 0.35)' }}>
+            <span style={{ fontSize: '0.78rem', color: '#94a3b8', fontWeight: 700 }}>Filter Layer:</span>
+            <select
+              value={metricLayer}
+              onChange={(e) => setMetricLayer(e.target.value)}
+              style={{
+                background: 'transparent',
+                border: 'none',
+                color: '#00f5a0',
+                fontWeight: 800,
+                fontSize: '0.85rem',
+                cursor: 'pointer',
+                outline: 'none'
+              }}
+            >
+              <option value="aqi" style={{ background: '#0a140f', color: '#fff' }}>AQI (Air Quality Index)</option>
+              <option value="pm25" style={{ background: '#0a140f', color: '#fff' }}>PM2.5 (Fine Dust)</option>
+              <option value="pm10" style={{ background: '#0a140f', color: '#fff' }}>PM10 (Coarse Dust)</option>
+              <option value="temperature" style={{ background: '#0a140f', color: '#fff' }}>Temperature (°C)</option>
+              <option value="humidity" style={{ background: '#0a140f', color: '#fff' }}>Humidity (%)</option>
+            </select>
+          </div>
+
+          {/* Use My Location Pin */}
+          <button
+            onClick={handleLocateMe}
+            className="location-selector-container"
+            style={{ cursor: 'pointer', padding: '0.5rem 0.85rem', background: 'var(--bg-card)', color: '#00f5a0', fontSize: '0.8rem', border: '1px solid rgba(0, 245, 160, 0.25)' }}
+            title="Locate my position on map"
+            type="button"
+          >
+            <Navigation size={14} className={locatingUser ? 'spin' : ''} />
+            <span>{locatingUser ? 'Locating...' : 'My Location'}</span>
+          </button>
+
           {/* ECOROUTE NAVIGATOR TOGGLE BUTTON */}
           <button
             onClick={() => setEcoRouteActive(!ecoRouteActive)}
@@ -572,13 +667,30 @@ export default function MapPage({ onSelectCityForDashboard }) {
               maxZoom={19}
             />
 
+            {/* User GPS Pin (if located) */}
+            {userPos && (
+              <Marker
+                position={userPos}
+                icon={createWaypointIcon('YOU ARE HERE', true)}
+              >
+                <Popup className="custom-dark-popup">
+                  <div style={{ color: '#fff', padding: '4px', textAlign: 'center' }}>
+                    <strong style={{ color: '#00f5a0' }}>Your Current Location</strong>
+                    <div style={{ fontSize: '0.78rem', color: '#94a3b8', marginTop: '2px' }}>
+                      Lat: {userPos[0].toFixed(4)}, Lng: {userPos[1].toFixed(4)}
+                    </div>
+                  </div>
+                </Popup>
+              </Marker>
+            )}
+
             {/* Standard Station Pins (always visible or in nationwide mode) */}
             {!ecoRouteActive && cityDataList.map((city) => {
               const lat = Number(city.latitude || CITY_COORDINATES[city.city]?.latitude);
               const lng = Number(city.longitude || CITY_COORDINATES[city.city]?.longitude);
               if (!lat || !lng) return null;
 
-              const markerIcon = createAqiMarkerIcon(city.aqi, city.city);
+              const markerIcon = createMetricMarkerIcon(metricLayer, city);
               const { label: statusLabel, color: statusColor } = getAqiCategory(city.aqi);
 
               return (

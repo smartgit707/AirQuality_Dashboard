@@ -13,6 +13,9 @@ import CopilotPage from './pages/CopilotPage';
 import CopilotWidget from './components/CopilotWidget';
 import GlobePage from './pages/GlobePage';
 import BreathIQPage from './pages/BreathIQPage';
+import CityPage from './pages/CityPage';
+import RankingsPage from './pages/RankingsPage';
+import PollutantsPage from './pages/PollutantsPage';
 
 // Auth & User Portal Pages
 import LoginPage from './pages/LoginPage';
@@ -226,6 +229,32 @@ export default function App() {
       return <SystemStatusPage />;
     }
 
+    if (viewMode === 'city') {
+      return (
+        <CityPage 
+          city={selectedCity} 
+          onNavigate={setViewMode} 
+          onCityChange={handleCityChange} 
+        />
+      );
+    }
+    if (viewMode === 'rankings') {
+      return (
+        <RankingsPage 
+          onSelectCityForDashboard={handleSelectCityFromMap} 
+          onNavigate={setViewMode} 
+        />
+      );
+    }
+    if (viewMode === 'pollutants') {
+      return (
+        <PollutantsPage 
+          currentCity={selectedCity} 
+          onSelectCityForDashboard={handleSelectCityFromMap} 
+        />
+      );
+    }
+
     // Default Overview
     return (
       <Dashboard 
@@ -238,6 +267,7 @@ export default function App() {
         isDbConnected={isDbConnected}
         onRetry={handleRefresh}
         onNavigate={setViewMode}
+        onCityChange={handleCityChange}
       />
     );
   };

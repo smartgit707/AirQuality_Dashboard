@@ -47,6 +47,7 @@ export default function PollutantCard({ name, fullName, value, unit, typeKey }) 
   const [tilt, setTilt] = useState({ rx: 0, ry: 0, glareX: 50, glareY: 50, opacity: 0 });
   const [isHovered, setIsHovered] = useState(false);
 
+  const isUnavailable = value === null || value === undefined || isNaN(value);
   const status = getPollutantStatus(typeKey, value);
   const facts = POLLUTANT_FACTS[typeKey] || {
     formula: name,
@@ -63,7 +64,9 @@ export default function PollutantCard({ name, fullName, value, unit, typeKey }) 
   if (typeKey === 'so2') maxRef = 60;
   if (typeKey === 'o3') maxRef = 120;
 
-  const percentage = Math.min(100, Math.max(8, Math.round((value / maxRef) * 100)));
+  const percentage = isUnavailable 
+    ? 0 
+    : Math.min(100, Math.max(8, Math.round((value / maxRef) * 100)));
 
   const handleMouseMove = (e) => {
     if (isFlipped || !cardRef.current) return;
@@ -195,12 +198,20 @@ export default function PollutantCard({ name, fullName, value, unit, typeKey }) 
             </div>
 
             <div className="pollutant-value-row" style={{ margin: '0.85rem 0 0.4rem' }}>
-              <span className="pollutant-value" style={{ fontSize: '1.85rem', fontWeight: 800, color: '#f8fafc', letterSpacing: '-0.02em' }}>
-                {value}
-              </span>
-              <span className="pollutant-unit" style={{ fontSize: '0.85rem', color: '#94a3b8', marginLeft: '4px', fontWeight: 600 }}>
-                {unit}
-              </span>
+              {isUnavailable ? (
+                <span className="pollutant-unavailable" style={{ fontSize: '1.05rem', fontWeight: 600, color: '#94a3b8', fontStyle: 'italic' }}>
+                  Data unavailable
+                </span>
+              ) : (
+                <>
+                  <span className="pollutant-value" style={{ fontSize: '1.85rem', fontWeight: 800, color: '#f8fafc', letterSpacing: '-0.02em' }}>
+                    {value}
+                  </span>
+                  <span className="pollutant-unit" style={{ fontSize: '0.85rem', color: '#94a3b8', marginLeft: '4px', fontWeight: 600 }}>
+                    {unit}
+                  </span>
+                </>
+              )}
             </div>
           </div>
 
@@ -211,14 +222,14 @@ export default function PollutantCard({ name, fullName, value, unit, typeKey }) 
                 style={{ 
                   width: `${percentage}%`, 
                   backgroundColor: status.color,
-                  boxShadow: `0 0 8px ${status.color}88`
+                  boxShadow: isUnavailable ? 'none' : `0 0 8px ${status.color}88`
                 }}
               />
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '4px', fontSize: '0.68rem', color: '#64748b' }}>
-              <span>Safe: 0</span>
+              <span>{isUnavailable ? 'Offline' : 'Safe: 0'}</span>
               <span style={{ cursor: 'pointer', color: '#94a3b8' }} onClick={toggleFlip}>3D Flip ↗</span>
-              <span>Max: {maxRef} {unit}</span>
+              <span>{isUnavailable ? 'N/A' : `Max: ${maxRef} ${unit}`}</span>
             </div>
           </div>
         </div>
