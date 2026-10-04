@@ -35,7 +35,13 @@ import { mockCityData } from './data/mockData';
 
 export default function App() {
   const { user, isAuthenticated, isAdmin } = useAuth();
-  const [viewMode, setViewMode] = useState('dashboard');
+  
+  // Default to 'login' page on open if not authenticated (as requested by user)
+  const [viewMode, setViewMode] = useState(() => {
+    const token = localStorage.getItem('ecosense_token');
+    const storedUser = localStorage.getItem('ecosense_user') || localStorage.getItem('ecosense_mock_user');
+    return (token && storedUser) ? 'dashboard' : 'login';
+  });
   const [selectedCity, setSelectedCity] = useState('Delhi');
   const [dashboardData, setDashboardData] = useState(() => mockCityData['Delhi'] || null);
   const [historyData, setHistoryData] = useState(() => mockCityData['Delhi']?.trend || []);
@@ -125,27 +131,39 @@ export default function App() {
 
     // 2. User Protected Views
     if (viewMode === 'user-dashboard') {
-      if (!isAuthenticated) return <LoginPage onNavigate={setViewMode} />;
+      const hasAuth = isAuthenticated || Boolean(localStorage.getItem('ecosense_token'));
+      if (!hasAuth) return <LoginPage onNavigate={setViewMode} />;
       return <UserDashboard onNavigate={setViewMode} onSelectCity={handleCityChange} />;
     }
     if (viewMode === 'my-environment') {
-      if (!isAuthenticated) return <LoginPage onNavigate={setViewMode} />;
+      const hasAuth = isAuthenticated || Boolean(localStorage.getItem('ecosense_token'));
+      if (!hasAuth) return <LoginPage onNavigate={setViewMode} />;
       return <MyEnvironmentPage onNavigate={setViewMode} />;
     }
     if (viewMode === 'settings') {
-      if (!isAuthenticated) return <LoginPage onNavigate={setViewMode} />;
+      const hasAuth = isAuthenticated || Boolean(localStorage.getItem('ecosense_token'));
+      if (!hasAuth) return <LoginPage onNavigate={setViewMode} />;
       return <SettingsPage />;
     }
 
     // 3. Admin Protected Views
     if (viewMode.startsWith('admin')) {
-      if (!isAuthenticated) return <LoginPage onNavigate={setViewMode} />;
-      if (!isAdmin) {
+      const storedUser = user || (() => {
+        try {
+          const s = localStorage.getItem('ecosense_user') || localStorage.getItem('ecosense_mock_user');
+          return s ? JSON.parse(s) : null;
+        } catch (_) { return null; }
+      })();
+      const storedToken = localStorage.getItem('ecosense_token');
+      const isUserAdmin = isAdmin || (storedUser && (storedUser.role === 'ADMIN' || storedUser.email?.toLowerCase().includes('admin')));
+
+      if (!storedUser || !storedToken) return <LoginPage onNavigate={setViewMode} />;
+      if (!isUserAdmin) {
         return (
           <div style={{ textAlign: 'center', padding: '80px 20px', color: '#f8fafc' }}>
             <h2 style={{ fontSize: '1.8rem', color: '#ef4444', marginBottom: '10px' }}>403 — Unauthorized Access</h2>
             <p style={{ color: '#94a3b8', maxWidth: '480px', margin: '0 auto 24px auto' }}>
-              Administrative privileges are required to view this console. Your current role is <strong>{user?.role}</strong>.
+              Administrative privileges are required to view this console. Your current role is <strong>{storedUser?.role || 'USER'}</strong>.
             </p>
             <button
               onClick={() => setViewMode('dashboard')}

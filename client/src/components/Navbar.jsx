@@ -65,7 +65,7 @@ export default function Navbar({
 
   const handleLogout = () => {
     logout();
-    onViewModeChange('dashboard');
+    onViewModeChange('login');
   };
 
   return (

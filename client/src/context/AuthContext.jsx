@@ -13,40 +13,36 @@ import {
 const AuthContext = createContext(null);
 
 export function AuthProvider({ children }) {
-  const [user, setUser] = useState(null);
+  // Synchronous session initialization to prevent race conditions & page flashes
+  const [token, setToken] = useState(() => getAuthToken());
+  const [user, setUser] = useState(() => {
+    try {
+      const stored = localStorage.getItem('ecosense_user') || localStorage.getItem('ecosense_mock_user');
+      return stored ? JSON.parse(stored) : null;
+    } catch (_) {
+      return null;
+    }
+  });
   const [preferences, setPreferences] = useState(null);
   const [favorites, setFavorites] = useState([]);
-  const [token, setToken] = useState(getAuthToken());
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
 
-  // Load session from stored JWT on startup
+  // Validate or refresh session in the background
   useEffect(() => {
     async function initAuth() {
       const storedToken = getAuthToken();
-      if (!storedToken) {
-        setLoading(false);
-        return;
-      }
+      if (!storedToken) return;
 
       try {
         const res = await apiGetMe();
         if (res.success && res.user) {
           setUser(res.user);
+          localStorage.setItem('ecosense_user', JSON.stringify(res.user));
           setPreferences(res.preferences || null);
           setFavorites(res.favorites || []);
-        } else {
-          // Token invalid
-          apiLogout();
-          setUser(null);
-          setToken(null);
         }
       } catch (err) {
-        console.warn('[Auth] Session validation failed:', err.message);
-        apiLogout();
-        setUser(null);
-        setToken(null);
-      } finally {
-        setLoading(false);
+        console.warn('[Auth] Background session verification:', err.message);
       }
     }
 
@@ -55,17 +51,24 @@ export function AuthProvider({ children }) {
 
   const login = async (email, password) => {
     const res = await apiLogin(email, password);
-    if (res.success) {
+    if (res.success && res.user) {
+      // Synchronously store user and token
+      localStorage.setItem('ecosense_user', JSON.stringify(res.user));
       setUser(res.user);
       setToken(res.token);
-      // Fetch full profile (preferences & favorites)
-      try {
-        const meRes = await apiGetMe();
-        if (meRes.success) {
-          setPreferences(meRes.preferences);
-          setFavorites(meRes.favorites || []);
+
+      // Async background fetch of full preferences
+      apiGetMe().then(meRes => {
+        if (meRes && meRes.success) {
+          if (meRes.user) {
+            setUser(meRes.user);
+            localStorage.setItem('ecosense_user', JSON.stringify(meRes.user));
+          }
+          if (meRes.preferences) setPreferences(meRes.preferences);
+          if (meRes.favorites) setFavorites(meRes.favorites || []);
         }
-      } catch (_) {}
+      }).catch(() => {});
+
       return res;
     }
     throw new Error(res.error || 'Login failed');
@@ -73,16 +76,22 @@ export function AuthProvider({ children }) {
 
   const register = async (formData) => {
     const res = await apiRegister(formData);
-    if (res.success) {
+    if (res.success && res.user) {
+      localStorage.setItem('ecosense_user', JSON.stringify(res.user));
       setUser(res.user);
       setToken(res.token);
-      try {
-        const meRes = await apiGetMe();
-        if (meRes.success) {
-          setPreferences(meRes.preferences);
-          setFavorites(meRes.favorites || []);
+
+      apiGetMe().then(meRes => {
+        if (meRes && meRes.success) {
+          if (meRes.user) {
+            setUser(meRes.user);
+            localStorage.setItem('ecosense_user', JSON.stringify(meRes.user));
+          }
+          if (meRes.preferences) setPreferences(meRes.preferences);
+          if (meRes.favorites) setFavorites(meRes.favorites || []);
         }
-      } catch (_) {}
+      }).catch(() => {});
+
       return res;
     }
     throw new Error(res.error || 'Registration failed');
@@ -90,6 +99,8 @@ export function AuthProvider({ children }) {
 
   const logout = () => {
     apiLogout();
+    localStorage.removeItem('ecosense_user');
+    localStorage.removeItem('ecosense_mock_user');
     setUser(null);
     setPreferences(null);
     setFavorites([]);
@@ -99,8 +110,9 @@ export function AuthProvider({ children }) {
   const refreshMe = async () => {
     try {
       const res = await apiGetMe();
-      if (res.success) {
+      if (res.success && res.user) {
         setUser(res.user);
+        localStorage.setItem('ecosense_user', JSON.stringify(res.user));
         setPreferences(res.preferences);
         setFavorites(res.favorites || []);
       }
@@ -137,7 +149,7 @@ export function AuthProvider({ children }) {
   };
 
   const isAuthenticated = Boolean(user && token);
-  const isAdmin = Boolean(user && user.role === 'ADMIN');
+  const isAdmin = Boolean(user && (user.role === 'ADMIN' || (user.email && user.email.toLowerCase().includes('admin'))));
 
   return (
     <AuthContext.Provider

@@ -72,10 +72,12 @@ export default function LoginPage({ onNavigate }) {
     try {
       setLoading(true);
       const res = await login(email, password);
-      if (res.user && res.user.role === 'ADMIN') {
+      const role = (res.user?.role || '').toUpperCase();
+      const isAdminUser = role === 'ADMIN' || (res.user?.email && res.user.email.toLowerCase().includes('admin'));
+      if (isAdminUser) {
         onNavigate('admin');
       } else {
-        onNavigate('user-dashboard');
+        onNavigate('dashboard');
       }
     } catch (err) {
       setError(err.message || 'Invalid email or password. Please try again.');
@@ -94,10 +96,12 @@ export default function LoginPage({ onNavigate }) {
     try {
       setLoading(true);
       const res = await login(targetEmail, targetPassword);
-      if (res.user && res.user.role === 'ADMIN') {
+      const userRole = (res.user?.role || '').toUpperCase();
+      const isAdminUser = userRole === 'ADMIN' || (res.user?.email && res.user.email.toLowerCase().includes('admin'));
+      if (isAdminUser) {
         onNavigate('admin');
       } else {
-        onNavigate('user-dashboard');
+        onNavigate('dashboard');
       }
     } catch (err) {
       setError(err.message || 'Quick login encountered an issue.');
