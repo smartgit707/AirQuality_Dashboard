@@ -9,27 +9,55 @@ export default function MetricCard({
   subtitle 
 }) {
   return (
-    <div className="metric-card">
+    <div 
+      className="metric-card"
+      style={{
+        borderTop: `3px solid ${accentColor}`,
+        position: 'relative',
+        overflow: 'hidden'
+      }}
+    >
+      {/* Subtle corner light */}
+      <div 
+        style={{
+          position: 'absolute',
+          top: '-25px',
+          right: '-25px',
+          width: '70px',
+          height: '70px',
+          borderRadius: '50%',
+          background: `${accentColor}18`,
+          filter: 'blur(15px)',
+          pointerEvents: 'none'
+        }}
+      />
+
       <div className="card-top">
-        <span className="card-label">{label}</span>
+        <span className="card-label" style={{ letterSpacing: '0.04em' }}>{label}</span>
         <div 
           className="card-icon-chip"
           style={{ 
             color: accentColor, 
-            backgroundColor: `${accentColor}18` 
+            backgroundColor: `${accentColor}18`,
+            border: `1px solid ${accentColor}33`,
+            boxShadow: `0 0 10px ${accentColor}22`
           }}
         >
-          {Icon && <Icon size={20} />}
+          {Icon && <Icon size={18} />}
         </div>
       </div>
 
-      <div className="card-value-group">
-        <span className="card-numeric-value">{value}</span>
-        <span className="card-unit">{unit}</span>
+      <div className="card-value-group" style={{ margin: '0.85rem 0 0.35rem' }}>
+        <span className="card-numeric-value" style={{ fontSize: '2rem', fontWeight: 800, letterSpacing: '-0.02em', color: '#f8fafc' }}>
+          {value}
+        </span>
+        <span className="card-unit" style={{ fontSize: '0.9rem', fontWeight: 600, color: '#94a3b8', marginLeft: '4px' }}>
+          {unit}
+        </span>
       </div>
 
       {subtitle && (
-        <div className="card-footer-info">
+        <div className="card-footer-info" style={{ color: '#64748b', fontSize: '0.78rem' }}>
           <span>{subtitle}</span>
         </div>
       )}

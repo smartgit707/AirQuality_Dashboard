@@ -22,6 +22,8 @@ import PollutantCard from '../components/PollutantCard';
 import AQIChart from '../components/AQIChart';
 import EnvironmentalScore from '../components/EnvironmentalScore';
 import RecommendationCard from '../components/RecommendationCard';
+import CigaretteEquivalenceCard from '../components/CigaretteEquivalenceCard';
+import AudioBriefingButton from '../components/AudioBriefingButton';
 import { getAQIStatus } from '../data/mockData';
 
 export default function Dashboard({ 
@@ -106,6 +108,14 @@ export default function Dashboard({
         </div>
 
         <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center', flexWrap: 'wrap' }}>
+          {/* Audio Dispatch Button */}
+          <AudioBriefingButton 
+            city={data.city} 
+            aqi={data.aqi} 
+            temperature={data.temperature} 
+            pm25={data.pm25} 
+          />
+
           {/* Live Open-Meteo API Indicator */}
           <span 
             className="source-badge" 
@@ -191,27 +201,25 @@ export default function Dashboard({
         </div>
       )}
 
-      {/* EcoSense Environmental Health Score Card */}
-      <section style={{ marginBottom: '1.5rem' }}>
+      {/* 1. Executive Intelligence Hero Row: Real-Time AQI + Environmental Health Score */}
+      <section className="hero-intelligence-grid" style={{ marginBottom: '1.75rem' }}>
+        <AQICard aqi={data.aqi} />
         <EnvironmentalScore data={data} loading={loading} />
       </section>
 
-      {/* 1. Top Metrics Overview Grid */}
-      <section className="top-metrics-grid" aria-label="Key Environmental Metrics">
-        {/* AQI Hero Card */}
-        <AQICard aqi={data.aqi} />
+      {/* 2. Berkeley Earth Toxicity Equivalence Banner */}
+      <CigaretteEquivalenceCard pm25={data.pm25} />
 
-        {/* Temperature Card */}
+      {/* 3. Secondary Environmental Parameter Cards */}
+      <section className="secondary-metrics-grid" aria-label="Key Environmental Metrics" style={{ marginBottom: '2rem' }}>
         <MetricCard 
           label="Temperature"
           value={data.temperature}
           unit="°C"
           icon={Thermometer}
           accentColor="#f97316"
-          subtitle="Ambient reading"
+          subtitle="Ambient thermal state"
         />
-
-        {/* Humidity Card */}
         <MetricCard 
           label="Humidity"
           value={data.humidity}
@@ -220,18 +228,14 @@ export default function Dashboard({
           accentColor="#06b6d4"
           subtitle="Relative moisture"
         />
-
-        {/* PM2.5 Card */}
         <MetricCard 
           label="PM2.5"
           value={data.pm25}
           unit="µg/m³"
           icon={CloudFog}
-          accentColor="#eab308"
+          accentColor="#fbbf24"
           subtitle="Fine particles"
         />
-
-        {/* PM10 Card */}
         <MetricCard 
           label="PM10"
           value={data.pm10}
@@ -240,8 +244,6 @@ export default function Dashboard({
           accentColor="#a855f7"
           subtitle="Respirable dust"
         />
-
-        {/* CO2 Level Card */}
         <MetricCard 
           label="CO2 Level"
           value={data.co2 || 490}
