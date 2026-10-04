@@ -287,3 +287,13 @@ export async function apiGetAdminSystemMetrics() {
   return await request('/api/admin/system');
 }
 
+/**
+ * EcoSense AI Environmental Copilot
+ */
+export async function apiAskCopilot(message, city = 'Hyderabad') {
+  return await request('/api/copilot/chat', {
+    method: 'POST',
+    body: JSON.stringify({ message, city })
+  });
+}
+

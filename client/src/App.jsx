@@ -9,6 +9,8 @@ import AlertsPage from './pages/AlertsPage';
 import TrendsPage from './pages/TrendsPage';
 import ReportsPage from './pages/ReportsPage';
 import SystemStatusPage from './pages/SystemStatusPage';
+import CopilotPage from './pages/CopilotPage';
+import CopilotWidget from './components/CopilotWidget';
 
 // Auth & User Portal Pages
 import LoginPage from './pages/LoginPage';
@@ -158,6 +160,9 @@ export default function App() {
     }
 
     // 4. Public Environmental Views
+    if (viewMode === 'copilot') {
+      return <CopilotPage defaultCity={selectedCity} />;
+    }
     if (viewMode === 'map') {
       return <MapPage onSelectCityForDashboard={handleSelectCityFromMap} />;
     }
@@ -227,12 +232,19 @@ export default function App() {
             <span className="footer-tag">Open-Meteo API</span>
             <span className="footer-tag">Express Backend</span>
             <span className="footer-tag">PostgreSQL Records</span>
+            <span className="footer-tag">AI Copilot</span>
             <span className="footer-tag">Interactive Map</span>
             <span className="footer-tag">Diurnal Forecasting</span>
             <span className="footer-tag">Automated Collector</span>
           </div>
         </div>
       </footer>
+
+      {/* Global Floating AI Copilot Assistant */}
+      <CopilotWidget 
+        currentCity={selectedCity} 
+        onOpenFullPage={() => setViewMode('copilot')} 
+      />
     </div>
   );
 }

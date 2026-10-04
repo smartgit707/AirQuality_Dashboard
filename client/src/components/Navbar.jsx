@@ -16,7 +16,8 @@ import {
   LogIn,
   LogOut,
   Sliders,
-  Home
+  Home,
+  Bot
 } from 'lucide-react';
 import LocationSelector from './LocationSelector';
 import { useAuth } from '../context/AuthContext';
@@ -35,6 +36,7 @@ export default function Navbar({
 
   const baseNavItems = [
     { key: 'dashboard', label: 'Overview', icon: Activity },
+    { key: 'copilot', label: 'AI Copilot', icon: Bot, copilotBadge: true },
     { key: 'map', label: 'Map', icon: MapPin },
     { key: 'analytics', label: 'Analytics', icon: BarChart2 },
     { key: 'compare', label: 'Compare', icon: ArrowLeftRight },
@@ -55,7 +57,7 @@ export default function Navbar({
     }
   }
 
-  const showLocationSelector = ['dashboard', 'analytics', 'forecast', 'trends', 'reports'].includes(viewMode);
+  const showLocationSelector = ['dashboard', 'copilot', 'analytics', 'forecast', 'trends', 'reports'].includes(viewMode);
 
   const handleLogout = () => {
     logout();

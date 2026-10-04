@@ -5,6 +5,7 @@ const airQualityRoutes = require('./routes/airQuality');
 const authRoutes = require('./routes/auth');
 const userRoutes = require('./routes/user');
 const adminRoutes = require('./routes/admin');
+const copilotRoutes = require('./routes/copilot');
 const airQualityController = require('./controllers/airQualityController');
 const { startDataCollector } = require('./jobs/dataCollector');
 const db = require('./db');
@@ -26,6 +27,7 @@ app.use((req, res, next) => {
 app.use('/api/auth', authRoutes);
 app.use('/api/user', userRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api/copilot', copilotRoutes);
 app.use('/api', airQualityRoutes);
 
 // Health check endpoint
