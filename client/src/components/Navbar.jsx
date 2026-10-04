@@ -67,8 +67,8 @@ export default function Navbar({
       <div className="navbar-content">
         {/* EcoSense Logo & Tagline */}
         <div className="navbar-brand" onClick={() => onViewModeChange('dashboard')} style={{ cursor: 'pointer' }}>
-          <div className="brand-icon-wrapper" style={{ background: 'linear-gradient(135deg, #10b981 0%, #38bdf8 100%)' }}>
-            <Wind size={22} style={{ color: '#0b1120' }} />
+          <div className="brand-icon-wrapper" style={{ background: 'linear-gradient(135deg, #00f5a0 0%, #10b981 50%, #a3e635 100%)', boxShadow: '0 0 20px rgba(0, 245, 160, 0.45)' }}>
+            <Wind size={22} style={{ color: '#052317' }} />
           </div>
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
@@ -178,7 +178,7 @@ export default function Navbar({
                     width: '24px',
                     height: '24px',
                     borderRadius: '8px',
-                    background: isAdmin ? 'linear-gradient(135deg, #6366f1, #8b5cf6)' : 'linear-gradient(135deg, #10b981, #0ea5e9)',
+                    background: isAdmin ? 'linear-gradient(135deg, #6366f1, #8b5cf6)' : 'linear-gradient(135deg, #00f5a0, #10b981)',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center'
@@ -265,13 +265,14 @@ export default function Navbar({
                     display: 'flex',
                     alignItems: 'center',
                     gap: '4px',
-                    padding: '6px 12px',
+                    padding: '6px 14px',
                     borderRadius: '10px',
-                    background: 'linear-gradient(135deg, #10b981, #059669)',
+                    background: 'linear-gradient(135deg, #00f5a0, #059669)',
                     border: 'none',
-                    color: '#ffffff',
-                    fontSize: '0.8rem',
-                    fontWeight: 600,
+                    color: '#052317',
+                    fontSize: '0.82rem',
+                    fontWeight: 700,
+                    boxShadow: '0 4px 14px rgba(0, 245, 160, 0.35)',
                     cursor: 'pointer'
                   }}
                 >

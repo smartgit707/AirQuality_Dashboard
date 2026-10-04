@@ -81,7 +81,7 @@ export default function RegisterPage({ onNavigate }) {
                 <Wind size={16} />
               </div>
               <span style={{ fontSize: '0.85rem', fontWeight: 800, color: '#f8fafc', letterSpacing: '0.02em' }}>
-                EcoSense <span style={{ color: '#10b981', fontWeight: 600 }}>Citizen Portal</span>
+                EcoSense <span style={{ color: '#00f5a0', fontWeight: 700 }}>Citizen Portal</span>
               </span>
             </div>
           </div>
@@ -118,8 +118,8 @@ export default function RegisterPage({ onNavigate }) {
               {/* Card 2: Favorite Stations */}
               <div className="auth-glass-card">
                 <div className="auth-glass-metric-left">
-                  <div className="auth-glass-icon" style={{ background: 'rgba(56, 189, 248, 0.15)', border: '1px solid rgba(56, 189, 248, 0.3)' }}>
-                    <Activity size={18} color="#38bdf8" />
+                  <div className="auth-glass-icon" style={{ background: 'rgba(0, 245, 160, 0.15)', border: '1px solid rgba(0, 245, 160, 0.35)' }}>
+                    <Activity size={18} color="#00f5a0" />
                   </div>
                   <div>
                     <div style={{ fontSize: '0.72rem', color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
@@ -130,7 +130,7 @@ export default function RegisterPage({ onNavigate }) {
                     </div>
                   </div>
                 </div>
-                <span style={{ fontSize: '0.72rem', color: '#38bdf8', fontWeight: 600 }}>
+                <span style={{ fontSize: '0.72rem', color: '#00f5a0', fontWeight: 800 }}>
                   5 CITIES
                 </span>
               </div>
@@ -149,12 +149,12 @@ export default function RegisterPage({ onNavigate }) {
                 width: '38px',
                 height: '38px',
                 borderRadius: '12px',
-                background: 'linear-gradient(135deg, rgba(56, 189, 248, 0.2), rgba(16, 185, 129, 0.2))',
-                border: '1px solid rgba(56, 189, 248, 0.4)',
+                background: 'linear-gradient(135deg, rgba(0, 245, 160, 0.25), rgba(16, 185, 129, 0.25))',
+                border: '1px solid rgba(0, 245, 160, 0.45)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                color: '#38bdf8'
+                color: '#00f5a0'
               }}>
                 <UserPlus size={20} />
               </div>
@@ -289,11 +289,6 @@ export default function RegisterPage({ onNavigate }) {
               type="submit"
               disabled={loading}
               className="auth-submit-btn"
-              style={{
-                background: 'linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%)',
-                borderColor: 'rgba(56, 189, 248, 0.3)',
-                boxShadow: '0 6px 20px -3px rgba(14, 165, 233, 0.35)'
-              }}
             >
               {loading ? 'Creating Account...' : (
                 <>

@@ -114,20 +114,21 @@ export default function MyEnvironmentPage({ onNavigate }) {
             width: '48px',
             height: '48px',
             borderRadius: '14px',
-            background: 'linear-gradient(135deg, #0ea5e9, #3b82f6)',
+            background: 'linear-gradient(135deg, #00f5a0, #10b981)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            boxShadow: '0 8px 18px rgba(14, 165, 233, 0.3)'
+            boxShadow: '0 8px 18px rgba(0, 245, 160, 0.35)',
+            color: '#042416'
           }}>
-            <Home size={24} color="#ffffff" />
+            <Home size={24} color="#042416" />
           </div>
           <div>
             <h1 style={{ fontSize: '1.5rem', fontWeight: 700, margin: 0, color: '#f8fafc' }}>
               My Environment Station
             </h1>
             <p style={{ margin: 0, fontSize: '0.85rem', color: '#94a3b8' }}>
-              Dedicated micro-station monitoring your primary locality: <strong style={{ color: '#38bdf8' }}>{currentCity}</strong>
+              Dedicated micro-station monitoring your primary locality: <strong style={{ color: '#00f5a0' }}>{currentCity}</strong>
             </p>
           </div>
         </div>
@@ -178,10 +179,10 @@ export default function MyEnvironmentPage({ onNavigate }) {
       {saveMsg && (
         <div style={{
           padding: '12px 16px',
-          background: 'rgba(14, 165, 233, 0.15)',
-          border: '1px solid rgba(14, 165, 233, 0.3)',
+          background: 'rgba(0, 245, 160, 0.15)',
+          border: '1px solid rgba(0, 245, 160, 0.35)',
           borderRadius: '12px',
-          color: '#38bdf8',
+          color: '#00f5a0',
           fontSize: '0.88rem',
           marginBottom: '20px',
           display: 'flex',
@@ -253,7 +254,7 @@ export default function MyEnvironmentPage({ onNavigate }) {
             </div>
 
             <div style={{ background: 'rgba(15, 23, 42, 0.6)', padding: '16px', borderRadius: '14px' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#38bdf8', fontSize: '0.8rem', marginBottom: '6px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#00f5a0', fontSize: '0.8rem', marginBottom: '6px' }}>
                 <Droplets size={16} /> Rel. Humidity
               </div>
               <div style={{ fontSize: '1.6rem', fontWeight: 700, color: '#f8fafc' }}>
@@ -304,7 +305,7 @@ export default function MyEnvironmentPage({ onNavigate }) {
 
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '16px' }}>
             <div style={{ background: 'rgba(15, 23, 42, 0.5)', padding: '16px', borderRadius: '12px' }}>
-              <strong style={{ fontSize: '0.85rem', color: '#38bdf8', display: 'block', marginBottom: '4px' }}>
+              <strong style={{ fontSize: '0.85rem', color: '#00f5a0', display: 'block', marginBottom: '4px' }}>
                 🏃 Outdoor Exercise
               </strong>
               <p style={{ margin: 0, fontSize: '0.82rem', color: '#cbd5e1' }}>

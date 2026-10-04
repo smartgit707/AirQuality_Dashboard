@@ -125,8 +125,8 @@ export default function LoginPage({ onNavigate }) {
               {/* Card 2: Fine Particulate Matter */}
               <div className="auth-glass-card">
                 <div className="auth-glass-metric-left">
-                  <div className="auth-glass-icon" style={{ background: 'rgba(56, 189, 248, 0.15)', border: '1px solid rgba(56, 189, 248, 0.3)' }}>
-                    <Wind size={18} color="#38bdf8" />
+                  <div className="auth-glass-icon" style={{ background: 'rgba(0, 245, 160, 0.15)', border: '1px solid rgba(0, 245, 160, 0.35)' }}>
+                    <Wind size={18} color="#00f5a0" />
                   </div>
                   <div>
                     <div style={{ fontSize: '0.72rem', color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
@@ -140,10 +140,10 @@ export default function LoginPage({ onNavigate }) {
                 <span style={{
                   padding: '3px 9px',
                   borderRadius: '6px',
-                  background: 'rgba(56, 189, 248, 0.15)',
-                  color: '#38bdf8',
+                  background: 'rgba(0, 245, 160, 0.18)',
+                  color: '#00f5a0',
                   fontSize: '0.72rem',
-                  fontWeight: 700
+                  fontWeight: 800
                 }}>
                   CLEAN BURDEN
                 </span>
@@ -183,12 +183,12 @@ export default function LoginPage({ onNavigate }) {
                 width: '38px',
                 height: '38px',
                 borderRadius: '12px',
-                background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.2), rgba(56, 189, 248, 0.2))',
-                border: '1px solid rgba(16, 185, 129, 0.4)',
+                background: 'linear-gradient(135deg, rgba(0, 245, 160, 0.25), rgba(16, 185, 129, 0.25))',
+                border: '1px solid rgba(0, 245, 160, 0.45)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                color: '#10b981'
+                color: '#00f5a0'
               }}>
                 <LogIn size={20} />
               </div>

@@ -137,13 +137,14 @@ export default function UserDashboard({ onNavigate, onSelectCity }) {
             width: '64px',
             height: '64px',
             borderRadius: '20px',
-            background: 'linear-gradient(135deg, #10b981, #3b82f6)',
+            background: 'linear-gradient(135deg, #00f5a0, #10b981)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            boxShadow: '0 8px 20px rgba(16, 185, 129, 0.3)'
+            boxShadow: '0 8px 20px rgba(0, 245, 160, 0.4)',
+            color: '#042416'
           }}>
-            <User size={32} color="#ffffff" />
+            <User size={32} color="#042416" />
           </div>
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '4px' }}>
@@ -151,9 +152,9 @@ export default function UserDashboard({ onNavigate, onSelectCity }) {
                 Welcome back, {user?.name || 'Observer'}
               </h1>
               <span style={{
-                background: user?.role === 'ADMIN' ? 'rgba(99, 102, 241, 0.2)' : 'rgba(16, 185, 129, 0.2)',
-                border: user?.role === 'ADMIN' ? '1px solid rgba(99, 102, 241, 0.4)' : '1px solid rgba(16, 185, 129, 0.4)',
-                color: user?.role === 'ADMIN' ? '#818cf8' : '#34d399',
+                background: user?.role === 'ADMIN' ? 'rgba(99, 102, 241, 0.2)' : 'rgba(0, 245, 160, 0.2)',
+                border: user?.role === 'ADMIN' ? '1px solid rgba(99, 102, 241, 0.4)' : '1px solid rgba(0, 245, 160, 0.4)',
+                color: user?.role === 'ADMIN' ? '#818cf8' : '#00f5a0',
                 padding: '2px 10px',
                 borderRadius: '12px',
                 fontSize: '0.75rem',
@@ -167,7 +168,7 @@ export default function UserDashboard({ onNavigate, onSelectCity }) {
               </span>
             </div>
             <p style={{ margin: 0, fontSize: '0.9rem', color: '#94a3b8' }}>
-              Monitoring primary zone: <strong style={{ color: '#38bdf8' }}>{defaultCity}</strong> • Alert Threshold: <strong style={{ color: '#fbbf24' }}>{preferences?.alert_aqi_threshold || 100} AQI</strong>
+              Monitoring primary zone: <strong style={{ color: '#00f5a0' }}>{defaultCity}</strong> • Alert Threshold: <strong style={{ color: '#fbbf24' }}>{preferences?.alert_aqi_threshold || 100} AQI</strong>
             </p>
           </div>
         </div>
@@ -262,14 +263,14 @@ export default function UserDashboard({ onNavigate, onSelectCity }) {
                 onNavigate('my-environment');
               }}
               style={{
-                background: 'rgba(56, 189, 248, 0.15)',
-                border: '1px solid rgba(56, 189, 248, 0.3)',
-                color: '#38bdf8',
+                background: 'rgba(0, 245, 160, 0.15)',
+                border: '1px solid rgba(0, 245, 160, 0.35)',
+                color: '#00f5a0',
                 borderRadius: '8px',
                 padding: '6px 12px',
                 fontSize: '0.8rem',
                 cursor: 'pointer',
-                fontWeight: 600
+                fontWeight: 700
               }}
             >
               Station View →
@@ -312,7 +313,7 @@ export default function UserDashboard({ onNavigate, onSelectCity }) {
                   </div>
                 </div>
                 <div style={{ background: 'rgba(15, 23, 42, 0.5)', padding: '10px', borderRadius: '10px', textAlign: 'center' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px', color: '#38bdf8', fontSize: '0.75rem' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px', color: '#00f5a0', fontSize: '0.75rem' }}>
                     <Droplets size={13} /> Humidity
                   </div>
                   <div style={{ fontSize: '1.1rem', fontWeight: 700, color: '#f1f5f9', marginTop: '2px' }}>
@@ -560,9 +561,9 @@ export default function UserDashboard({ onNavigate, onSelectCity }) {
                         borderRadius: '8px',
                         background: 'rgba(51, 65, 85, 0.4)',
                         border: '1px solid rgba(255, 255, 255, 0.06)',
-                        color: '#38bdf8',
+                        color: '#00f5a0',
                         fontSize: '0.78rem',
-                        fontWeight: 600,
+                        fontWeight: 700,
                         cursor: 'pointer'
                       }}
                     >

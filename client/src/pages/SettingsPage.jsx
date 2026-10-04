@@ -163,7 +163,7 @@ export default function SettingsPage() {
             boxShadow: '0 8px 24px rgba(0, 0, 0, 0.3)'
           }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '18px' }}>
-              <User size={18} color="#38bdf8" />
+              <User size={18} color="#00f5a0" />
               <h2 style={{ fontSize: '1.15rem', fontWeight: 700, margin: 0, color: '#f8fafc' }}>
                 Profile Identity
               </h2>
@@ -251,14 +251,15 @@ export default function SettingsPage() {
                   display: 'flex',
                   alignItems: 'center',
                   gap: '6px',
-                  padding: '9px 16px',
+                  padding: '10px 18px',
                   borderRadius: '10px',
-                  background: '#3b82f6',
-                  border: 'none',
-                  color: '#ffffff',
+                  background: 'linear-gradient(135deg, #00f5a0 0%, #10b981 100%)',
+                  border: '1px solid rgba(0, 245, 160, 0.4)',
+                  color: '#042416',
                   fontSize: '0.85rem',
-                  fontWeight: 600,
-                  cursor: 'pointer'
+                  fontWeight: 800,
+                  cursor: 'pointer',
+                  boxShadow: '0 4px 14px rgba(0, 245, 160, 0.35)'
                 }}
               >
                 <Save size={15} /> Update Name
