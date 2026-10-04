@@ -77,17 +77,23 @@ if (fs.existsSync(clientDistPath)) {
   });
 }
 
-// Start Express server and initialize database connection
-app.listen(PORT, async () => {
-  console.log(`===================================================`);
-  console.log(`🌿 EcoSense Backend Server running on port ${PORT}`);
-  console.log(`📡 Health Check: http://localhost:${PORT}/api/health`);
-  console.log(`🌍 System Status: http://localhost:${PORT}/api/system/status`);
-  console.log(`===================================================`);
+// Export Express app for serverless deployments (such as Vercel)
+module.exports = app;
 
-  // Test PostgreSQL connection
-  await db.initConnection();
+// Start Express server and initialize database connection if run directly
+if (require.main === module || !process.env.VERCEL) {
+  app.listen(PORT, async () => {
+    console.log(`===================================================`);
+    console.log(`🌿 EcoSense Backend Server running on port ${PORT}`);
+    console.log(`📡 Health Check: http://localhost:${PORT}/api/health`);
+    console.log(`🌍 System Status: http://localhost:${PORT}/api/system/status`);
+    console.log(`===================================================`);
 
-  // Start automated background telemetry collection
-  startDataCollector(airQualityController.fetchAndStoreCityTelemetry);
-});
+    // Test PostgreSQL connection
+    await db.initConnection();
+
+    // Start automated background telemetry collection
+    startDataCollector(airQualityController.fetchAndStoreCityTelemetry);
+  });
+}
+
