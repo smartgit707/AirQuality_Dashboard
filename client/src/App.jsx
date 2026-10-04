@@ -11,6 +11,7 @@ import ReportsPage from './pages/ReportsPage';
 import SystemStatusPage from './pages/SystemStatusPage';
 import CopilotPage from './pages/CopilotPage';
 import CopilotWidget from './components/CopilotWidget';
+import GlobePage from './pages/GlobePage';
 
 // Auth & User Portal Pages
 import LoginPage from './pages/LoginPage';
@@ -163,6 +164,9 @@ export default function App() {
     if (viewMode === 'copilot') {
       return <CopilotPage defaultCity={selectedCity} />;
     }
+    if (viewMode === 'globe') {
+      return <GlobePage onSelectCityForDashboard={handleSelectCityFromMap} />;
+    }
     if (viewMode === 'map') {
       return <MapPage onSelectCityForDashboard={handleSelectCityFromMap} />;
     }
@@ -199,6 +203,7 @@ export default function App() {
         isApiConnected={isApiConnected}
         isDbConnected={isDbConnected}
         onRetry={handleRefresh}
+        onNavigate={setViewMode}
       />
     );
   };

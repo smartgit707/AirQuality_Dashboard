@@ -14,7 +14,8 @@ import {
   Activity,
   AlertTriangle,
   RefreshCw,
-  Database
+  Database,
+  Globe
 } from 'lucide-react';
 import AQICard from '../components/AQICard';
 import MetricCard from '../components/MetricCard';
@@ -34,7 +35,8 @@ export default function Dashboard({
   error, 
   isApiConnected, 
   isDbConnected, 
-  onRetry 
+  onRetry,
+  onNavigate
 }) {
   // If no data and loading, show full page loading state
   if (!data && loading) {
@@ -142,6 +144,30 @@ export default function Dashboard({
             <Database size={13} style={{ marginRight: '4px' }} />
             {isDbConnected ? 'PostgreSQL Live Connected' : 'Express API Connected'}
           </span>
+
+          {/* 3D Earth Digital Twin Launcher */}
+          {onNavigate && (
+            <button
+              onClick={() => onNavigate('globe')}
+              className="source-badge"
+              style={{
+                borderColor: 'rgba(0, 245, 160, 0.45)',
+                color: '#00f5a0',
+                backgroundColor: 'rgba(0, 245, 160, 0.12)',
+                cursor: 'pointer',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '6px',
+                fontWeight: 700,
+                transition: 'all 0.2s',
+                boxShadow: '0 0 12px rgba(0, 245, 160, 0.2)'
+              }}
+              title="Launch full 3D interactive holographic Earth Digital Twin"
+            >
+              <Globe size={13} />
+              <span>3D Earth Studio</span>
+            </button>
+          )}
         </div>
       </section>
 
