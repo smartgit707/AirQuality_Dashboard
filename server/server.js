@@ -63,6 +63,18 @@ app.get('/', (req, res) => {
   });
 });
 
+// Serve frontend production build if available
+const path = require('path');
+const fs = require('fs');
+const clientDistPath = path.join(__dirname, '../client/dist');
+if (fs.existsSync(clientDistPath)) {
+  app.use(express.static(clientDistPath));
+  app.get('*', (req, res, next) => {
+    if (req.url.startsWith('/api')) return next();
+    res.sendFile(path.join(clientDistPath, 'index.html'));
+  });
+}
+
 // Start Express server and initialize database connection
 app.listen(PORT, async () => {
   console.log(`===================================================`);

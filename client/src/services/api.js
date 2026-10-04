@@ -3,7 +3,7 @@
  * Centralized HTTP service interacting solely with Express Backend API
  */
 
-const BACKEND_BASE_URL = 'http://localhost:5001';
+const BACKEND_BASE_URL = import.meta.env.VITE_API_URL || (import.meta.env.MODE === 'production' ? '' : 'http://localhost:5001');
 
 // Token storage helpers
 export function getAuthToken() {
