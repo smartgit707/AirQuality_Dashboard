@@ -1000,6 +1000,28 @@ body {
   border: 1px solid transparent;
 }
 
+/* Leaflet Specific Overrides */
+.map-card-wrapper {
+  height: 620px;
+  min-height: 520px;
+  position: relative;
+  width: 100%;
+  border-radius: var(--radius-lg);
+}
+
+.leaflet-container {
+  height: 100% !important;
+  width: 100% !important;
+  border-radius: var(--radius-lg);
+  background: #0b1120 !important;
+  z-index: 1 !important;
+}
+
+.leaflet-div-icon {
+  background: transparent !important;
+  border: none !important;
+}
+
 .leaflet-popup-content-wrapper {
   background: #0f172a !important;
   color: #f8fafc !important;
