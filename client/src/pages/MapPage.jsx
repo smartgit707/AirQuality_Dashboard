@@ -179,27 +179,43 @@ const ECOROUTE_CORRIDORS = {
   }
 };
 
+// Hardcoded fallback coordinates for all monitored stations
+const CITY_COORDINATES = {
+  Chennai: { latitude: 13.0827, longitude: 80.2707 },
+  Hyderabad: { latitude: 17.3850, longitude: 78.4867 },
+  Delhi: { latitude: 28.6139, longitude: 77.2090 },
+  Mumbai: { latitude: 19.0760, longitude: 72.8777 },
+  Bengaluru: { latitude: 12.9716, longitude: 77.5946 }
+};
+
 // Helper to force Leaflet to recalculate container size when mounted in tab
 function MapResizer() {
   const map = useMap();
   useEffect(() => {
     map.invalidateSize();
-    const t = setTimeout(() => {
-      map.invalidateSize();
-    }, 200);
-    return () => clearTimeout(t);
+    const t1 = setTimeout(() => map.invalidateSize(), 100);
+    const t2 = setTimeout(() => map.invalidateSize(), 350);
+    const t3 = setTimeout(() => map.invalidateSize(), 800);
+    return () => {
+      clearTimeout(t1);
+      clearTimeout(t2);
+      clearTimeout(t3);
+    };
   }, [map]);
   return null;
 }
 
-// Controller to fly to corridor
+// Controller to smoothly animate to target corridor
 function MapFlyController({ center, zoom }) {
   const map = useMap();
+  const lat = center ? center[0] : null;
+  const lng = center ? center[1] : null;
+
   useEffect(() => {
-    if (center && zoom) {
-      map.flyTo(center, zoom, { duration: 1.5 });
+    if (lat && lng && zoom) {
+      map.flyTo([lat, lng], zoom, { duration: 1.2 });
     }
-  }, [center, zoom, map]);
+  }, [lat, lng, zoom, map]);
   return null;
 }
 
@@ -536,6 +552,7 @@ export default function MapPage({ onSelectCityForDashboard }) {
         {/* Interactive Leaflet Map Container */}
         <div className="card map-card-wrapper" style={{ padding: 0, overflow: 'hidden', height: '620px' }}>
           <MapContainer
+            key={ecoRouteActive ? `ecoroute-${selectedCityCorridor}` : 'national-stations'}
             center={mapCenter}
             zoom={mapZoom}
             scrollWheelZoom={true}
@@ -555,7 +572,7 @@ export default function MapPage({ onSelectCityForDashboard }) {
             ) : (
               <TileLayer
                 attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>'
-                url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
+                url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png"
                 subdomains="abcd"
                 maxZoom={19}
               />
@@ -563,14 +580,17 @@ export default function MapPage({ onSelectCityForDashboard }) {
 
             {/* Standard Station Pins (always visible or in nationwide mode) */}
             {!ecoRouteActive && cityDataList.map((city) => {
-              if (!city.latitude || !city.longitude) return null;
+              const lat = Number(city.latitude || CITY_COORDINATES[city.city]?.latitude);
+              const lng = Number(city.longitude || CITY_COORDINATES[city.city]?.longitude);
+              if (!lat || !lng) return null;
+
               const markerIcon = createAqiMarkerIcon(city.aqi, city.city);
               const { label: statusLabel, color: statusColor } = getAqiCategory(city.aqi);
 
               return (
                 <Marker
                   key={city.city}
-                  position={[city.latitude, city.longitude]}
+                  position={[lat, lng]}
                   icon={markerIcon}
                 >
                   <Popup className="custom-dark-popup">

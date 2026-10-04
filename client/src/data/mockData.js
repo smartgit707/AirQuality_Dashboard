@@ -7,6 +7,8 @@ export const mockCityData = {
   Chennai: {
     city: "Chennai",
     state: "Tamil Nadu",
+    latitude: 13.0827,
+    longitude: 80.2707,
     aqi: 78,
     temperature: 29,
     humidity: 68,
@@ -32,6 +34,8 @@ export const mockCityData = {
   Delhi: {
     city: "Delhi",
     state: "National Capital Region",
+    latitude: 28.6139,
+    longitude: 77.2090,
     aqi: 215,
     temperature: 24,
     humidity: 45,
@@ -57,6 +61,8 @@ export const mockCityData = {
   Mumbai: {
     city: "Mumbai",
     state: "Maharashtra",
+    latitude: 19.0760,
+    longitude: 72.8777,
     aqi: 118,
     temperature: 31,
     humidity: 75,
@@ -82,6 +88,8 @@ export const mockCityData = {
   Bengaluru: {
     city: "Bengaluru",
     state: "Karnataka",
+    latitude: 12.9716,
+    longitude: 77.5946,
     aqi: 42,
     temperature: 23,
     humidity: 60,
@@ -107,6 +115,8 @@ export const mockCityData = {
   Hyderabad: {
     city: "Hyderabad",
     state: "Telangana",
+    latitude: 17.3850,
+    longitude: 78.4867,
     aqi: 88,
     temperature: 28,
     humidity: 58,
