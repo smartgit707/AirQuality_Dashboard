@@ -4,9 +4,10 @@
   "description": "Air Quality and Environment Monitoring Dashboard - Full Stack College Project",
   "scripts": {
     "install:all": "npm install --prefix client && npm install --prefix server",
+    "postinstall": "npm --prefix client install && npm --prefix server install",
     "client": "npm run dev --prefix client",
     "server": "npm run start --prefix server",
-    "build": "npm run build --prefix client",
+    "build": "npm --prefix client install && npm --prefix client run build",
     "start": "node server/server.js"
   },
   "keywords": ["air-quality", "dashboard", "environment-monitoring", "react", "express"]
