@@ -12,6 +12,7 @@ import SystemStatusPage from './pages/SystemStatusPage';
 import CopilotPage from './pages/CopilotPage';
 import CopilotWidget from './components/CopilotWidget';
 import GlobePage from './pages/GlobePage';
+import BreathIQPage from './pages/BreathIQPage';
 
 // Auth & User Portal Pages
 import LoginPage from './pages/LoginPage';
@@ -173,6 +174,9 @@ export default function App() {
     }
 
     // 4. Public Environmental Views
+    if (viewMode === 'breathiq') {
+      return <BreathIQPage onSelectCityForDashboard={handleSelectCityFromMap} />;
+    }
     if (viewMode === 'copilot') {
       return <CopilotPage defaultCity={selectedCity} />;
     }

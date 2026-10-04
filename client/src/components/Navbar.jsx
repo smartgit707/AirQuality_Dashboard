@@ -18,7 +18,8 @@ import {
   Sliders,
   Home,
   Bot,
-  Globe
+  Globe,
+  HeartPulse
 } from 'lucide-react';
 import LocationSelector from './LocationSelector';
 import { useAuth } from '../context/AuthContext';
@@ -37,6 +38,7 @@ export default function Navbar({
 
   const baseNavItems = [
     { key: 'dashboard', label: 'Overview', icon: Activity },
+    { key: 'breathiq', label: 'BreathIQ', icon: HeartPulse, breathBadge: true },
     { key: 'copilot', label: 'AI Copilot', icon: Bot, copilotBadge: true },
     { key: 'globe', label: '3D Earth', icon: Globe, globeBadge: true },
     { key: 'map', label: 'Map', icon: MapPin },

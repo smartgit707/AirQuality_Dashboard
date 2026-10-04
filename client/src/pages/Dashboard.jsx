@@ -15,7 +15,8 @@ import {
   AlertTriangle,
   RefreshCw,
   Database,
-  Globe
+  Globe,
+  HeartPulse
 } from 'lucide-react';
 import AQICard from '../components/AQICard';
 import MetricCard from '../components/MetricCard';
@@ -166,6 +167,30 @@ export default function Dashboard({
             >
               <Globe size={13} />
               <span>3D Earth Studio</span>
+            </button>
+          )}
+
+          {/* BreathIQ 3D Pulmonary Inhalation Launcher */}
+          {onNavigate && (
+            <button
+              onClick={() => onNavigate('breathiq')}
+              className="source-badge"
+              style={{
+                borderColor: 'rgba(239, 68, 68, 0.45)',
+                color: '#f87171',
+                backgroundColor: 'rgba(239, 68, 68, 0.12)',
+                cursor: 'pointer',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '6px',
+                fontWeight: 700,
+                transition: 'all 0.2s',
+                boxShadow: '0 0 12px rgba(239, 68, 68, 0.2)'
+              }}
+              title="Launch 3D physiological respiratory inhalation & alveolar deposition simulator"
+            >
+              <HeartPulse size={13} />
+              <span>BreathIQ Simulator</span>
             </button>
           )}
         </div>
