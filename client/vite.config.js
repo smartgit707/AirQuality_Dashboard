@@ -14,5 +14,18 @@ export default defineConfig({
         secure: false,
       }
     }
+  },
+  build: {
+    chunkSizeWarningLimit: 2500,
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          vendor: ['react', 'react-dom'],
+          charts: ['recharts'],
+          three: ['three'],
+          leaflet: ['leaflet', 'react-leaflet']
+        }
+      }
+    }
   }
 });
