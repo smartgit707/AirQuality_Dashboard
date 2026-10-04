@@ -1091,6 +1091,18 @@ body {
   z-index: 1 !important;
 }
 
+/* Bulletproof Dark Theme Tiles Filter on Standard OSM Layer */
+.leaflet-tiles-dark .leaflet-tile,
+.leaflet-dark-mode .leaflet-tile-pane .leaflet-tile {
+  filter: invert(100%) hue-rotate(180deg) brightness(88%) contrast(115%) saturate(35%) !important;
+  -webkit-filter: invert(100%) hue-rotate(180deg) brightness(88%) contrast(115%) saturate(35%) !important;
+}
+
+.leaflet-tiles-day .leaflet-tile {
+  filter: none !important;
+  -webkit-filter: none !important;
+}
+
 .leaflet-div-icon {
   background: transparent !important;
   border: none !important;

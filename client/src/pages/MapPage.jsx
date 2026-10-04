@@ -556,27 +556,21 @@ export default function MapPage({ onSelectCityForDashboard }) {
             center={mapCenter}
             zoom={mapZoom}
             scrollWheelZoom={true}
+            className={tileSource === 'dark' ? 'leaflet-dark-mode' : ''}
             style={{ height: '100%', width: '100%', background: '#0b1120' }}
           >
             {/* Auto Recalculate Size */}
             <MapResizer />
             {ecoRouteActive && <MapFlyController center={activeCorridor.center} zoom={activeCorridor.zoom} />}
 
-            {/* Standard OpenStreetMap or CartoDB Dark Matter */}
-            {tileSource === 'osm' ? (
-              <TileLayer
-                attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                maxZoom={19}
-              />
-            ) : (
-              <TileLayer
-                attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>'
-                url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png"
-                subdomains="abcd"
-                maxZoom={19}
-              />
-            )}
+            {/* Standard OpenStreetMap with Guaranteed Dark / Day Environmental Styling */}
+            <TileLayer
+              key={tileSource}
+              attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+              url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+              className={tileSource === 'dark' ? 'leaflet-tiles-dark' : 'leaflet-tiles-day'}
+              maxZoom={19}
+            />
 
             {/* Standard Station Pins (always visible or in nationwide mode) */}
             {!ecoRouteActive && cityDataList.map((city) => {
