@@ -1,36 +1,74 @@
 require('dotenv').config();
 const { Pool } = require('pg');
+const fs = require('fs');
+const path = require('path');
 
-// Initialize PostgreSQL Connection Pool using environment variables
-const pool = new Pool({
-  host: process.env.DATABASE_HOST || 'localhost',
-  port: parseInt(process.env.DATABASE_PORT, 10) || 5432,
-  database: process.env.DATABASE_NAME || 'air_quality_db',
-  user: process.env.DATABASE_USER || 'postgres',
-  password: process.env.DATABASE_PASSWORD || 'postgres',
-  connectionTimeoutMillis: 3000,
-  idleTimeoutMillis: 10000,
-});
+const connectionString = process.env.DATABASE_URL || process.env.POSTGRES_URL || process.env.POSTGRES_PRISMA_URL;
+const isCloudOrProduction = Boolean(connectionString || process.env.NODE_ENV === 'production' || process.env.VERCEL);
+
+// Initialize PostgreSQL Connection Pool supporting both local and cloud connection strings (Neon, Supabase, Vercel Postgres)
+const poolConfig = connectionString
+  ? {
+      connectionString,
+      ssl: isCloudOrProduction ? { rejectUnauthorized: false } : false,
+      connectionTimeoutMillis: 5000,
+      idleTimeoutMillis: 10000,
+    }
+  : {
+      host: process.env.DATABASE_HOST || 'localhost',
+      port: parseInt(process.env.DATABASE_PORT, 10) || 5432,
+      database: process.env.DATABASE_NAME || 'air_quality_db',
+      user: process.env.DATABASE_USER || 'postgres',
+      password: process.env.DATABASE_PASSWORD || 'postgres',
+      connectionTimeoutMillis: 3000,
+      idleTimeoutMillis: 10000,
+    };
+
+const pool = new Pool(poolConfig);
 
 let isPostgresConnected = false;
+let isMigrated = false;
 
-// Connection test on server boot
+// Connection test on server boot & auto-migration
 async function initConnection() {
   try {
     const client = await pool.connect();
-    const res = await client.query('SELECT NOW() AS current_time;');
-    client.release();
+    await client.query('SELECT NOW() AS current_time;');
     isPostgresConnected = true;
-    console.log(`[Database] ✅ Connected to PostgreSQL database '${process.env.DATABASE_NAME}' at ${process.env.DATABASE_HOST}:${process.env.DATABASE_PORT}`);
+    console.log(`[Database] ✅ Connected to PostgreSQL database successfully.`);
+
+    // Auto-migrate schema on fresh cloud databases if needed
+    if (!isMigrated) {
+      try {
+        const tableCheck = await client.query("SELECT to_regclass('public.air_quality_records') AS tbl_exists;");
+        if (!tableCheck.rows[0] || !tableCheck.rows[0].tbl_exists) {
+          console.log('[Database] 🚀 Tables not detected. Auto-running schema initialization...');
+          const schemaPath = path.join(__dirname, 'schema.sql');
+          if (fs.existsSync(schemaPath)) {
+            const sql = fs.readFileSync(schemaPath, 'utf8');
+            await client.query(sql);
+            console.log('[Database] ✅ Schema and seed records created successfully.');
+          }
+        }
+        isMigrated = true;
+      } catch (migErr) {
+        console.warn('[Database] Auto-migration check:', migErr.message);
+      }
+    }
+
+    client.release();
     return true;
   } catch (err) {
     isPostgresConnected = false;
     console.warn(`[Database] ⚠️ PostgreSQL connection attempt failed (${err.code || err.message}).`);
-    console.warn(`[Database] Ensure PostgreSQL is running on ${process.env.DATABASE_HOST}:${process.env.DATABASE_PORT} and run 'npm run db:init' to seed.`);
     console.warn(`[Database] Using fallback in-memory dataset structured identically to 'air_quality_records' table.`);
     return false;
   }
 }
+
+// Auto-trigger connection attempt on load
+initConnection().catch(() => {});
+
 
 // Fallback historical records (matching PostgreSQL table schema) for offline demo mode
 const fallbackRecords = [
@@ -147,12 +185,14 @@ const fallbackAuditLogs = [
  * Execute query with automatic fallback
  */
 async function query(text, params = []) {
-  if (isPostgresConnected) {
+  if (isPostgresConnected || connectionString) {
     try {
-      return await pool.query(text, params);
+      const res = await pool.query(text, params);
+      isPostgresConnected = true;
+      return res;
     } catch (err) {
-      console.error('[Database] Query execution error on PostgreSQL:', err.message);
-      // Fall through to fallback simulator if live db had transient issue
+      console.warn('[Database] Query execution fallback:', err.message);
+      // Fall through to fallback simulator if live db has transient issue or not yet initialized
     }
   }
 

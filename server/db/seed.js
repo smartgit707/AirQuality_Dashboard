@@ -7,7 +7,11 @@ async function runSeed() {
   console.log('--- Initializing PostgreSQL Schema and Historical Seed Data ---');
   console.log(`Connecting to ${process.env.DATABASE_USER}@${process.env.DATABASE_HOST}:${process.env.DATABASE_PORT}/${process.env.DATABASE_NAME}...`);
 
-  const pool = new Pool({
+  const connectionString = process.env.DATABASE_URL || process.env.POSTGRES_URL;
+  const pool = new Pool(connectionString ? {
+    connectionString,
+    ssl: { rejectUnauthorized: false }
+  } : {
     host: process.env.DATABASE_HOST || 'localhost',
     port: parseInt(process.env.DATABASE_PORT, 10) || 5432,
     database: process.env.DATABASE_NAME || 'air_quality_db',
