@@ -87,3 +87,31 @@ VALUES
     ('Bengaluru', 48, 25.2, 55.0, 22.0, 42.0, 0.5, 18.0, 6.0, 32.0, 12.0, 914.0, NOW() - INTERVAL '4 hours'),
     ('Bengaluru', 42, 23.8, 59.0, 18.0, 36.0, 0.4, 15.0, 5.0, 28.0, 11.0, 915.0, NOW() - INTERVAL '2 hours'),
     ('Bengaluru', 42, 23.0, 60.0, 18.0, 36.0, 0.4, 15.0, 5.0, 28.0, 11.0, 915.0, NOW() - INTERVAL '2 minutes');
+
+-- ==============================================================================
+-- 3. Smart Alerts Table
+-- ==============================================================================
+DROP TABLE IF EXISTS alerts;
+
+CREATE TABLE alerts (
+    id SERIAL PRIMARY KEY,
+    city VARCHAR(100) NOT NULL,
+    severity VARCHAR(20) NOT NULL CHECK (severity IN ('INFO', 'WARNING', 'CRITICAL')),
+    metric VARCHAR(50) NOT NULL,
+    value NUMERIC(8, 2) NOT NULL,
+    message TEXT NOT NULL,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    is_read BOOLEAN DEFAULT FALSE
+);
+
+CREATE INDEX idx_alerts_city_created_at ON alerts(city, created_at DESC);
+
+-- Seed Alerts
+INSERT INTO alerts (city, severity, metric, value, message, created_at, is_read)
+VALUES
+    ('Delhi', 'CRITICAL', 'AQI', 215.0, 'Unhealthy air quality detected. Elevated smog levels across urban corridor.', NOW() - INTERVAL '25 minutes', false),
+    ('Delhi', 'CRITICAL', 'PM2.5', 165.0, 'PM2.5 concentration has increased significantly above safe limits.', NOW() - INTERVAL '2 hours', false),
+    ('Mumbai', 'WARNING', 'AQI', 118.0, 'Air quality has reached a level that may affect sensitive individuals.', NOW() - INTERVAL '1 hour', false),
+    ('Hyderabad', 'INFO', 'AQI', 88.0, 'Moderate air quality prevailing. Atmospheric parameters remain within expected bounds.', NOW() - INTERVAL '3 hours', true),
+    ('Chennai', 'INFO', 'Humidity', 68.0, 'Coastal humidity peak detected with stable wind circulation.', NOW() - INTERVAL '4 hours', true);
+

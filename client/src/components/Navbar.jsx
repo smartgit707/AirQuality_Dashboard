@@ -1,5 +1,17 @@
 import React from 'react';
-import { Wind, Activity, RefreshCw, ArrowLeftRight } from 'lucide-react';
+import { 
+  Wind, 
+  Activity, 
+  MapPin, 
+  BarChart2, 
+  ArrowLeftRight, 
+  Sparkles, 
+  Bell, 
+  TrendingUp, 
+  FileText, 
+  Server, 
+  RefreshCw 
+} from 'lucide-react';
 import LocationSelector from './LocationSelector';
 
 export default function Navbar({ 
@@ -12,74 +24,74 @@ export default function Navbar({
   viewMode = 'dashboard',
   onViewModeChange
 }) {
+  const navItems = [
+    { key: 'dashboard', label: 'Overview', icon: Activity },
+    { key: 'map', label: 'Map', icon: MapPin },
+    { key: 'analytics', label: 'Analytics', icon: BarChart2 },
+    { key: 'compare', label: 'Compare', icon: ArrowLeftRight },
+    { key: 'forecast', label: 'Forecast', icon: Sparkles },
+    { key: 'alerts', label: 'Alerts', icon: Bell },
+    { key: 'trends', label: 'Trends', icon: TrendingUp },
+    { key: 'reports', label: 'Reports', icon: FileText },
+    { key: 'system', label: 'System', icon: Server },
+  ];
+
+  const showLocationSelector = ['dashboard', 'analytics', 'forecast', 'trends', 'reports'].includes(viewMode);
+
   return (
     <nav className="navbar">
       <div className="navbar-content">
-        <div className="navbar-brand">
-          <div className="brand-icon-wrapper">
-            <Wind size={24} />
+        {/* EcoSense Logo & Tagline */}
+        <div className="navbar-brand" onClick={() => onViewModeChange('dashboard')} style={{ cursor: 'pointer' }}>
+          <div className="brand-icon-wrapper" style={{ background: 'linear-gradient(135deg, #10b981 0%, #38bdf8 100%)' }}>
+            <Wind size={22} style={{ color: '#0b1120' }} />
           </div>
           <div>
-            <h1 className="brand-title">Air Quality & Environment Monitor</h1>
-            <p className="brand-subtitle">Smart Environmental Intelligence Dashboard</p>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <h1 className="brand-title" style={{ letterSpacing: '0.02em', fontSize: '1.25rem', fontWeight: 800 }}>
+                EcoSense
+              </h1>
+              <span style={{ 
+                fontSize: '0.65rem', 
+                fontWeight: 700, 
+                color: '#10b981', 
+                background: 'rgba(16, 185, 129, 0.15)', 
+                padding: '2px 6px', 
+                borderRadius: '4px',
+                border: '1px solid rgba(16, 185, 129, 0.3)'
+              }}>
+                INTELLIGENCE
+              </span>
+            </div>
+            <p className="brand-subtitle" style={{ fontSize: '0.72rem', color: '#94a3b8' }}>
+              Monitor. Analyze. Compare. Predict.
+            </p>
           </div>
         </div>
 
-        {/* View Mode Toggle Switch */}
-        <div style={{
-          display: 'flex',
-          background: 'rgba(255, 255, 255, 0.05)',
-          padding: '4px',
-          borderRadius: 'var(--radius-md)',
-          border: '1px solid var(--border-color)',
-          gap: '4px'
-        }}>
-          <button
-            onClick={() => onViewModeChange && onViewModeChange('dashboard')}
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '6px',
-              padding: '6px 14px',
-              borderRadius: 'var(--radius-sm)',
-              border: 'none',
-              cursor: 'pointer',
-              fontSize: '0.85rem',
-              fontWeight: 700,
-              transition: 'all 0.2s',
-              background: viewMode === 'dashboard' ? 'var(--accent-blue)' : 'transparent',
-              color: viewMode === 'dashboard' ? '#fff' : 'var(--text-secondary)'
-            }}
-          >
-            <Activity size={15} />
-            <span>Dashboard</span>
-          </button>
-
-          <button
-            onClick={() => onViewModeChange && onViewModeChange('compare')}
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '6px',
-              padding: '6px 14px',
-              borderRadius: 'var(--radius-sm)',
-              border: 'none',
-              cursor: 'pointer',
-              fontSize: '0.85rem',
-              fontWeight: 700,
-              transition: 'all 0.2s',
-              background: viewMode === 'compare' ? 'var(--accent-cyan)' : 'transparent',
-              color: viewMode === 'compare' ? '#0b1120' : 'var(--text-secondary)'
-            }}
-          >
-            <ArrowLeftRight size={15} />
-            <span>Compare Cities</span>
-          </button>
+        {/* Navigation Tabs */}
+        <div className="navbar-nav-tabs">
+          {navItems.map(item => {
+            const Icon = item.icon;
+            const isActive = viewMode === item.key;
+            return (
+              <button
+                key={item.key}
+                onClick={() => onViewModeChange && onViewModeChange(item.key)}
+                className={`nav-tab-button ${isActive ? 'active' : ''}`}
+                type="button"
+              >
+                <Icon size={14} />
+                <span>{item.label}</span>
+              </button>
+            );
+          })}
         </div>
 
+        {/* Actions Area */}
         <div className="navbar-actions">
-          {/* Location Selector (Only in single dashboard mode) */}
-          {viewMode === 'dashboard' && (
+          {/* Location Selector (when applicable) */}
+          {showLocationSelector && (
             <LocationSelector 
               currentCity={currentCity} 
               onCityChange={onCityChange} 
@@ -90,23 +102,25 @@ export default function Navbar({
           {/* Last Updated Indicator */}
           <div className="last-updated-badge" title="Real-time data update status">
             <span className="pulse-dot"></span>
-            <span>Updated: {lastUpdated || 'Just now'}</span>
+            <span>{lastUpdated || 'Just now'}</span>
           </div>
 
           {/* Refresh Action Button */}
-          {viewMode === 'dashboard' && (
+          {showLocationSelector && (
             <button 
               onClick={onRefresh}
-              className="location-selector-container"
-              style={{ cursor: 'pointer', background: 'transparent' }}
-              title="Refresh current city data"
+              className="location-selector-container refresh-action-btn"
+              title="Force synchronize latest environmental telemetry"
               disabled={loading}
+              aria-label="Refresh telemetry"
+              style={{ cursor: loading ? 'not-allowed' : 'pointer' }}
             >
               <RefreshCw 
                 size={16} 
-                className={`location-icon ${loading ? 'spin-animation' : ''}`} 
-                style={{ animation: loading ? 'spin 1s linear infinite' : 'none' }}
+                className={loading ? 'spin' : ''} 
+                style={{ color: loading ? 'var(--accent-blue)' : '#fff' }}
               />
+              <span className="refresh-label">{loading ? 'Syncing...' : 'Sync'}</span>
             </button>
           )}
         </div>

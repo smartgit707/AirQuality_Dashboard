@@ -2,6 +2,8 @@ require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const airQualityRoutes = require('./routes/airQuality');
+const airQualityController = require('./controllers/airQualityController');
+const { startDataCollector } = require('./jobs/dataCollector');
 const db = require('./db');
 
 const app = express();
@@ -17,14 +19,15 @@ app.use((req, res, next) => {
   next();
 });
 
-// Mount routes
+// Mount EcoSense API routes
 app.use('/api', airQualityRoutes);
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {
   res.json({
     status: 'OK',
-    message: 'Air Quality Monitoring API is running smoothly',
+    project: 'EcoSense Environmental Intelligence Platform',
+    message: 'EcoSense Backend API is running smoothly',
     databaseConnected: db.isPostgresConnected(),
     timestamp: new Date().toISOString()
   });
@@ -33,14 +36,23 @@ app.get('/api/health', (req, res) => {
 // Root welcome message
 app.get('/', (req, res) => {
   res.json({
-    project: 'Air Quality and Environment Monitoring Dashboard API',
-    version: '2.0.0 (Phase 3 Full Stack: React -> Express -> PostgreSQL)',
+    project: 'EcoSense: Intelligent Air Quality & Environmental Monitoring Platform',
+    tagline: 'Monitor. Analyze. Compare. Predict.',
+    version: '3.0.0 (Full EcoSense Architecture)',
     databaseConnected: db.isPostgresConnected(),
     endpoints: [
       'GET /api/health',
       'GET /api/cities',
       'GET /api/air-quality/:city',
-      'GET /api/air-quality/:city/history'
+      'GET /api/air-quality/:city/history',
+      'GET /api/comparison?cities=...',
+      'GET /api/analytics/:city?metric=...&range=...',
+      'GET /api/forecast/:city',
+      'GET /api/alerts',
+      'PATCH /api/alerts/:id/read',
+      'GET /api/recommendations/:city',
+      'GET /api/system/status',
+      'POST /api/refresh/:city'
     ]
   });
 });
@@ -48,12 +60,14 @@ app.get('/', (req, res) => {
 // Start Express server and initialize database connection
 app.listen(PORT, async () => {
   console.log(`===================================================`);
-  console.log(`🚀 Air Quality Server is running on port ${PORT}`);
+  console.log(`🌿 EcoSense Backend Server running on port ${PORT}`);
   console.log(`📡 Health Check: http://localhost:${PORT}/api/health`);
-  console.log(`🌍 City Latest: http://localhost:${PORT}/api/air-quality/Chennai`);
-  console.log(`📈 City History: http://localhost:${PORT}/api/air-quality/Chennai/history`);
+  console.log(`🌍 System Status: http://localhost:${PORT}/api/system/status`);
   console.log(`===================================================`);
 
   // Test PostgreSQL connection
   await db.initConnection();
+
+  // Start automated background telemetry collection
+  startDataCollector(airQualityController.fetchAndStoreCityTelemetry);
 });

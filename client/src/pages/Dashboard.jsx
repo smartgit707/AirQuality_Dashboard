@@ -20,6 +20,8 @@ import AQICard from '../components/AQICard';
 import MetricCard from '../components/MetricCard';
 import PollutantCard from '../components/PollutantCard';
 import AQIChart from '../components/AQIChart';
+import EnvironmentalScore from '../components/EnvironmentalScore';
+import RecommendationCard from '../components/RecommendationCard';
 import { getAQIStatus } from '../data/mockData';
 
 export default function Dashboard({ 
@@ -188,6 +190,11 @@ export default function Dashboard({
           )}
         </div>
       )}
+
+      {/* EcoSense Environmental Health Score Card */}
+      <section style={{ marginBottom: '1.5rem' }}>
+        <EnvironmentalScore data={data} loading={loading} />
+      </section>
 
       {/* 1. Top Metrics Overview Grid */}
       <section className="top-metrics-grid" aria-label="Key Environmental Metrics">
@@ -422,6 +429,11 @@ export default function Dashboard({
             </div>
           </div>
         </div>
+      </section>
+
+      {/* Activity & Outdoor Health Recommendations */}
+      <section style={{ marginBottom: '2rem' }}>
+        <RecommendationCard city={data.city} aqi={data.aqi} />
       </section>
     </main>
   );

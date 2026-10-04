@@ -75,6 +75,15 @@ const fallbackRecords = [
   { city: 'Bengaluru', aqi: 42, temperature: 23.0, humidity: 60.0, pm25: 18.0, pm10: 36.0, co: 0.4, no2: 15.0, so2: 5.0, o3: 28.0, wind_speed: 11.0, pressure: 915.0, recorded_at: new Date(Date.now() - 2 * 60 * 1000) }
 ];
 
+// Fallback alerts dataset for offline / development mode
+const fallbackAlerts = [
+  { id: 1, city: 'Delhi', severity: 'CRITICAL', metric: 'AQI', value: 215.0, message: 'Unhealthy air quality detected. Elevated smog levels across urban corridor.', created_at: new Date(Date.now() - 25 * 60 * 1000), is_read: false },
+  { id: 2, city: 'Delhi', severity: 'CRITICAL', metric: 'PM2.5', value: 165.0, message: 'PM2.5 concentration has increased significantly above safe limits.', created_at: new Date(Date.now() - 120 * 60 * 1000), is_read: false },
+  { id: 3, city: 'Mumbai', severity: 'WARNING', metric: 'AQI', value: 118.0, message: 'Air quality has reached a level that may affect sensitive individuals.', created_at: new Date(Date.now() - 60 * 60 * 1000), is_read: false },
+  { id: 4, city: 'Hyderabad', severity: 'INFO', metric: 'AQI', value: 88.0, message: 'Moderate air quality prevailing. Atmospheric parameters remain within expected bounds.', created_at: new Date(Date.now() - 180 * 60 * 1000), is_read: true },
+  { id: 5, city: 'Chennai', severity: 'INFO', metric: 'Humidity', value: 68.0, message: 'Coastal humidity peak detected with stable wind circulation.', created_at: new Date(Date.now() - 240 * 60 * 1000), is_read: true }
+];
+
 /**
  * Execute query with automatic fallback
  */
@@ -84,19 +93,66 @@ async function query(text, params = []) {
       return await pool.query(text, params);
     } catch (err) {
       console.error('[Database] Query execution error on PostgreSQL:', err.message);
-      throw err;
+      // Fall through to fallback simulator if live db had transient issue
     }
   }
 
   // If PostgreSQL is not connected, simulate SQL query on fallback schema records
   const normalized = text.toLowerCase().replace(/\s+/g, ' ');
   
-  // 1. SELECT * ... ORDER BY recorded_at DESC LIMIT 1 (get latest city record)
+  // 1. SELECT COUNT(*) ...
+  if (normalized.includes('count(*)')) {
+    if (normalized.includes('alerts')) {
+      return { rows: [{ count: fallbackAlerts.length }], rowCount: 1 };
+    }
+    return { rows: [{ count: fallbackRecords.length }], rowCount: 1 };
+  }
+
+  // 2. ALERTS QUERIES
+  if (normalized.includes('from alerts')) {
+    if (normalized.includes('order by created_at desc')) {
+      return {
+        rows: [...fallbackAlerts].sort((a, b) => new Date(b.created_at) - new Date(a.created_at)),
+        rowCount: fallbackAlerts.length
+      };
+    }
+    return { rows: fallbackAlerts, rowCount: fallbackAlerts.length };
+  }
+
+  // UPDATE alerts SET is_read = ...
+  if (normalized.startsWith('update alerts')) {
+    const alertId = parseInt(params[0], 10);
+    const target = fallbackAlerts.find(a => a.id === alertId);
+    if (target) {
+      target.is_read = true;
+      return { rows: [target], rowCount: 1 };
+    }
+    return { rows: [], rowCount: 0 };
+  }
+
+  // INSERT INTO alerts ...
+  if (normalized.startsWith('insert into alerts')) {
+    const [city, severity, metric, value, message] = params;
+    const newAlert = {
+      id: fallbackAlerts.length + 1,
+      city: city || 'All',
+      severity: severity || 'INFO',
+      metric: metric || 'AQI',
+      value: Number(value) || 0,
+      message: message || '',
+      created_at: new Date(),
+      is_read: false
+    };
+    fallbackAlerts.unshift(newAlert);
+    return { rows: [newAlert], rowCount: 1 };
+  }
+
+  // 3. SELECT * ... ORDER BY recorded_at DESC LIMIT 1 (get latest city record)
   if (normalized.includes('order by recorded_at desc limit 1') || normalized.includes('desc limit 1')) {
     const cityName = (params[0] || '').toLowerCase();
     const cityRecords = fallbackRecords
-      .filter(r => r.city.toLowerCase() === cityName)
-      .sort((a, b) => b.recorded_at - a.recorded_at);
+      .filter(r => !cityName || r.city.toLowerCase() === cityName)
+      .sort((a, b) => new Date(b.recorded_at) - new Date(a.recorded_at));
     
     return {
       rows: cityRecords.slice(0, 1),
@@ -104,12 +160,20 @@ async function query(text, params = []) {
     };
   }
 
-  // 2. SELECT ... ORDER BY recorded_at ASC (get historical records)
-  if (normalized.includes('order by recorded_at asc') || normalized.includes('asc')) {
+  // 4. SELECT ... ORDER BY recorded_at ASC / DESC (get historical records)
+  if (normalized.includes('order by recorded_at')) {
     const cityName = (params[0] || '').toLowerCase();
-    const cityRecords = fallbackRecords
-      .filter(r => r.city.toLowerCase() === cityName)
-      .sort((a, b) => a.recorded_at - b.recorded_at);
+    let cityRecords = fallbackRecords;
+    if (cityName) {
+      cityRecords = fallbackRecords.filter(r => r.city.toLowerCase() === cityName);
+    }
+    
+    cityRecords = [...cityRecords].sort((a, b) => {
+      if (normalized.includes('desc')) {
+        return new Date(b.recorded_at) - new Date(a.recorded_at);
+      }
+      return new Date(a.recorded_at) - new Date(b.recorded_at);
+    });
     
     return {
       rows: cityRecords,
@@ -117,9 +181,8 @@ async function query(text, params = []) {
     };
   }
 
-  // 3. INSERT INTO air_quality_records ...
+  // 5. INSERT INTO air_quality_records ...
   if (normalized.startsWith('insert into air_quality_records')) {
-    // Parameters order: [city, aqi, temperature, humidity, pm25, pm10, co, no2, so2, o3, wind_speed, pressure, recorded_at]
     const [city, aqi, temperature, humidity, pm25, pm10, co, no2, so2, o3, wind_speed, pressure, recorded_at] = params;
     const newRecord = {
       id: fallbackRecords.length + 1,
@@ -145,7 +208,7 @@ async function query(text, params = []) {
     };
   }
 
-  // 4. Fallback generic filter
+  // Generic fallback
   return {
     rows: [],
     rowCount: 0
@@ -156,5 +219,10 @@ module.exports = {
   pool,
   query,
   initConnection,
-  isPostgresConnected: () => isPostgresConnected
+  isPostgresConnected: () => isPostgresConnected,
+  getFallbackStats: () => ({
+    totalRecords: fallbackRecords.length,
+    totalAlerts: fallbackAlerts.length
+  })
 };
+
