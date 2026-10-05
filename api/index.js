@@ -2,4 +2,6 @@
 // Connects Vercel's serverless runtime directly to the Express application
 const app = require('../server/server');
 
-module.exports = app;
+module.exports = (req, res) => {
+  return app(req, res);
+};

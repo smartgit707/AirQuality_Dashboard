@@ -39,12 +39,8 @@ import { mockCityData } from './data/mockData';
 export default function App() {
   const { user, isAuthenticated, isAdmin } = useAuth();
   
-  // Default to 'login' page on open if not authenticated (as requested by user)
-  const [viewMode, setViewMode] = useState(() => {
-    const token = localStorage.getItem('ecosense_token');
-    const storedUser = localStorage.getItem('ecosense_user') || localStorage.getItem('ecosense_mock_user');
-    return (token && storedUser) ? 'dashboard' : 'login';
-  });
+  // Default to public air-quality dashboard
+  const [viewMode, setViewMode] = useState('dashboard');
   const [selectedCity, setSelectedCity] = useState('Delhi');
   const [dashboardData, setDashboardData] = useState(() => mockCityData['Delhi'] || null);
   const [historyData, setHistoryData] = useState(() => mockCityData['Delhi']?.trend || []);

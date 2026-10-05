@@ -637,16 +637,35 @@ export default function LoginPage({ onNavigate }) {
             </div>
           </div>
 
-          {/* Navigation to Register */}
-          <div className="auth-bottom-nav">
-            Don't have an account?{' '}
-            <button
-              type="button"
-              onClick={() => onNavigate('register')}
-              className="auth-switch-link"
-            >
-              Create account
-            </button>
+          {/* Navigation to Register and Return to Dashboard */}
+          <div className="auth-bottom-nav" style={{ display: 'flex', flexDirection: 'column', gap: '8px', alignItems: 'center' }}>
+            <div>
+              Don't have an account?{' '}
+              <button
+                type="button"
+                onClick={() => onNavigate('register')}
+                className="auth-switch-link"
+              >
+                Create account
+              </button>
+            </div>
+            <div>
+              <button
+                type="button"
+                onClick={() => onNavigate('dashboard')}
+                style={{
+                  background: 'transparent',
+                  border: 'none',
+                  color: '#00f5a0',
+                  fontSize: '0.82rem',
+                  fontWeight: 600,
+                  cursor: 'pointer',
+                  textDecoration: 'underline'
+                }}
+              >
+                &larr; Return to Live Air Quality Platform
+              </button>
+            </div>
           </div>
         </div>
       </div>
