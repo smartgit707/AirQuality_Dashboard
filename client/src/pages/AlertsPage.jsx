@@ -102,6 +102,78 @@ export default function AlertsPage() {
         </button>
       </div>
 
+      {/* Alert Configuration Console (Section 19) */}
+      <div 
+        className="card" 
+        style={{ 
+          marginBottom: '1.5rem', 
+          padding: '1.5rem',
+          background: 'rgba(12, 24, 18, 0.85)',
+          border: '1px solid rgba(0, 245, 160, 0.25)',
+          borderRadius: '16px'
+        }}
+      >
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem', flexWrap: 'wrap', gap: '8px' }}>
+          <div>
+            <h3 style={{ fontSize: '1.15rem', fontWeight: 800, color: '#f8fafc', margin: 0 }}>
+              Personalized Alert Surveillance Thresholds
+            </h3>
+            <p style={{ color: '#94a3b8', fontSize: '0.82rem', margin: '4px 0 0' }}>
+              Configure automatic push triggers for AQI excursions and particulate spikes
+            </p>
+          </div>
+          <span style={{ fontSize: '0.75rem', color: '#10b981', background: 'rgba(16, 185, 129, 0.1)', padding: '3px 8px', borderRadius: '6px', border: '1px solid rgba(16, 185, 129, 0.3)' }}>
+            ● Active Real-Time Guard
+          </span>
+        </div>
+
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '14px', alignItems: 'center' }}>
+          {/* AQI Threshold Slider */}
+          <div style={{ background: 'rgba(0, 0, 0, 0.3)', padding: '12px', borderRadius: '10px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.8rem', color: '#94a3b8', marginBottom: '6px' }}>
+              <span>AQI Warning Limit:</span>
+              <strong style={{ color: '#00f5a0' }}>150 AQI (Sensitive)</strong>
+            </div>
+            <input 
+              type="range" 
+              min="50" 
+              max="300" 
+              defaultValue="150" 
+              style={{ width: '100%', accentColor: '#00f5a0' }} 
+            />
+          </div>
+
+          {/* Preferred City */}
+          <div style={{ background: 'rgba(0, 0, 0, 0.3)', padding: '12px', borderRadius: '10px' }}>
+            <span style={{ display: 'block', fontSize: '0.8rem', color: '#94a3b8', marginBottom: '6px' }}>Preferred Monitored Hub:</span>
+            <select 
+              defaultValue="Delhi" 
+              style={{ width: '100%', background: '#0a140f', border: '1px solid rgba(255, 255, 255, 0.15)', color: '#fff', borderRadius: '6px', padding: '6px', fontSize: '0.85rem' }}
+            >
+              {['Delhi', 'Mumbai', 'Bengaluru', 'Chennai', 'Hyderabad', 'Kolkata', 'Pune'].map(c => (
+                <option key={c} value={c}>{c}</option>
+              ))}
+            </select>
+          </div>
+
+          {/* Pollutant Monitors */}
+          <div style={{ background: 'rgba(0, 0, 0, 0.3)', padding: '12px', borderRadius: '10px' }}>
+            <span style={{ display: 'block', fontSize: '0.8rem', color: '#94a3b8', marginBottom: '6px' }}>Criteria Pollutants to Guard:</span>
+            <div style={{ display: 'flex', gap: '10px', fontSize: '0.8rem', color: '#f8fafc' }}>
+              <label style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                <input type="checkbox" defaultChecked style={{ accentColor: '#00f5a0' }} /> PM2.5
+              </label>
+              <label style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                <input type="checkbox" defaultChecked style={{ accentColor: '#00f5a0' }} /> PM10
+              </label>
+              <label style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                <input type="checkbox" defaultChecked style={{ accentColor: '#00f5a0' }} /> Ozone
+              </label>
+            </div>
+          </div>
+        </div>
+      </div>
+
       {/* Filter & Counter Bar */}
       <div className="card" style={{ marginBottom: '1.5rem', padding: '1rem 1.25rem' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>

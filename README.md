@@ -16,17 +16,16 @@ Urban air quality and environmental degradation represent critical public health
 
 ## 2. Key Objectives & Features
 
-1. **Overview Dashboard**: Real-time monitoring across 5 metropolitan monitoring stations (Chennai, Hyderabad, Delhi, Mumbai, Bengaluru) displaying AQI, dynamic status, 6 criteria pollutants (PM2.5, PM10, CO, NO2, SO2, O3), and 4 weather factors (Temp, Humidity, Wind Speed, Pressure).
-2. **EcoSense Environmental Health Score**: Transparent rule-based composite index (0–100) combining AQI severity (60%), particulate burden (25%), and meteorological comfort (15%).
-3. **Live Pollution Interactive Map**: Leaflet / React-Leaflet GIS visualization featuring color-coded station markers, interactive telemetry popups, and quick-jump navigation.
-4. **Atmospheric Analytics**: Longitudinal analytics across any parameter (AQI, PM2.5, etc.) and time horizons (24 Hours, 7 Days, 30 Days) with min, max, average, and percentage trend velocity.
-5. **Multi-City Comparison Matrix**: Simultaneous benchmark across 2 to 5 monitoring stations with automated winner detection (Cleanest Air, Highest Pollution, Lowest PM2.5) and overlaid Recharts trends.
-6. **Diurnal AQI Forecast**: Mathematical moving average projection model factoring diurnal nocturnal stagnation curves into 24-hour expected peak and lowest points.
-7. **Smart Notification & Alerts Engine**: In-app threshold surveillance logging `INFO`, `WARNING`, and `CRITICAL` alerts with interactive read acknowledgement.
-8. **Health & Activity Advisories**: EPA/WHO-aligned outdoor guidance for running, walking, cycling, outdoor sports, and home ventilation.
-9. **Automated Background Data Collector**: Background scheduler (`server/jobs/dataCollector.js`) polling Open-Meteo at configurable intervals (`DATA_COLLECTION_INTERVAL`).
+1. **Information-First Homepage**: 15-section comprehensive air-quality portal featuring global autocomplete search, holographic AQI gauge with 3D flip WHO guidelines, CPCB/EPA continuous scale bar with dynamic marker, criteria pollutants grid (with defensive "Data unavailable" fallback), weather telemetry, 24-hour diurnal trend chart, mini map preview, and live rankings.
+2. **Global Location Search & GPS Autocomplete**: Instant search across 18 Indian & international metropolitan hubs (Delhi, Mumbai, Bengaluru, Chennai, Hyderabad, Kolkata, Pune, Ahmedabad, Jaipur, Lucknow, Chandigarh, Kochi, Patna, London, New York, Tokyo, Paris, Dubai) with "Use My Location" browser geolocation support.
+3. **Criteria Pollutants Dossier & Pathophysiology**: Dedicated pollutant pages and flip cards for PM2.5, PM10, CO, NO₂, SO₂, and O₃, comparing current concentrations against WHO 24-hour guidelines and detailing physiological respiratory impacts.
+4. **Interactive Multi-Layer Map**: Leaflet / React-Leaflet GIS visualization featuring multi-metric layer toggles (`AQI`, `PM2.5`, `PM10`, `Temperature`, `Humidity`), real-time marker badges, and Cleanest-Air "EcoRoute" navigation corridors.
+5. **Metropolitan Rankings Leaderboard**: Live sorting of most polluted vs. cleanest cities with All, India, and World regional filters.
+6. **Multi-City Comparison Matrix**: Simultaneous comparison across 2 to 5 monitoring stations with 7-day average, 30-day average, and 24-hr velocity trend curves.
+7. **Diurnal Atmospheric Forecast**: Diurnal Dispersion & Decay Model (DAD-v2.1) providing 6-hour, 12-hour, and 24-hour horizon toggles, backed by transparent accuracy metrics (~8.4% MAE benchmarked against CAAQMS monitors).
+8. **Admin Control Center & Telemetry Monitor**: Section 21 Data Collection Monitoring Table tracking station sync status (`● Healthy` / `● Delayed`), database record counts, role-based access control (RBAC), and security audit trails.
+9. **Smart Notification & Alerts Engine**: Configurable threshold surveillance logging `INFO`, `WARNING`, and `CRITICAL` alerts with interactive read acknowledgement.
 10. **Printable Audit Reports**: On-demand station dossiers with summary statistics and browser print / PDF export styling.
-11. **System Health & Diagnostic Platform**: Administrative telemetry monitoring API gateway uptime, PostgreSQL connection state, synchronization logs, and record counters.
 
 ---
 

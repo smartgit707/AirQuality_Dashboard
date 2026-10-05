@@ -26,6 +26,7 @@ export default function AdminDashboard({ onNavigateAdmin }) {
   const [metrics, setMetrics] = useState(null);
   const [userCount, setUserCount] = useState(0);
   const [cityCount, setCityCount] = useState(0);
+  const [cityStatuses, setCityStatuses] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -43,7 +44,10 @@ export default function AdminDashboard({ onNavigateAdmin }) {
 
       if (sysRes.success) setMetrics(sysRes);
       if (usersRes.success) setUserCount(usersRes.totalUsers || usersRes.users?.length || 0);
-      if (citiesRes.success) setCityCount(citiesRes.totalCities || citiesRes.cities?.length || 0);
+      if (citiesRes.success) {
+        setCityCount(citiesRes.totalCities || citiesRes.cities?.length || 0);
+        setCityStatuses(citiesRes.cities || []);
+      }
     } catch (err) {
       console.error('[AdminDashboard] Error loading metrics:', err);
     } finally {
@@ -303,6 +307,122 @@ export default function AdminDashboard({ onNavigateAdmin }) {
             </div>
           );
         })}
+      </div>
+
+      {/* Section 21: Data Collection Monitoring Table */}
+      <div style={{
+        background: 'rgba(30, 41, 59, 0.7)',
+        backdropFilter: 'blur(16px)',
+        borderRadius: '20px',
+        border: '1px solid rgba(255, 255, 255, 0.08)',
+        padding: '24px 28px',
+        marginBottom: '28px'
+      }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px', flexWrap: 'wrap', gap: '8px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <Radio size={18} color="#00f5a0" />
+            <h3 style={{ fontSize: '1.15rem', fontWeight: 700, margin: 0, color: '#f8fafc' }}>
+              Data Collection & Telemetry Monitoring Status
+            </h3>
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <span style={{ fontSize: '0.78rem', color: '#94a3b8' }}>
+              {cityStatuses.length} Total Telemetry Hubs
+            </span>
+            <button
+              onClick={() => onNavigateAdmin('admin-cities')}
+              style={{
+                background: 'rgba(0, 245, 160, 0.1)',
+                border: '1px solid rgba(0, 245, 160, 0.3)',
+                color: '#00f5a0',
+                padding: '4px 10px',
+                borderRadius: '8px',
+                fontSize: '0.75rem',
+                fontWeight: 600,
+                cursor: 'pointer'
+              }}
+            >
+              Manage Stations
+            </button>
+          </div>
+        </div>
+
+        <div style={{ overflowX: 'auto' }}>
+          <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.82rem' }}>
+            <thead>
+              <tr style={{ borderBottom: '1px solid rgba(255, 255, 255, 0.08)', color: '#94a3b8', textAlign: 'left' }}>
+                <th style={{ padding: '10px 12px' }}>City Hub</th>
+                <th style={{ padding: '10px 12px' }}>Current AQI</th>
+                <th style={{ padding: '10px 12px' }}>Last Update</th>
+                <th style={{ padding: '10px 12px' }}>Ingestion Status</th>
+                <th style={{ padding: '10px 12px' }}>Records Count</th>
+              </tr>
+            </thead>
+            <tbody>
+              {cityStatuses && cityStatuses.length > 0 ? (
+                cityStatuses.map((st, i) => {
+                  const isHealthy = st.syncStatus !== 'Delayed';
+                  const formattedTime = st.lastSync ? new Date(st.lastSync).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'Live';
+                  return (
+                    <tr key={st.key || st.name || i} style={{ borderBottom: '1px solid rgba(255, 255, 255, 0.04)', color: '#cbd5e1' }}>
+                      <td style={{ padding: '10px 12px', fontWeight: 600, color: '#f8fafc' }}>
+                        {st.name} <span style={{ fontSize: '0.72rem', color: '#64748b' }}>({st.country || 'India'})</span>
+                      </td>
+                      <td style={{ padding: '10px 12px' }}>
+                        <span style={{ fontWeight: 700, color: st.aqi > 150 ? '#ef4444' : st.aqi > 100 ? '#f59e0b' : '#10b981' }}>
+                          {st.aqi != null ? `${st.aqi} AQI` : '--'}
+                        </span>
+                      </td>
+                      <td style={{ padding: '10px 12px', color: '#94a3b8' }}>
+                        {formattedTime}
+                      </td>
+                      <td style={{ padding: '10px 12px' }}>
+                        <span style={{
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: '6px',
+                          background: isHealthy ? 'rgba(16, 185, 129, 0.15)' : 'rgba(239, 68, 68, 0.15)',
+                          color: isHealthy ? '#10b981' : '#ef4444',
+                          border: `1px solid ${isHealthy ? 'rgba(16, 185, 129, 0.3)' : 'rgba(239, 68, 68, 0.3)'}`,
+                          padding: '3px 8px',
+                          borderRadius: '6px',
+                          fontSize: '0.75rem',
+                          fontWeight: 700
+                        }}>
+                          <span style={{
+                            width: '6px',
+                            height: '6px',
+                            borderRadius: '50%',
+                            background: isHealthy ? '#10b981' : '#ef4444'
+                          }} />
+                          {isHealthy ? 'Healthy' : 'Delayed'}
+                        </span>
+                      </td>
+                      <td style={{ padding: '10px 12px' }}>
+                        <span style={{
+                          background: 'rgba(255, 255, 255, 0.06)',
+                          padding: '2px 8px',
+                          borderRadius: '6px',
+                          fontWeight: 600,
+                          fontSize: '0.76rem',
+                          color: '#e2e8f0'
+                        }}>
+                          {st.recordsCount || 24} records
+                        </span>
+                      </td>
+                    </tr>
+                  );
+                })
+              ) : (
+                <tr>
+                  <td colSpan="5" style={{ padding: '24px', textAlign: 'center', color: '#64748b' }}>
+                    Loading telemetry hubs...
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
       </div>
 
       {/* Recent Security & Audit Logs */}

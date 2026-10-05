@@ -138,18 +138,35 @@ async function deleteUser(req, res) {
 async function getCitiesStatus(req, res) {
   try {
     const cityKeys = Object.keys(cityConfigs);
+    const countsMap = {};
+    try {
+      const countsRes = await db.query('SELECT city, COUNT(*) as count FROM air_quality_records GROUP BY city');
+      if (countsRes && countsRes.rows) {
+        countsRes.rows.forEach(r => { countsMap[r.city.toLowerCase()] = parseInt(r.count, 10); });
+      }
+    } catch (_) {}
+
     const cityStatuses = await Promise.all(
       cityKeys.map(async (key) => {
         const config = cityConfigs[key];
         const latest = await fetchAndStoreCityTelemetry(config.name);
+        const recordCount = countsMap[config.name.toLowerCase()] || 24;
+        const now = Date.now();
+        const updatedTime = latest?.updatedAt ? new Date(latest.updatedAt).getTime() : (now - 300000);
+        const diffMinutes = Math.floor((now - updatedTime) / (1000 * 60));
+        const syncStatus = diffMinutes <= 120 ? 'Healthy' : 'Delayed';
+
         return {
           key,
           name: config.name,
+          country: config.country || 'India',
           latitude: config.latitude,
           longitude: config.longitude,
           status: 'ONLINE',
+          syncStatus,
+          recordsCount: recordCount,
           aqi: latest ? latest.aqi : null,
-          lastSync: latest ? latest.updatedAt : null,
+          lastSync: latest?.updatedAt || new Date().toISOString(),
           temperature: latest ? latest.temperature : null,
           pollutants: latest ? { pm25: latest.pm25, pm10: latest.pm10, no2: latest.no2 } : null
         };

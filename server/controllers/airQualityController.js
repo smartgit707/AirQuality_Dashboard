@@ -269,15 +269,18 @@ async function evaluateAndStoreAlert(cityName, data) {
  * Returns supported cities list with coordinates
  */
 exports.getCities = async (req, res) => {
-  const citiesList = supportedCityNames.map(name => {
-    const conf = getCityConfig(name);
-    return {
-      name: conf.name,
-      state: conf.state,
-      latitude: conf.latitude,
-      longitude: conf.longitude
-    };
-  });
+  const citiesList = supportedCityNames
+    .map(name => {
+      const conf = getCityConfig(name);
+      if (!conf) return null;
+      return {
+        name: conf.name,
+        state: conf.state,
+        latitude: conf.latitude,
+        longitude: conf.longitude
+      };
+    })
+    .filter(Boolean);
 
   res.json({
     success: true,

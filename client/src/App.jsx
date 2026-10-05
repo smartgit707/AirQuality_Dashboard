@@ -102,6 +102,21 @@ export default function App() {
     loadCityData(selectedCity, false);
   }, []);
 
+  // Section 28: Dynamic Document Title & SEO Tagging
+  useEffect(() => {
+    const cityName = selectedCity || 'National';
+    const aqiVal = currentData?.aqi ? ` (AQI ${currentData.aqi})` : '';
+    document.title = `${cityName} Air Quality Index${aqiVal} & Live Weather | EcoSense`;
+
+    let metaDesc = document.querySelector('meta[name="description"]');
+    if (!metaDesc) {
+      metaDesc = document.createElement('meta');
+      metaDesc.name = 'description';
+      document.head.appendChild(metaDesc);
+    }
+    metaDesc.content = `Check real-time Air Quality Index (AQI), PM2.5, PM10, criteria pollutants and weather forecast for ${cityName} on EcoSense.`;
+  }, [selectedCity, currentData?.aqi, viewMode]);
+
   // Handle location dropdown change
   const handleCityChange = (newCity) => {
     if (loading) return;

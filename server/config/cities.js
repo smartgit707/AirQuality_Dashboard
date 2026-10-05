@@ -142,8 +142,9 @@ const cities = {
  */
 function getCityConfig(cityName) {
   if (!cityName) return null;
-  const key = cityName.trim().toLowerCase();
-  return cities[key] || null;
+  const rawKey = cityName.trim().toLowerCase();
+  const strippedKey = rawKey.replace(/[\s_-]+/g, '');
+  return cities[rawKey] || cities[strippedKey] || Object.values(cities).find(c => c.name.toLowerCase() === rawKey || c.name.toLowerCase().replace(/[\s_-]+/g, '') === strippedKey) || null;
 }
 
 module.exports = {
