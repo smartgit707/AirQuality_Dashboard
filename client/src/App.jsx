@@ -101,7 +101,7 @@ export default function App() {
   // Section 28: Dynamic Document Title & SEO Tagging
   useEffect(() => {
     const cityName = selectedCity || 'National';
-    const aqiVal = currentData?.aqi ? ` (AQI ${currentData.aqi})` : '';
+    const aqiVal = dashboardData?.aqi ? ` (AQI ${dashboardData.aqi})` : '';
     document.title = `${cityName} Air Quality Index${aqiVal} & Live Weather | EcoSense`;
 
     let metaDesc = document.querySelector('meta[name="description"]');
@@ -111,7 +111,7 @@ export default function App() {
       document.head.appendChild(metaDesc);
     }
     metaDesc.content = `Check real-time Air Quality Index (AQI), PM2.5, PM10, criteria pollutants and weather forecast for ${cityName} on EcoSense.`;
-  }, [selectedCity, currentData?.aqi, viewMode]);
+  }, [selectedCity, dashboardData?.aqi, viewMode]);
 
   // Handle location dropdown change
   const handleCityChange = (newCity) => {
