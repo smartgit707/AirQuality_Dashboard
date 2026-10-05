@@ -70,31 +70,31 @@ export default function CityPage({ city = 'Chennai', onNavigate, onCityChange })
       {/* City Breadcrumb & SEO Header */}
       <div 
         style={{
-          background: 'linear-gradient(135deg, rgba(12, 24, 18, 0.95) 0%, rgba(6, 12, 9, 0.98) 100%)',
-          border: '1px solid rgba(0, 245, 160, 0.25)',
+          background: 'var(--bg-card)',
+          border: '1px solid var(--border-color)',
           borderRadius: '24px',
           padding: '2rem 2.5rem',
           marginBottom: '2rem',
-          boxShadow: '0 20px 45px rgba(0, 0, 0, 0.5), inset 0 0 35px rgba(0, 245, 160, 0.05)'
+          boxShadow: 'var(--shadow-card)'
         }}
       >
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#94a3b8', fontSize: '0.85rem', marginBottom: '0.75rem' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--text-secondary)', fontSize: '0.85rem', marginBottom: '0.75rem' }}>
           <span>World</span>
           <span>&rsaquo;</span>
           <span>{data.country || 'India'}</span>
           <span>&rsaquo;</span>
           <span>{data.state || 'Tamil Nadu'}</span>
           <span>&rsaquo;</span>
-          <span style={{ color: '#00f5a0', fontWeight: 700 }}>{data.city}</span>
+          <span style={{ color: 'var(--accent-cyan)', fontWeight: 700 }}>{data.city}</span>
         </div>
 
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '1rem' }}>
           <div>
-            <h1 style={{ fontSize: '2.5rem', fontWeight: 900, color: '#f8fafc', margin: '0 0 6px 0', letterSpacing: '-0.02em' }}>
+            <h1 style={{ fontSize: '2.5rem', fontWeight: 900, color: 'var(--text-primary)', margin: '0 0 6px 0', letterSpacing: '-0.02em' }}>
               {data.city}, {data.state}
             </h1>
-            <p style={{ color: '#94a3b8', fontSize: '0.95rem', margin: 0, display: 'flex', alignItems: 'center', gap: '6px' }}>
-              <Clock size={15} style={{ color: '#00f5a0' }} />
+            <p style={{ color: 'var(--text-secondary)', fontSize: '0.95rem', margin: 0, display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <Clock size={15} style={{ color: 'var(--accent-cyan)' }} />
               <span>Last updated: {data.lastUpdated || '10 minutes ago'} &bull; Station Elevation: 14m</span>
             </p>
           </div>
@@ -102,11 +102,11 @@ export default function CityPage({ city = 'Chennai', onNavigate, onCityChange })
           {/* City Ranking Pills */}
           <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
             <div style={{ background: 'rgba(0, 245, 160, 0.1)', border: '1px solid rgba(0, 245, 160, 0.3)', padding: '8px 14px', borderRadius: '12px', textAlign: 'center' }}>
-              <div style={{ fontSize: '0.7rem', color: '#94a3b8', textTransform: 'uppercase', fontWeight: 700 }}>National Rank</div>
+              <div style={{ fontSize: '0.7rem', color: 'var(--text-secondary)', textTransform: 'uppercase', fontWeight: 700 }}>National Rank</div>
               <div style={{ fontSize: '1.25rem', fontWeight: 800, color: '#00f5a0' }}>#4 Cleanest</div>
             </div>
             <div style={{ background: 'rgba(59, 130, 246, 0.1)', border: '1px solid rgba(59, 130, 246, 0.3)', padding: '8px 14px', borderRadius: '12px', textAlign: 'center' }}>
-              <div style={{ fontSize: '0.7rem', color: '#94a3b8', textTransform: 'uppercase', fontWeight: 700 }}>Regional Rank</div>
+              <div style={{ fontSize: '0.7rem', color: 'var(--text-secondary)', textTransform: 'uppercase', fontWeight: 700 }}>Regional Rank</div>
               <div style={{ fontSize: '1.25rem', fontWeight: 800, color: '#60a5fa' }}>#2 in South Zone</div>
             </div>
           </div>
@@ -127,60 +127,60 @@ export default function CityPage({ city = 'Chennai', onNavigate, onCityChange })
         {/* Environmental Weather Micro-climate */}
         <div
           style={{
-            background: 'rgba(12, 24, 18, 0.72)',
-            border: '1px solid rgba(255, 255, 255, 0.08)',
+            background: 'var(--bg-card)',
+            border: '1px solid var(--border-color)',
             borderRadius: '24px',
             padding: '24px',
             display: 'flex',
             flexDirection: 'column',
             justifyContent: 'space-between',
-            boxShadow: '0 12px 30px rgba(0, 0, 0, 0.4)'
+            boxShadow: 'var(--shadow-card)'
           }}
         >
           <div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#00f5a0', marginBottom: '14px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--accent-cyan)', marginBottom: '14px' }}>
               <Wind size={20} />
-              <h3 style={{ fontSize: '1.2rem', fontWeight: 800, margin: 0, color: '#f8fafc' }}>
+              <h3 style={{ fontSize: '1.2rem', fontWeight: 800, margin: 0, color: 'var(--text-primary)' }}>
                 Meteorological Conditions in {data.city}
               </h3>
             </div>
-            <p style={{ color: '#94a3b8', fontSize: '0.85rem', marginBottom: '1.5rem' }}>
+            <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', marginBottom: '1.5rem' }}>
               Atmospheric dispersion forces dictate particulate settling and ventilation.
             </p>
 
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '14px' }}>
-              <div style={{ background: 'rgba(0, 0, 0, 0.3)', padding: '14px', borderRadius: '14px', border: '1px solid rgba(255, 255, 255, 0.05)' }}>
-                <span style={{ fontSize: '0.75rem', color: '#94a3b8', display: 'flex', alignItems: 'center', gap: '4px' }}>
+              <div style={{ background: 'var(--bg-subpanel, rgba(0, 0, 0, 0.3))', padding: '14px', borderRadius: '14px', border: '1px solid var(--border-color, rgba(255, 255, 255, 0.05))' }}>
+                <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', display: 'flex', alignItems: 'center', gap: '4px' }}>
                   <Thermometer size={14} style={{ color: '#f97316' }} /> Temperature
                 </span>
-                <div style={{ fontSize: '1.4rem', fontWeight: 800, color: '#f8fafc', marginTop: '4px' }}>
+                <div style={{ fontSize: '1.4rem', fontWeight: 800, color: 'var(--text-primary)', marginTop: '4px' }}>
                   {data.temperature}°C
                 </div>
               </div>
 
-              <div style={{ background: 'rgba(0, 0, 0, 0.3)', padding: '14px', borderRadius: '14px', border: '1px solid rgba(255, 255, 255, 0.05)' }}>
-                <span style={{ fontSize: '0.75rem', color: '#94a3b8', display: 'flex', alignItems: 'center', gap: '4px' }}>
+              <div style={{ background: 'var(--bg-subpanel, rgba(0, 0, 0, 0.3))', padding: '14px', borderRadius: '14px', border: '1px solid var(--border-color, rgba(255, 255, 255, 0.05))' }}>
+                <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', display: 'flex', alignItems: 'center', gap: '4px' }}>
                   <Droplets size={14} style={{ color: '#06b6d4' }} /> Humidity
                 </span>
-                <div style={{ fontSize: '1.4rem', fontWeight: 800, color: '#f8fafc', marginTop: '4px' }}>
+                <div style={{ fontSize: '1.4rem', fontWeight: 800, color: 'var(--text-primary)', marginTop: '4px' }}>
                   {data.humidity}%
                 </div>
               </div>
 
-              <div style={{ background: 'rgba(0, 0, 0, 0.3)', padding: '14px', borderRadius: '14px', border: '1px solid rgba(255, 255, 255, 0.05)' }}>
-                <span style={{ fontSize: '0.75rem', color: '#94a3b8', display: 'flex', alignItems: 'center', gap: '4px' }}>
+              <div style={{ background: 'var(--bg-subpanel, rgba(0, 0, 0, 0.3))', padding: '14px', borderRadius: '14px', border: '1px solid var(--border-color, rgba(255, 255, 255, 0.05))' }}>
+                <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', display: 'flex', alignItems: 'center', gap: '4px' }}>
                   <Wind size={14} style={{ color: '#10b981' }} /> Wind Velocity
                 </span>
-                <div style={{ fontSize: '1.4rem', fontWeight: 800, color: '#f8fafc', marginTop: '4px' }}>
+                <div style={{ fontSize: '1.4rem', fontWeight: 800, color: 'var(--text-primary)', marginTop: '4px' }}>
                   {data.windSpeed || data.wind_speed} km/h
                 </div>
               </div>
 
-              <div style={{ background: 'rgba(0, 0, 0, 0.3)', padding: '14px', borderRadius: '14px', border: '1px solid rgba(255, 255, 255, 0.05)' }}>
-                <span style={{ fontSize: '0.75rem', color: '#94a3b8', display: 'flex', alignItems: 'center', gap: '4px' }}>
+              <div style={{ background: 'var(--bg-subpanel, rgba(0, 0, 0, 0.3))', padding: '14px', borderRadius: '14px', border: '1px solid var(--border-color, rgba(255, 255, 255, 0.05))' }}>
+                <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', display: 'flex', alignItems: 'center', gap: '4px' }}>
                   <Gauge size={14} style={{ color: '#a855f7' }} /> Barometer
                 </span>
-                <div style={{ fontSize: '1.4rem', fontWeight: 800, color: '#f8fafc', marginTop: '4px' }}>
+                <div style={{ fontSize: '1.4rem', fontWeight: 800, color: 'var(--text-primary)', marginTop: '4px' }}>
                   {data.pressure} hPa
                 </div>
               </div>
@@ -239,10 +239,10 @@ export default function CityPage({ city = 'Chennai', onNavigate, onCityChange })
       <div style={{ marginBottom: '2.5rem' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
           <div>
-            <h2 style={{ fontSize: '1.4rem', fontWeight: 800, color: '#f8fafc', margin: 0 }}>
+            <h2 style={{ fontSize: '1.4rem', fontWeight: 800, color: 'var(--text-primary)', margin: 0 }}>
               Live Pollutant Concentrations
             </h2>
-            <p style={{ color: '#94a3b8', fontSize: '0.85rem', margin: '4px 0 0 0' }}>
+            <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', margin: '4px 0 0 0' }}>
               6 Criteria air contaminants observed in {data.city}
             </p>
           </div>
@@ -270,24 +270,24 @@ export default function CityPage({ city = 'Chennai', onNavigate, onCityChange })
         {/* Trend Graph with 24h & 7d Toggle */}
         <div
           style={{
-            background: 'rgba(12, 24, 18, 0.72)',
-            border: '1px solid rgba(255, 255, 255, 0.08)',
+            background: 'var(--bg-card)',
+            border: '1px solid var(--border-color)',
             borderRadius: '20px',
             padding: '24px',
-            boxShadow: '0 12px 30px rgba(0, 0, 0, 0.4)'
+            boxShadow: 'var(--shadow-card)'
           }}
         >
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
             <div>
-              <h3 style={{ fontSize: '1.25rem', fontWeight: 800, color: '#f8fafc', margin: 0 }}>
+              <h3 style={{ fontSize: '1.25rem', fontWeight: 800, color: 'var(--text-primary)', margin: 0 }}>
                 {activeTrendTab === '24h' ? '24-Hour Diurnal AQI Trend' : '7-Day Historical Trend'}
               </h3>
-              <p style={{ color: '#94a3b8', fontSize: '0.8rem', margin: '4px 0 0 0' }}>
+              <p style={{ color: 'var(--text-secondary)', fontSize: '0.8rem', margin: '4px 0 0 0' }}>
                 Trajectory of air quality index in {data.city}
               </p>
             </div>
 
-            <div style={{ display: 'flex', gap: '6px', background: 'rgba(0, 0, 0, 0.3)', padding: '4px', borderRadius: '10px' }}>
+            <div style={{ display: 'flex', gap: '6px', background: 'var(--bg-subpanel, rgba(0, 0, 0, 0.3))', padding: '4px', borderRadius: '10px' }}>
               <button
                 onClick={() => setActiveTrendTab('24h')}
                 style={{
@@ -295,7 +295,7 @@ export default function CityPage({ city = 'Chennai', onNavigate, onCityChange })
                   borderRadius: '6px',
                   border: 'none',
                   background: activeTrendTab === '24h' ? '#00f5a0' : 'transparent',
-                  color: activeTrendTab === '24h' ? '#052317' : '#94a3b8',
+                  color: activeTrendTab === '24h' ? '#052317' : 'var(--text-secondary)',
                   fontWeight: 700,
                   fontSize: '0.78rem',
                   cursor: 'pointer'
@@ -310,7 +310,7 @@ export default function CityPage({ city = 'Chennai', onNavigate, onCityChange })
                   borderRadius: '6px',
                   border: 'none',
                   background: activeTrendTab === '7d' ? '#00f5a0' : 'transparent',
-                  color: activeTrendTab === '7d' ? '#052317' : '#94a3b8',
+                  color: activeTrendTab === '7d' ? '#052317' : 'var(--text-secondary)',
                   fontWeight: 700,
                   fontSize: '0.78rem',
                   cursor: 'pointer'
@@ -353,53 +353,53 @@ export default function CityPage({ city = 'Chennai', onNavigate, onCityChange })
         {/* Air Quality Insights Analysis Panel */}
         <div
           style={{
-            background: 'rgba(12, 24, 18, 0.72)',
-            border: '1px solid rgba(255, 255, 255, 0.08)',
+            background: 'var(--bg-card)',
+            border: '1px solid var(--border-color)',
             borderRadius: '20px',
             padding: '24px',
             display: 'flex',
             flexDirection: 'column',
             justifyContent: 'space-between',
-            boxShadow: '0 12px 30px rgba(0, 0, 0, 0.4)'
+            boxShadow: 'var(--shadow-card)'
           }}
         >
           <div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#00f5a0', marginBottom: '14px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--accent-cyan)', marginBottom: '14px' }}>
               <Sparkles size={20} />
-              <h3 style={{ fontSize: '1.25rem', fontWeight: 800, margin: 0, color: '#f8fafc' }}>
+              <h3 style={{ fontSize: '1.25rem', fontWeight: 800, margin: 0, color: 'var(--text-primary)' }}>
                 Air Quality Insights & Analytics
               </h3>
             </div>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', padding: '10px 14px', background: 'rgba(0, 0, 0, 0.25)', borderRadius: '10px' }}>
-                <span style={{ color: '#94a3b8', fontSize: '0.85rem' }}>Highest AQI Period:</span>
+              <div style={{ display: 'flex', justifyContent: 'space-between', padding: '10px 14px', background: 'var(--bg-subpanel, rgba(0, 0, 0, 0.25))', border: '1px solid var(--border-color)', borderRadius: '10px' }}>
+                <span style={{ color: 'var(--text-secondary)', fontSize: '0.85rem' }}>Highest AQI Period:</span>
                 <span style={{ fontWeight: 800, color: '#ef4444' }}>{peakTime} ({highestAqi} AQI)</span>
               </div>
 
-              <div style={{ display: 'flex', justifyContent: 'space-between', padding: '10px 14px', background: 'rgba(0, 0, 0, 0.25)', borderRadius: '10px' }}>
-                <span style={{ color: '#94a3b8', fontSize: '0.85rem' }}>Lowest AQI Period:</span>
+              <div style={{ display: 'flex', justifyContent: 'space-between', padding: '10px 14px', background: 'var(--bg-subpanel, rgba(0, 0, 0, 0.25))', border: '1px solid var(--border-color)', borderRadius: '10px' }}>
+                <span style={{ color: 'var(--text-secondary)', fontSize: '0.85rem' }}>Lowest AQI Period:</span>
                 <span style={{ fontWeight: 800, color: '#10b981' }}>{cleanTime} ({lowestAqi} AQI)</span>
               </div>
 
-              <div style={{ display: 'flex', justifyContent: 'space-between', padding: '10px 14px', background: 'rgba(0, 0, 0, 0.25)', borderRadius: '10px' }}>
-                <span style={{ color: '#94a3b8', fontSize: '0.85rem' }}>24-Hour Mean AQI:</span>
-                <span style={{ fontWeight: 800, color: '#f8fafc' }}>{avgAqi} AQI</span>
+              <div style={{ display: 'flex', justifyContent: 'space-between', padding: '10px 14px', background: 'var(--bg-subpanel, rgba(0, 0, 0, 0.25))', border: '1px solid var(--border-color)', borderRadius: '10px' }}>
+                <span style={{ color: 'var(--text-secondary)', fontSize: '0.85rem' }}>24-Hour Mean AQI:</span>
+                <span style={{ fontWeight: 800, color: 'var(--text-primary)' }}>{avgAqi} AQI</span>
               </div>
 
-              <div style={{ display: 'flex', justifyContent: 'space-between', padding: '10px 14px', background: 'rgba(0, 0, 0, 0.25)', borderRadius: '10px' }}>
-                <span style={{ color: '#94a3b8', fontSize: '0.85rem' }}>Dominant Criteria Pollutant:</span>
+              <div style={{ display: 'flex', justifyContent: 'space-between', padding: '10px 14px', background: 'var(--bg-subpanel, rgba(0, 0, 0, 0.25))', border: '1px solid var(--border-color)', borderRadius: '10px' }}>
+                <span style={{ color: 'var(--text-secondary)', fontSize: '0.85rem' }}>Dominant Criteria Pollutant:</span>
                 <span style={{ fontWeight: 800, color: '#fbbf24' }}>PM2.5 (Fine Particles)</span>
               </div>
 
-              <div style={{ display: 'flex', justifyContent: 'space-between', padding: '10px 14px', background: 'rgba(0, 0, 0, 0.25)', borderRadius: '10px' }}>
-                <span style={{ color: '#94a3b8', fontSize: '0.85rem' }}>Pollution Trend vs Yesterday:</span>
+              <div style={{ display: 'flex', justifyContent: 'space-between', padding: '10px 14px', background: 'var(--bg-subpanel, rgba(0, 0, 0, 0.25))', border: '1px solid var(--border-color)', borderRadius: '10px' }}>
+                <span style={{ color: 'var(--text-secondary)', fontSize: '0.85rem' }}>Pollution Trend vs Yesterday:</span>
                 <span style={{ fontWeight: 800, color: '#10b981' }}>&darr; 4.2% (Improving)</span>
               </div>
             </div>
           </div>
 
-          <div style={{ marginTop: '1.25rem', paddingTop: '12px', borderTop: '1px solid rgba(255, 255, 255, 0.08)', fontSize: '0.8rem', color: '#94a3b8' }}>
+          <div style={{ marginTop: '1.25rem', paddingTop: '12px', borderTop: '1px solid var(--border-color, rgba(255, 255, 255, 0.08))', fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
             <span>Recommendation: </span>
             <strong style={{ color: status.color }}>{status.healthAdvice}</strong>
           </div>

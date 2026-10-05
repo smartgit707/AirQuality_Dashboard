@@ -4,6 +4,7 @@
   --bg-secondary: #0a140f;
   --bg-card: rgba(12, 24, 18, 0.72);
   --bg-card-hover: rgba(18, 36, 27, 0.88);
+  --bg-subpanel: rgba(0, 0, 0, 0.25);
   --border-color: rgba(255, 255, 255, 0.08);
   --border-subtle: rgba(0, 245, 160, 0.08);
   
@@ -1630,25 +1631,26 @@ body {
 }
 
 /* ============================================================
-   LIGHT MODE DESIGN SYSTEM
+   LIGHT MODE DESIGN SYSTEM - HIGH CONTRAST & PROFESSIONAL POLISH
    ============================================================ */
 :root[data-theme="light"],
 body.light-mode {
   --bg-primary: #f8fafc;
   --bg-secondary: #ffffff;
-  --bg-card: rgba(255, 255, 255, 0.96);
-  --bg-card-hover: rgba(248, 250, 252, 1);
-  --border-color: rgba(226, 232, 240, 0.95);
-  --border-subtle: rgba(16, 185, 129, 0.18);
+  --bg-card: #ffffff;
+  --bg-card-hover: #f1f5f9;
+  --bg-subpanel: #f8fafc;
+  --border-color: #cbd5e1;
+  --border-subtle: #94a3b8;
   
   --text-primary: #0f172a;
-  --text-secondary: #475569;
-  --text-muted: #64748b;
+  --text-secondary: #334155;
+  --text-muted: #475569;
   
-  --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.05);
-  --shadow-md: 0 4px 14px -2px rgba(0, 0, 0, 0.06), 0 2px 6px -1px rgba(0, 0, 0, 0.04);
-  --shadow-lg: 0 12px 28px -4px rgba(0, 0, 0, 0.08), 0 4px 12px -2px rgba(0, 0, 0, 0.04);
-  --shadow-card: 0 4px 20px -2px rgba(0, 0, 0, 0.05), inset 0 1px 0 0 rgba(255, 255, 255, 1);
+  --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.08);
+  --shadow-md: 0 4px 14px -2px rgba(15, 23, 42, 0.08), 0 2px 6px -1px rgba(15, 23, 42, 0.04);
+  --shadow-lg: 0 12px 28px -4px rgba(15, 23, 42, 0.1), 0 4px 12px -2px rgba(15, 23, 42, 0.05);
+  --shadow-card: 0 4px 20px -2px rgba(15, 23, 42, 0.08), inset 0 1px 0 0 rgba(255, 255, 255, 1);
 }
 
 body.light-mode,
@@ -1662,12 +1664,57 @@ body.light-mode,
   background-attachment: fixed !important;
 }
 
+/* Global High Contrast Text Overrides in Light Mode */
+body.light-mode h1, 
+body.light-mode h2, 
+body.light-mode h3, 
+body.light-mode h4, 
+body.light-mode h5, 
+body.light-mode h6,
+body.light-mode .section-title,
+body.light-mode .card-title,
+body.light-mode .panel-title,
+body.light-mode strong,
+body.light-mode [style*="color: #f8fafc"],
+body.light-mode [style*="color: '#f8fafc'"],
+body.light-mode [style*="color: #fff"],
+body.light-mode [style*="color: '#fff'"],
+body.light-mode [style*="color: #ffffff"],
+body.light-mode [style*="color: '#ffffff'"],
+body.light-mode [style*="color: rgb(248, 250, 252)"],
+body.light-mode [style*="color: rgb(248,250,252)"],
+body.light-mode [style*="color: rgb(255, 255, 255)"],
+body.light-mode [style*="color: rgb(255,255,255)"],
+body.light-mode [style*="color: #e2e8f0"],
+body.light-mode [style*="color: rgb(226, 232, 240)"] {
+  color: #0f172a !important;
+}
+
+body.light-mode p,
+body.light-mode [style*="color: #94a3b8"],
+body.light-mode [style*="color: '#94a3b8'"],
+body.light-mode [style*="color: #cbd5e1"],
+body.light-mode [style*="color: '#cbd5e1'"],
+body.light-mode [style*="color: rgb(148, 163, 184)"],
+body.light-mode [style*="color: rgb(148,163,184)"],
+body.light-mode [style*="color: rgb(203, 213, 225)"],
+body.light-mode [style*="color: rgb(203,213,225)"],
+body.light-mode [style*="color: #64748b"],
+body.light-mode [style*="color: rgb(100, 116, 139)"],
+body.light-mode .section-subtitle,
+body.light-mode .panel-subtitle,
+body.light-mode .card-subtitle,
+body.light-mode .text-secondary,
+body.light-mode .condition-desc {
+  color: #334155 !important;
+}
+
 /* Light Mode Navbar */
 body.light-mode .navbar,
 [data-theme="light"] .navbar {
-  background: rgba(255, 255, 255, 0.92) !important;
-  border-bottom: 1px solid rgba(226, 232, 240, 0.95) !important;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04) !important;
+  background: rgba(255, 255, 255, 0.95) !important;
+  border-bottom: 1px solid #cbd5e1 !important;
+  box-shadow: 0 4px 20px rgba(15, 23, 42, 0.06) !important;
 }
 
 body.light-mode .brand-title,
@@ -1677,151 +1724,192 @@ body.light-mode .brand-title,
 
 body.light-mode .brand-subtitle,
 [data-theme="light"] .brand-subtitle {
-  color: #64748b !important;
+  color: #475569 !important;
 }
 
 body.light-mode .nav-tab-button,
 [data-theme="light"] .nav-tab-button {
-  color: #475569 !important;
+  color: #334155 !important;
 }
 
 body.light-mode .nav-tab-button:hover,
 [data-theme="light"] .nav-tab-button:hover {
-  background: rgba(16, 185, 129, 0.1) !important;
+  background: rgba(16, 185, 129, 0.12) !important;
   color: #059669 !important;
 }
 
 body.light-mode .nav-tab-button.active,
 [data-theme="light"] .nav-tab-button.active {
-  background: rgba(16, 185, 129, 0.18) !important;
-  color: #059669 !important;
-  border-color: rgba(16, 185, 129, 0.35) !important;
+  background: rgba(16, 185, 129, 0.2) !important;
+  color: #047857 !important;
+  border-color: rgba(16, 185, 129, 0.4) !important;
 }
 
-/* Light Mode Cards & Surfaces */
+/* Light Mode Cards & Outer Containers */
 body.light-mode .card,
-[data-theme="light"] .card,
 body.light-mode .metric-card,
-[data-theme="light"] .metric-card,
 body.light-mode .condition-card,
-[data-theme="light"] .condition-card,
 body.light-mode .homepage-hero-banner,
-[data-theme="light"] .homepage-hero-banner,
 body.light-mode .selected-location-header,
-[data-theme="light"] .selected-location-header,
 body.light-mode .rankings-preview-section,
-[data-theme="light"] .rankings-preview-section,
 body.light-mode .mini-map-preview-card,
-[data-theme="light"] .mini-map-preview-card,
 body.light-mode .pollutant-card,
-[data-theme="light"] .pollutant-card,
 body.light-mode .pollutant-card-front,
-[data-theme="light"] .pollutant-card-front,
-body.light-mode .pollutant-card-back,
-[data-theme="light"] .pollutant-card-back {
+body.light-mode .aqi-hero-card,
+body.light-mode .scale-reference-panel,
+body.light-mode .aqi-scale-section {
   background: #ffffff !important;
-  border: 1px solid rgba(226, 232, 240, 0.95) !important;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04) !important;
+  border: 1px solid #cbd5e1 !important;
+  box-shadow: 0 4px 20px rgba(15, 23, 42, 0.06) !important;
   color: #0f172a !important;
 }
 
-/* Light Mode Headings and Typography */
-body.light-mode h1,
-[data-theme="light"] h1,
-body.light-mode h2,
-[data-theme="light"] h2,
-body.light-mode h3,
-[data-theme="light"] h3,
-body.light-mode h4,
-[data-theme="light"] h4 {
+/* Hero Banner on Homepage in Light Mode */
+body.light-mode .homepage-hero-banner {
+  background: linear-gradient(135deg, #ffffff 0%, #ecfdf5 100%) !important;
+  border: 1px solid #a7f3d0 !important;
+  box-shadow: 0 10px 30px rgba(16, 185, 129, 0.08) !important;
+}
+
+body.light-mode .homepage-hero-banner h1 {
+  color: #064e3b !important;
+}
+
+body.light-mode .homepage-hero-banner p {
+  color: #334155 !important;
+}
+
+/* Inner Panels / Chips / Sub-containers */
+body.light-mode [style*="background: rgba(0, 0, 0,"],
+body.light-mode [style*="background: rgba(0,0,0,"],
+body.light-mode [style*="background:rgba(0, 0, 0,"],
+body.light-mode [style*="background:rgba(0,0,0,"],
+body.light-mode [style*="background: rgba(255, 255, 255, 0.03)"],
+body.light-mode [style*="background: rgba(255, 255, 255, 0.04)"],
+body.light-mode [style*="background: rgba(255, 255, 255, 0.05)"],
+body.light-mode [style*="background: rgba(255, 255, 255, 0.06)"],
+body.light-mode [style*="background: rgba(255, 255, 255, 0.08)"],
+body.light-mode [style*="background: rgba(12, 24, 18,"],
+body.light-mode [style*="background: rgba(12,24,18,"],
+body.light-mode [style*="background: rgba(15, 23, 42,"],
+body.light-mode [style*="background: rgba(15,23,42,"] {
+  background: #f8fafc !important;
+  border-color: #cbd5e1 !important;
   color: #0f172a !important;
 }
 
-body.light-mode p,
-[data-theme="light"] p,
-body.light-mode .section-subtitle,
-[data-theme="light"] .section-subtitle,
-body.light-mode .card-subtitle,
-[data-theme="light"] .card-subtitle {
+/* Popular City Chips */
+body.light-mode button[type="button"][style*="border-radius: 8px"],
+body.light-mode button[type="button"][style*="border-radius: 10px"] {
+  border-color: #cbd5e1 !important;
+}
+
+/* Criteria Pollutants in Light Mode */
+body.light-mode .pollutant-name,
+body.light-mode .pollutant-value,
+body.light-mode .condition-value,
+body.light-mode .card-numeric-value {
+  color: #0f172a !important;
+}
+
+body.light-mode .pollutant-fullname,
+body.light-mode .pollutant-unit,
+body.light-mode .condition-label,
+body.light-mode .condition-unit,
+body.light-mode .stat-summary-label {
   color: #475569 !important;
 }
 
-body.light-mode .card-numeric-value,
-[data-theme="light"] .card-numeric-value {
-  color: #0f172a !important;
+body.light-mode .pollutant-bar-bg {
+  background: #e2e8f0 !important;
 }
 
-body.light-mode .condition-value,
-[data-theme="light"] .condition-value {
+/* Location Search Input & Autocomplete Dropdown in Light Mode */
+body.light-mode .location-search-input {
+  background: #ffffff !important;
+  border: 1px solid #94a3b8 !important;
   color: #0f172a !important;
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.05) !important;
 }
 
-body.light-mode .condition-label,
-[data-theme="light"] .condition-label,
-body.light-mode .stat-summary-label,
-[data-theme="light"] .stat-summary-label {
+body.light-mode .location-search-input::placeholder {
   color: #64748b !important;
 }
 
-/* Light Mode Form Elements & Dropdowns */
-body.light-mode .location-search-input,
-[data-theme="light"] .location-search-input,
-body.light-mode select,
-[data-theme="light"] select {
+body.light-mode .location-search-dropdown {
   background: #ffffff !important;
-  border: 1px solid rgba(203, 213, 225, 0.9) !important;
+  border: 1px solid #cbd5e1 !important;
+  box-shadow: 0 16px 36px rgba(15, 23, 42, 0.12) !important;
   color: #0f172a !important;
 }
 
-body.light-mode .location-search-input::placeholder,
-[data-theme="light"] .location-search-input::placeholder {
-  color: #94a3b8 !important;
+body.light-mode .location-search-item {
+  color: #0f172a !important;
+  border-bottom: 1px solid #f1f5f9 !important;
 }
 
-body.light-mode .location-search-dropdown,
-[data-theme="light"] .location-search-dropdown {
-  background: #ffffff !important;
-  border: 1px solid rgba(226, 232, 240, 0.95) !important;
-  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.08) !important;
+body.light-mode .location-search-item:hover {
+  background: #ecfdf5 !important;
+}
+
+body.light-mode .location-search-item span {
   color: #0f172a !important;
 }
 
-body.light-mode .location-search-item,
-[data-theme="light"] .location-search-item {
+/* Tables (Admin, Rankings, Reports, Compare) */
+body.light-mode table {
   color: #0f172a !important;
-  border-bottom: 1px solid rgba(241, 245, 249, 0.9) !important;
 }
 
-body.light-mode .location-search-item:hover,
-[data-theme="light"] .location-search-item:hover {
-  background: rgba(16, 185, 129, 0.08) !important;
+body.light-mode th {
+  background: #f1f5f9 !important;
+  color: #1e293b !important;
+  border-bottom: 2px solid #cbd5e1 !important;
 }
 
-/* Light Mode Tables */
-body.light-mode table,
-[data-theme="light"] table {
+body.light-mode td {
+  border-bottom: 1px solid #e2e8f0 !important;
   color: #1e293b !important;
 }
 
-body.light-mode th,
-[data-theme="light"] th {
+/* Footer */
+body.light-mode .dashboard-footer {
+  background: #ffffff !important;
+  border-top: 1px solid #cbd5e1 !important;
   color: #475569 !important;
-  border-bottom: 1px solid rgba(226, 232, 240, 0.95) !important;
 }
 
-body.light-mode td,
-[data-theme="light"] td {
-  border-bottom: 1px solid rgba(241, 245, 249, 0.95) !important;
+/* Recharts in Light Mode */
+body.light-mode .recharts-cartesian-grid line {
+  stroke: #e2e8f0 !important;
+}
+
+body.light-mode .recharts-text,
+body.light-mode .recharts-cartesian-axis-tick text {
+  fill: #334155 !important;
+}
+
+body.light-mode .recharts-default-tooltip {
+  background: #ffffff !important;
+  border: 1px solid #cbd5e1 !important;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.1) !important;
+  color: #0f172a !important;
+}
+
+/* Back Face 3D Flip Card in Light Mode */
+body.light-mode [style*="rotateY(180deg)"] {
+  background: #ffffff !important;
+  border: 1px solid #cbd5e1 !important;
+  color: #0f172a !important;
+  box-shadow: 0 12px 30px rgba(15, 23, 42, 0.12) !important;
+}
+
+body.light-mode [style*="rotateY(180deg)"] span,
+body.light-mode [style*="rotateY(180deg)"] div,
+body.light-mode [style*="rotateY(180deg)"] p {
   color: #1e293b !important;
 }
 
-/* Light Mode Footer */
-body.light-mode .dashboard-footer,
-[data-theme="light"] .dashboard-footer {
-  background: #ffffff !important;
-  border-top: 1px solid rgba(226, 232, 240, 0.95) !important;
-  color: #475569 !important;
-}
 
 
 

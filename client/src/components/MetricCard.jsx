@@ -51,16 +51,16 @@ export default function MetricCard({
         </div>
 
         <div className="card-value-group" style={{ margin: '0.85rem 0 0.35rem' }}>
-          <span className="card-numeric-value" style={{ fontSize: '2rem', fontWeight: 800, letterSpacing: '-0.02em', color: '#f8fafc' }}>
+          <span className="card-numeric-value" style={{ fontSize: '2rem', fontWeight: 800, letterSpacing: '-0.02em', color: 'var(--text-primary)' }}>
             {value}
           </span>
-          <span className="card-unit" style={{ fontSize: '0.9rem', fontWeight: 600, color: '#94a3b8', marginLeft: '4px' }}>
+          <span className="card-unit" style={{ fontSize: '0.9rem', fontWeight: 600, color: 'var(--text-secondary)', marginLeft: '4px' }}>
             {unit}
           </span>
         </div>
 
         {subtitle && (
-          <div className="card-footer-info" style={{ color: '#64748b', fontSize: '0.78rem' }}>
+          <div className="card-footer-info" style={{ color: 'var(--text-muted)', fontSize: '0.78rem' }}>
             <span>{subtitle}</span>
           </div>
         )}

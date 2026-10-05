@@ -84,13 +84,13 @@ export default function RecommendationCard({ city, aqi }) {
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
           <Info size={18} style={{ color: '#38bdf8', flexShrink: 0 }} />
-          <span style={{ fontSize: '0.92rem', color: '#e2e8f0' }}>
+          <span style={{ fontSize: '0.92rem', color: 'var(--text-primary)' }}>
             {recData?.overview || 'Standard atmospheric parameters permit general outdoor activity.'}
           </span>
         </div>
 
-        <div style={{ fontSize: '0.82rem', color: '#94a3b8' }}>
-          Mask Advisory: <strong style={{ color: '#fff' }}>{recData?.maskAdvisory || 'Not required'}</strong>
+        <div style={{ fontSize: '0.82rem', color: 'var(--text-secondary)' }}>
+          Mask Advisory: <strong style={{ color: 'var(--text-primary)' }}>{recData?.maskAdvisory || 'Not required'}</strong>
         </div>
       </div>
 
@@ -104,8 +104,8 @@ export default function RecommendationCard({ city, aqi }) {
             <div 
               key={key} 
               style={{ 
-                background: 'rgba(15, 23, 42, 0.4)', 
-                border: '1px solid rgba(255, 255, 255, 0.05)',
+                background: 'var(--bg-subpanel, rgba(15, 23, 42, 0.4))', 
+                border: '1px solid var(--border-color, rgba(255, 255, 255, 0.05))',
                 borderRadius: '8px',
                 padding: '1rem',
                 display: 'flex',
@@ -114,7 +114,7 @@ export default function RecommendationCard({ city, aqi }) {
                 gap: '8px'
               }}
             >
-              <span style={{ fontSize: '0.85rem', color: '#94a3b8', fontWeight: 600 }}>
+              <span style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', fontWeight: 600 }}>
                 {act.label}
               </span>
               <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>

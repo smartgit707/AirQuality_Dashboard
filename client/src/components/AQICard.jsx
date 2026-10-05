@@ -160,9 +160,9 @@ export default function AQICard({ aqi }) {
                     gap: '4px',
                     padding: '4px 10px',
                     borderRadius: '8px',
-                    background: 'rgba(255, 255, 255, 0.08)',
-                    border: '1px solid rgba(255, 255, 255, 0.15)',
-                    color: '#94a3b8',
+                    background: 'var(--bg-card-hover, rgba(255, 255, 255, 0.08))',
+                    border: '1px solid var(--border-color, rgba(255, 255, 255, 0.15))',
+                    color: 'var(--text-secondary)',
                     cursor: 'pointer',
                     fontSize: '0.72rem',
                     fontWeight: 700,
@@ -179,7 +179,7 @@ export default function AQICard({ aqi }) {
               <span className="aqi-big-number" style={{ color: status.color, textShadow: `0 0 35px ${status.color}55` }}>
                 {aqi}
               </span>
-              <span className="card-unit" style={{ marginLeft: '6px', fontSize: '1rem', fontWeight: 700, color: '#94a3b8' }}>
+              <span className="card-unit" style={{ marginLeft: '6px', fontSize: '1rem', fontWeight: 700, color: 'var(--text-secondary)' }}>
                 AQI
               </span>
             </div>
@@ -188,13 +188,13 @@ export default function AQICard({ aqi }) {
               {status.label} Air Quality
             </div>
 
-            <p className="aqi-description" style={{ color: '#cbd5e1', fontSize: '0.88rem', lineHeight: 1.45, margin: 0 }}>
+            <p className="aqi-description" style={{ color: 'var(--text-secondary)', fontSize: '0.88rem', lineHeight: 1.45, margin: 0 }}>
               {status.description}
             </p>
           </div>
 
           <div style={{ position: 'relative', zIndex: 1, marginTop: '1.5rem' }}>
-            <div className="aqi-meter-bar" style={{ height: '8px', background: 'rgba(255, 255, 255, 0.08)', borderRadius: '9999px', overflow: 'hidden' }}>
+            <div className="aqi-meter-bar" style={{ height: '8px', background: 'var(--border-color, rgba(255, 255, 255, 0.08))', borderRadius: '9999px', overflow: 'hidden' }}>
               <div 
                 className="aqi-meter-fill" 
                 style={{ 
@@ -210,7 +210,7 @@ export default function AQICard({ aqi }) {
                 <Activity size={14} />
                 <span>{status.healthAdvice}</span>
               </div>
-              <span style={{ fontSize: '0.72rem', color: '#64748b', cursor: 'pointer' }} onClick={toggleFlip}>
+              <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)', cursor: 'pointer' }} onClick={toggleFlip}>
                 Click 3D Flip ↗
               </span>
             </div>

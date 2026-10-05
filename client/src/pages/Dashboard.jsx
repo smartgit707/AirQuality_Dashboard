@@ -139,10 +139,10 @@ export default function Dashboard({
             <span>AIR QUALITY & ENVIRONMENTAL INTELLIGENCE</span>
           </div>
 
-          <h1 style={{ fontSize: '2.6rem', fontWeight: 900, color: '#f8fafc', margin: '0 0 0.5rem', letterSpacing: '-0.02em', lineHeight: 1.15 }}>
+          <h1 style={{ fontSize: '2.6rem', fontWeight: 900, color: 'var(--text-primary)', margin: '0 0 0.5rem', letterSpacing: '-0.02em', lineHeight: 1.15 }}>
             Know the air around you.
           </h1>
-          <p style={{ color: '#94a3b8', fontSize: '1.05rem', margin: '0 0 1.5rem', lineHeight: 1.5 }}>
+          <p style={{ color: 'var(--text-secondary)', fontSize: '1.05rem', margin: '0 0 1.5rem', lineHeight: 1.5 }}>
             Real-time air quality index, criteria pollutants, meteorological dispersion, and physiological health models across metropolitan monitoring stations.
           </p>
 
@@ -157,17 +157,17 @@ export default function Dashboard({
           </div>
 
           {/* Popular City Quick Chips */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap', fontSize: '0.78rem', color: '#64748b' }}>
-            <span style={{ fontWeight: 700, color: '#94a3b8' }}>Popular:</span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap', fontSize: '0.78rem', color: 'var(--text-muted)' }}>
+            <span style={{ fontWeight: 700, color: 'var(--text-secondary)' }}>Popular:</span>
             {['Delhi', 'Mumbai', 'Bengaluru', 'Chennai', 'Hyderabad', 'Kolkata', 'Pune', 'London', 'New York'].map((cityName) => (
               <button
                 key={cityName}
                 type="button"
                 onClick={() => onCityChange && onCityChange(cityName)}
                 style={{
-                  background: cityName.toLowerCase() === currentCity.toLowerCase() ? 'rgba(0, 245, 160, 0.2)' : 'rgba(255, 255, 255, 0.05)',
-                  border: cityName.toLowerCase() === currentCity.toLowerCase() ? '1px solid #00f5a0' : '1px solid rgba(255, 255, 255, 0.1)',
-                  color: cityName.toLowerCase() === currentCity.toLowerCase() ? '#00f5a0' : '#cbd5e1',
+                  background: cityName.toLowerCase() === currentCity.toLowerCase() ? 'rgba(0, 245, 160, 0.2)' : 'var(--bg-card-hover, rgba(255, 255, 255, 0.05))',
+                  border: cityName.toLowerCase() === currentCity.toLowerCase() ? '1px solid var(--accent-cyan)' : '1px solid var(--border-color)',
+                  color: cityName.toLowerCase() === currentCity.toLowerCase() ? 'var(--accent-cyan)' : 'var(--text-secondary)',
                   borderRadius: '8px',
                   padding: '3px 10px',
                   fontSize: '0.76rem',
@@ -195,23 +195,23 @@ export default function Dashboard({
           flexWrap: 'wrap',
           gap: '1rem',
           marginBottom: '1.5rem',
-          background: 'rgba(12, 24, 18, 0.72)',
-          border: '1px solid rgba(255, 255, 255, 0.08)',
+          background: 'var(--bg-card)',
+          border: '1px solid var(--border-color)',
           borderRadius: '20px',
           padding: '1.25rem 2rem'
         }}
       >
         <div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <MapPin size={22} style={{ color: '#00f5a0' }} />
-            <h2 style={{ fontSize: '1.8rem', fontWeight: 900, color: '#f8fafc', margin: 0 }}>
+            <MapPin size={22} style={{ color: 'var(--accent-cyan)' }} />
+            <h2 style={{ fontSize: '1.8rem', fontWeight: 900, color: 'var(--text-primary)', margin: 0 }}>
               {data.city}
-              {data.state && <span style={{ fontSize: '1.1rem', color: '#94a3b8', fontWeight: 500, marginLeft: '8px' }}>({data.state}, {data.country || 'India'})</span>}
+              {data.state && <span style={{ fontSize: '1.1rem', color: 'var(--text-secondary)', fontWeight: 500, marginLeft: '8px' }}>({data.state}, {data.country || 'India'})</span>}
             </h2>
           </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginTop: '6px', color: '#94a3b8', fontSize: '0.85rem' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginTop: '6px', color: 'var(--text-secondary)', fontSize: '0.85rem' }}>
             <span style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
-              <Clock size={14} style={{ color: '#00f5a0' }} />
+              <Clock size={14} style={{ color: 'var(--accent-cyan)' }} />
               <span>Last updated: <strong>{data.lastUpdated || '10 minutes ago'}</strong></span>
             </span>
             <span>&bull;</span>
@@ -310,29 +310,29 @@ export default function Dashboard({
       <section 
         className="aqi-scale-section"
         style={{
-          background: 'rgba(12, 24, 18, 0.72)',
-          border: '1px solid rgba(255, 255, 255, 0.08)',
+          background: 'var(--bg-card)',
+          border: '1px solid var(--border-color)',
           borderRadius: '20px',
           padding: '24px',
           marginBottom: '2rem',
-          boxShadow: '0 12px 30px rgba(0, 0, 0, 0.4)'
+          boxShadow: 'var(--shadow-card)'
         }}
       >
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem', flexWrap: 'wrap', gap: '8px' }}>
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <Layers size={18} style={{ color: '#00f5a0' }} />
-              <h3 style={{ fontSize: '1.15rem', fontWeight: 800, color: '#f8fafc', margin: 0 }}>
+              <Layers size={18} style={{ color: 'var(--accent-cyan)' }} />
+              <h3 style={{ fontSize: '1.15rem', fontWeight: 800, color: 'var(--text-primary)', margin: 0 }}>
                 Official National Air Quality Index (NAQI) Scale
               </h3>
             </div>
-            <p style={{ color: '#94a3b8', fontSize: '0.8rem', margin: '4px 0 0' }}>
+            <p style={{ color: 'var(--text-secondary)', fontSize: '0.8rem', margin: '4px 0 0' }}>
               Standard 6-tier classification adopted by CPCB & US-EPA
             </p>
           </div>
 
           <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.82rem' }}>
-            <span style={{ color: '#94a3b8' }}>Currently in {data.city}:</span>
+            <span style={{ color: 'var(--text-secondary)' }}>Currently in {data.city}:</span>
             <strong style={{ color: currentAQIStatus.color }}>{currentAQIStatus.label} ({data.aqi} AQI)</strong>
           </div>
         </div>
@@ -397,10 +397,10 @@ export default function Dashboard({
               const isCurrent = currentAQIStatus.label.toLowerCase().includes(tier.label.toLowerCase());
               return (
                 <div key={tier.label} style={{ fontSize: '0.75rem' }}>
-                  <div style={{ fontWeight: 800, color: isCurrent ? tier.color : '#cbd5e1' }}>
+                  <div style={{ fontWeight: 800, color: isCurrent ? tier.color : 'var(--text-secondary)' }}>
                     {tier.label}
                   </div>
-                  <div style={{ color: '#64748b', fontSize: '0.7rem' }}>
+                  <div style={{ color: 'var(--text-muted)', fontSize: '0.7rem' }}>
                     {tier.range}
                   </div>
                 </div>
@@ -416,11 +416,11 @@ export default function Dashboard({
       <section className="pollutants-section" style={{ marginBottom: '2.5rem' }}>
         <div className="section-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem' }}>
           <div>
-            <h2 className="section-title" style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '1.4rem', fontWeight: 800, color: '#f8fafc', margin: 0 }}>
+            <h2 className="section-title" style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '1.4rem', fontWeight: 800, color: 'var(--text-primary)', margin: 0 }}>
               <Activity size={20} style={{ color: 'var(--accent-cyan)' }} />
               <span>Criteria Pollutants in {data.city}</span>
             </h2>
-            <p className="section-subtitle" style={{ color: '#94a3b8', fontSize: '0.85rem', margin: '4px 0 0' }}>
+            <p className="section-subtitle" style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', margin: '4px 0 0' }}>
               Concentrations evaluated against WHO Guidelines. Click "3D Flip" on cards for pathophysiology.
             </p>
           </div>
@@ -429,9 +429,9 @@ export default function Dashboard({
             <button
               onClick={() => onNavigate('pollutants')}
               style={{
-                background: 'rgba(255, 255, 255, 0.05)',
-                border: '1px solid rgba(255, 255, 255, 0.12)',
-                color: '#cbd5e1',
+                background: 'var(--bg-card-hover, rgba(255, 255, 255, 0.05))',
+                border: '1px solid var(--border-color, rgba(255, 255, 255, 0.12))',
+                color: 'var(--text-secondary)',
                 padding: '6px 12px',
                 borderRadius: '8px',
                 fontSize: '0.78rem',
@@ -464,11 +464,11 @@ export default function Dashboard({
           ============================================================ */}
       <section className="conditions-section" style={{ marginBottom: '2.5rem' }}>
         <div className="section-header" style={{ marginBottom: '1.25rem' }}>
-          <h2 className="section-title" style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '1.4rem', fontWeight: 800, color: '#f8fafc', margin: 0 }}>
+          <h2 className="section-title" style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '1.4rem', fontWeight: 800, color: 'var(--text-primary)', margin: 0 }}>
             <Wind size={20} style={{ color: 'var(--accent-teal)' }} />
             <span>Environmental & Meteorological Conditions</span>
           </h2>
-          <p className="section-subtitle" style={{ color: '#94a3b8', fontSize: '0.85rem', margin: '4px 0 0' }}>
+          <p className="section-subtitle" style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', margin: '4px 0 0' }}>
             Meteorological dispersion forces influencing ambient particulate residence time
           </p>
         </div>
@@ -572,41 +572,41 @@ export default function Dashboard({
           <div>
             <div className="panel-header" style={{ marginBottom: '1rem' }}>
               <div>
-                <h2 className="panel-title" style={{ display: 'flex', alignItems: 'center', gap: '8px', margin: 0 }}>
-                  <Sparkles size={18} style={{ color: '#00f5a0' }} />
+                <h2 className="panel-title" style={{ display: 'flex', alignItems: 'center', gap: '8px', margin: 0, color: 'var(--text-primary)' }}>
+                  <Sparkles size={18} style={{ color: 'var(--accent-cyan)' }} />
                   <span>Diurnal Insights</span>
                 </h2>
-                <p className="panel-subtitle">Atmospheric Behavioral Patterns</p>
+                <p className="panel-subtitle" style={{ color: 'var(--text-secondary)' }}>Atmospheric Behavioral Patterns</p>
               </div>
             </div>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-              <div style={{ background: 'rgba(0, 0, 0, 0.25)', padding: '12px', borderRadius: '10px' }}>
-                <div style={{ fontSize: '0.74rem', color: '#94a3b8', textTransform: 'uppercase', fontWeight: 700 }}>Dominant Contaminant</div>
+              <div style={{ background: 'var(--bg-subpanel, rgba(0, 0, 0, 0.25))', border: '1px solid var(--border-color)', padding: '12px', borderRadius: '10px' }}>
+                <div style={{ fontSize: '0.74rem', color: 'var(--text-secondary)', textTransform: 'uppercase', fontWeight: 700 }}>Dominant Contaminant</div>
                 <div style={{ fontSize: '1rem', fontWeight: 800, color: '#fbbf24', marginTop: '2px' }}>
                   PM2.5 (Fine Respirable Dust)
                 </div>
-                <div style={{ fontSize: '0.78rem', color: '#94a3b8', marginTop: '2px' }}>
+                <div style={{ fontSize: '0.78rem', color: 'var(--text-secondary)', marginTop: '2px' }}>
                   Accounts for ~68% of composite index
                 </div>
               </div>
 
-              <div style={{ background: 'rgba(0, 0, 0, 0.25)', padding: '12px', borderRadius: '10px' }}>
-                <div style={{ fontSize: '0.74rem', color: '#94a3b8', textTransform: 'uppercase', fontWeight: 700 }}>Peak Exposure Window</div>
+              <div style={{ background: 'var(--bg-subpanel, rgba(0, 0, 0, 0.25))', border: '1px solid var(--border-color)', padding: '12px', borderRadius: '10px' }}>
+                <div style={{ fontSize: '0.74rem', color: 'var(--text-secondary)', textTransform: 'uppercase', fontWeight: 700 }}>Peak Exposure Window</div>
                 <div style={{ fontSize: '1rem', fontWeight: 800, color: '#ef4444', marginTop: '2px' }}>
                   8:00 AM &ndash; 11:30 AM
                 </div>
-                <div style={{ fontSize: '0.78rem', color: '#94a3b8', marginTop: '2px' }}>
+                <div style={{ fontSize: '0.78rem', color: 'var(--text-secondary)', marginTop: '2px' }}>
                   Morning thermal inversion restricts mixing
                 </div>
               </div>
 
-              <div style={{ background: 'rgba(0, 0, 0, 0.25)', padding: '12px', borderRadius: '10px' }}>
-                <div style={{ fontSize: '0.74rem', color: '#94a3b8', textTransform: 'uppercase', fontWeight: 700 }}>Optimal Cleanest Window</div>
+              <div style={{ background: 'var(--bg-subpanel, rgba(0, 0, 0, 0.25))', border: '1px solid var(--border-color)', padding: '12px', borderRadius: '10px' }}>
+                <div style={{ fontSize: '0.74rem', color: 'var(--text-secondary)', textTransform: 'uppercase', fontWeight: 700 }}>Optimal Cleanest Window</div>
                 <div style={{ fontSize: '1rem', fontWeight: 800, color: '#10b981', marginTop: '2px' }}>
                   3:00 PM &ndash; 6:00 PM
                 </div>
-                <div style={{ fontSize: '0.78rem', color: '#94a3b8', marginTop: '2px' }}>
+                <div style={{ fontSize: '0.78rem', color: 'var(--text-secondary)', marginTop: '2px' }}>
                   Afternoon solar convection aids dispersion
                 </div>
               </div>
@@ -655,23 +655,23 @@ export default function Dashboard({
       <section 
         className="rankings-preview-section"
         style={{
-          background: 'rgba(12, 24, 18, 0.72)',
-          border: '1px solid rgba(255, 255, 255, 0.08)',
+          background: 'var(--bg-card)',
+          border: '1px solid var(--border-color)',
           borderRadius: '20px',
           padding: '24px',
           marginBottom: '2.5rem',
-          boxShadow: '0 12px 30px rgba(0, 0, 0, 0.4)'
+          boxShadow: 'var(--shadow-card)'
         }}
       >
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', flexWrap: 'wrap', gap: '10px' }}>
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <Trophy size={20} style={{ color: '#00f5a0' }} />
-              <h2 style={{ fontSize: '1.4rem', fontWeight: 800, color: '#f8fafc', margin: 0 }}>
+              <Trophy size={20} style={{ color: 'var(--accent-cyan)' }} />
+              <h2 style={{ fontSize: '1.4rem', fontWeight: 800, color: 'var(--text-primary)', margin: 0 }}>
                 Live Metropolitan Rankings Leaderboard
               </h2>
             </div>
-            <p style={{ color: '#94a3b8', fontSize: '0.85rem', margin: '4px 0 0' }}>
+            <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', margin: '4px 0 0' }}>
               Real-time atmospheric sorting across Indian metropolitan stations
             </p>
           </div>
@@ -687,7 +687,7 @@ export default function Dashboard({
                 borderRadius: '10px',
                 background: 'rgba(0, 245, 160, 0.15)',
                 border: '1px solid rgba(0, 245, 160, 0.3)',
-                color: '#00f5a0',
+                color: 'var(--accent-cyan)',
                 fontSize: '0.82rem',
                 fontWeight: 700,
                 cursor: 'pointer'
@@ -701,7 +701,7 @@ export default function Dashboard({
 
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '1.5rem' }}>
           {/* Most Polluted Cities Preview */}
-          <div style={{ background: 'rgba(0, 0, 0, 0.3)', borderRadius: '14px', padding: '16px', border: '1px solid rgba(239, 68, 68, 0.2)' }}>
+          <div style={{ background: 'var(--bg-subpanel, rgba(0, 0, 0, 0.3))', borderRadius: '14px', padding: '16px', border: '1px solid rgba(239, 68, 68, 0.2)' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#ef4444', fontWeight: 800, fontSize: '0.9rem', marginBottom: '12px' }}>
               <Flame size={16} />
               <span>Highest Pollution Levels</span>
@@ -718,16 +718,16 @@ export default function Dashboard({
                     alignItems: 'center',
                     padding: '8px 12px',
                     borderRadius: '8px',
-                    background: 'rgba(255, 255, 255, 0.03)',
+                    background: 'var(--bg-card-hover, rgba(255, 255, 255, 0.03))',
                     cursor: 'pointer',
                     transition: 'background 0.15s'
                   }}
                   onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(239, 68, 68, 0.1)'}
-                  onMouseLeave={(e) => e.currentTarget.style.background = 'rgba(255, 255, 255, 0.03)'}
+                  onMouseLeave={(e) => e.currentTarget.style.background = 'var(--bg-card-hover, rgba(255, 255, 255, 0.03))'}
                 >
                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <span style={{ fontWeight: 800, color: '#94a3b8', fontSize: '0.82rem' }}>#{c.rank}</span>
-                    <span style={{ fontWeight: 700, color: '#f8fafc', fontSize: '0.9rem' }}>{c.city}</span>
+                    <span style={{ fontWeight: 800, color: 'var(--text-secondary)', fontSize: '0.82rem' }}>#{c.rank}</span>
+                    <span style={{ fontWeight: 700, color: 'var(--text-primary)', fontSize: '0.9rem' }}>{c.city}</span>
                   </div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                     <span style={{ fontWeight: 800, color: c.status.color }}>{c.aqi} AQI</span>
@@ -741,7 +741,7 @@ export default function Dashboard({
           </div>
 
           {/* Cleanest Cities Preview */}
-          <div style={{ background: 'rgba(0, 0, 0, 0.3)', borderRadius: '14px', padding: '16px', border: '1px solid rgba(16, 185, 129, 0.2)' }}>
+          <div style={{ background: 'var(--bg-subpanel, rgba(0, 0, 0, 0.3))', borderRadius: '14px', padding: '16px', border: '1px solid rgba(16, 185, 129, 0.2)' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#10b981', fontWeight: 800, fontSize: '0.9rem', marginBottom: '12px' }}>
               <ShieldCheck size={16} />
               <span>Cleanest Air Quality</span>
@@ -758,16 +758,16 @@ export default function Dashboard({
                     alignItems: 'center',
                     padding: '8px 12px',
                     borderRadius: '8px',
-                    background: 'rgba(255, 255, 255, 0.03)',
+                    background: 'var(--bg-card-hover, rgba(255, 255, 255, 0.03))',
                     cursor: 'pointer',
                     transition: 'background 0.15s'
                   }}
                   onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(16, 185, 129, 0.1)'}
-                  onMouseLeave={(e) => e.currentTarget.style.background = 'rgba(255, 255, 255, 0.03)'}
+                  onMouseLeave={(e) => e.currentTarget.style.background = 'var(--bg-card-hover, rgba(255, 255, 255, 0.03))'}
                 >
                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <span style={{ fontWeight: 800, color: '#94a3b8', fontSize: '0.82rem' }}>#{c.rank}</span>
-                    <span style={{ fontWeight: 700, color: '#f8fafc', fontSize: '0.9rem' }}>{c.city}</span>
+                    <span style={{ fontWeight: 800, color: 'var(--text-secondary)', fontSize: '0.82rem' }}>#{c.rank}</span>
+                    <span style={{ fontWeight: 700, color: 'var(--text-primary)', fontSize: '0.9rem' }}>{c.city}</span>
                   </div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                     <span style={{ fontWeight: 800, color: c.status.color }}>{c.aqi} AQI</span>
@@ -804,10 +804,10 @@ export default function Dashboard({
             <ArrowLeftRight size={18} />
             <span style={{ fontSize: '0.8rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Multi-City Intelligence Matrix</span>
           </div>
-          <h3 style={{ fontSize: '1.35rem', fontWeight: 800, color: '#f8fafc', margin: '0 0 4px' }}>
+          <h3 style={{ fontSize: '1.35rem', fontWeight: 800, color: 'var(--text-primary)', margin: '0 0 4px' }}>
             Compare Air Quality Between 2 to 5 Metropolitan Hubs
           </h3>
-          <p style={{ color: '#94a3b8', fontSize: '0.85rem', margin: 0, maxWidth: '640px' }}>
+          <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', margin: 0, maxWidth: '640px' }}>
             Side-by-side comparison of PM2.5, PM10, meteorological dispersion, and 30-day historical averages.
           </p>
         </div>
@@ -841,23 +841,23 @@ export default function Dashboard({
           ============================================================ */}
       <section 
         style={{
-          background: 'rgba(12, 24, 18, 0.72)',
-          border: '1px solid rgba(255, 255, 255, 0.08)',
+          background: 'var(--bg-card)',
+          border: '1px solid var(--border-color)',
           borderRadius: '20px',
           padding: '24px',
           marginBottom: '2.5rem',
-          boxShadow: '0 12px 30px rgba(0, 0, 0, 0.4)'
+          boxShadow: 'var(--shadow-card)'
         }}
       >
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem', flexWrap: 'wrap', gap: '8px' }}>
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
               <Sparkles size={18} style={{ color: '#38bdf8' }} />
-              <h3 style={{ fontSize: '1.25rem', fontWeight: 800, color: '#f8fafc', margin: 0 }}>
+              <h3 style={{ fontSize: '1.25rem', fontWeight: 800, color: 'var(--text-primary)', margin: 0 }}>
                 12-Hour Hourly AQI Projection ({data.city})
               </h3>
             </div>
-            <p style={{ color: '#94a3b8', fontSize: '0.82rem', margin: '4px 0 0' }}>
+            <p style={{ color: 'var(--text-secondary)', fontSize: '0.82rem', margin: '4px 0 0' }}>
               Estimated forecast calculated via atmospheric diurnal model &bull; Confidence: 91.6%
             </p>
           </div>
@@ -894,14 +894,14 @@ export default function Dashboard({
               <div
                 key={step}
                 style={{
-                  background: 'rgba(0, 0, 0, 0.3)',
+                  background: 'var(--bg-subpanel, rgba(0, 0, 0, 0.3))',
                   border: `1px solid ${s.badgeBorder}`,
                   borderRadius: '12px',
                   padding: '12px',
                   textAlign: 'center'
                 }}
               >
-                <span style={{ fontSize: '0.74rem', color: '#94a3b8', fontWeight: 700 }}>In {step}</span>
+                <span style={{ fontSize: '0.74rem', color: 'var(--text-secondary)', fontWeight: 700 }}>In {step}</span>
                 <div style={{ fontSize: '1.4rem', fontWeight: 900, color: s.color, margin: '4px 0' }}>
                   {projectedAqi}
                 </div>
@@ -919,18 +919,18 @@ export default function Dashboard({
           ============================================================ */}
       <section 
         style={{
-          background: 'rgba(12, 24, 18, 0.72)',
-          border: '1px solid rgba(255, 255, 255, 0.08)',
+          background: 'var(--bg-card)',
+          border: '1px solid var(--border-color)',
           borderRadius: '20px',
           padding: '24px',
           marginBottom: '2.5rem',
-          boxShadow: '0 12px 30px rgba(0, 0, 0, 0.4)'
+          boxShadow: 'var(--shadow-card)'
         }}
       >
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem', flexWrap: 'wrap', gap: '8px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
             <AlertTriangle size={18} style={{ color: '#f59e0b' }} />
-            <h3 style={{ fontSize: '1.25rem', fontWeight: 800, color: '#f8fafc', margin: 0 }}>
+            <h3 style={{ fontSize: '1.25rem', fontWeight: 800, color: 'var(--text-primary)', margin: 0 }}>
               Active Smart Environmental Advisories
             </h3>
           </div>
@@ -959,22 +959,22 @@ export default function Dashboard({
         </div>
 
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '12px' }}>
-          <div style={{ background: 'rgba(0, 0, 0, 0.25)', borderLeft: '4px solid #ef4444', borderRadius: '10px', padding: '12px 16px' }}>
+          <div style={{ background: 'var(--bg-subpanel, rgba(0, 0, 0, 0.25))', border: '1px solid var(--border-color)', borderLeft: '4px solid #ef4444', borderRadius: '10px', padding: '12px 16px' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
               <strong style={{ color: '#ef4444', fontSize: '0.84rem' }}>🔴 CRITICAL THRESHOLD</strong>
-              <span style={{ fontSize: '0.72rem', color: '#94a3b8' }}>Live Alert</span>
+              <span style={{ fontSize: '0.72rem', color: 'var(--text-secondary)' }}>Live Alert</span>
             </div>
-            <p style={{ color: '#e2e8f0', fontSize: '0.85rem', margin: 0 }}>
+            <p style={{ color: 'var(--text-primary)', fontSize: '0.85rem', margin: 0 }}>
               PM2.5 concentrations in {data.city} exceed WHO 24-hour safe limits ({data.pm25} µg/m³ vs 15 µg/m³ limit).
             </p>
           </div>
 
-          <div style={{ background: 'rgba(0, 0, 0, 0.25)', borderLeft: '4px solid #f59e0b', borderRadius: '10px', padding: '12px 16px' }}>
+          <div style={{ background: 'var(--bg-subpanel, rgba(0, 0, 0, 0.25))', border: '1px solid var(--border-color)', borderLeft: '4px solid #f59e0b', borderRadius: '10px', padding: '12px 16px' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
               <strong style={{ color: '#fbbf24', fontSize: '0.84rem' }}>🟠 DISPERSION ADVISORY</strong>
-              <span style={{ fontSize: '0.72rem', color: '#94a3b8' }}>30 min ago</span>
+              <span style={{ fontSize: '0.72rem', color: 'var(--text-secondary)' }}>30 min ago</span>
             </div>
-            <p style={{ color: '#e2e8f0', fontSize: '0.85rem', margin: 0 }}>
+            <p style={{ color: 'var(--text-primary)', fontSize: '0.85rem', margin: 0 }}>
               Atmospheric wind velocity at {data.windSpeed || data.wind_speed || 10} km/h is facilitating steady particulate dispersion.
             </p>
           </div>
@@ -999,27 +999,27 @@ export default function Dashboard({
         <div 
           onClick={() => onNavigate && onNavigate('globe')}
           style={{
-            background: 'linear-gradient(135deg, rgba(6, 30, 20, 0.8) 0%, rgba(3, 15, 10, 0.9) 100%)',
-            border: '1px solid rgba(0, 245, 160, 0.3)',
+            background: 'var(--bg-card)',
+            border: '1px solid var(--border-color)',
             borderRadius: '20px',
             padding: '24px',
             cursor: 'pointer',
             transition: 'all 0.2s',
-            boxShadow: '0 10px 25px rgba(0, 0, 0, 0.4)'
+            boxShadow: 'var(--shadow-card)'
           }}
-          onMouseEnter={(e) => e.currentTarget.style.borderColor = '#00f5a0'}
-          onMouseLeave={(e) => e.currentTarget.style.borderColor = 'rgba(0, 245, 160, 0.3)'}
+          onMouseEnter={(e) => e.currentTarget.style.borderColor = 'var(--accent-cyan)'}
+          onMouseLeave={(e) => e.currentTarget.style.borderColor = 'var(--border-color)'}
         >
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#00f5a0', marginBottom: '8px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--accent-cyan)', marginBottom: '8px' }}>
             <Globe size={22} />
-            <h3 style={{ fontSize: '1.2rem', fontWeight: 800, margin: 0, color: '#f8fafc' }}>
+            <h3 style={{ fontSize: '1.2rem', fontWeight: 800, margin: 0, color: 'var(--text-primary)' }}>
               3D Earth Digital Twin
             </h3>
           </div>
-          <p style={{ color: '#94a3b8', fontSize: '0.85rem', marginBottom: '14px' }}>
+          <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', marginBottom: '14px' }}>
             Interactive WebGL 3D holographic globe rendering atmospheric criteria beacons, wind streamlines, and planetary air dispersion.
           </p>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '4px', color: '#00f5a0', fontSize: '0.82rem', fontWeight: 700 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '4px', color: 'var(--accent-cyan)', fontSize: '0.82rem', fontWeight: 700 }}>
             <span>Launch 3D Earth Studio</span>
             <ArrowRight size={13} />
           </div>
@@ -1029,24 +1029,24 @@ export default function Dashboard({
         <div 
           onClick={() => onNavigate && onNavigate('breathiq')}
           style={{
-            background: 'linear-gradient(135deg, rgba(35, 12, 14, 0.8) 0%, rgba(20, 6, 8, 0.9) 100%)',
-            border: '1px solid rgba(239, 68, 68, 0.3)',
+            background: 'var(--bg-card)',
+            border: '1px solid var(--border-color)',
             borderRadius: '20px',
             padding: '24px',
             cursor: 'pointer',
             transition: 'all 0.2s',
-            boxShadow: '0 10px 25px rgba(0, 0, 0, 0.4)'
+            boxShadow: 'var(--shadow-card)'
           }}
           onMouseEnter={(e) => e.currentTarget.style.borderColor = '#ef4444'}
-          onMouseLeave={(e) => e.currentTarget.style.borderColor = 'rgba(239, 68, 68, 0.3)'}
+          onMouseLeave={(e) => e.currentTarget.style.borderColor = 'var(--border-color)'}
         >
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#f87171', marginBottom: '8px' }}>
             <HeartPulse size={22} />
-            <h3 style={{ fontSize: '1.2rem', fontWeight: 800, margin: 0, color: '#f8fafc' }}>
+            <h3 style={{ fontSize: '1.2rem', fontWeight: 800, margin: 0, color: 'var(--text-primary)' }}>
               BreathIQ™ 3D Pulmonary Simulator
             </h3>
           </div>
-          <p style={{ color: '#94a3b8', fontSize: '0.85rem', marginBottom: '14px' }}>
+          <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', marginBottom: '14px' }}>
             Interactive physiological lung model calculating minute tidal ventilation, particulate alveolar deposition, and cigarette toxicity equivalence.
           </p>
           <div style={{ display: 'flex', alignItems: 'center', gap: '4px', color: '#f87171', fontSize: '0.82rem', fontWeight: 700 }}>

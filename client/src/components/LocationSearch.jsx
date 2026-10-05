@@ -100,18 +100,18 @@ export default function LocationSearch({
           display: 'flex',
           alignItems: 'center',
           gap: '8px',
-          background: isBanner ? 'rgba(10, 20, 15, 0.85)' : 'rgba(15, 23, 42, 0.65)',
-          border: isBanner ? '1px solid rgba(0, 245, 160, 0.28)' : '1px solid rgba(255, 255, 255, 0.12)',
+          background: 'var(--bg-card, rgba(10, 20, 15, 0.85))',
+          border: isBanner ? '1px solid var(--accent-cyan, rgba(0, 245, 160, 0.28))' : '1px solid var(--border-color)',
           borderRadius: isBanner ? '16px' : '10px',
           padding: isBanner ? '10px 16px' : '6px 12px',
-          boxShadow: isBanner ? '0 12px 35px rgba(0, 0, 0, 0.5), inset 0 0 20px rgba(0, 245, 160, 0.05)' : 'none',
+          boxShadow: isBanner ? 'var(--shadow-card)' : 'none',
           backdropFilter: 'blur(16px)',
           transition: 'all 0.25s ease'
         }}
       >
         <Search 
           size={isBanner ? 20 : 15} 
-          style={{ color: '#00f5a0', flexShrink: 0 }} 
+          style={{ color: 'var(--accent-cyan)', flexShrink: 0 }} 
         />
 
         <input
@@ -125,11 +125,12 @@ export default function LocationSearch({
           disabled={disabled}
           placeholder={isBanner ? "Search city, state, country or region (e.g. Chennai, Delhi, London)..." : "Search location..."}
           aria-label="Search air quality monitoring location"
+          className="location-search-input"
           style={{
             background: 'transparent',
             border: 'none',
             outline: 'none',
-            color: '#f8fafc',
+            color: 'var(--text-primary)',
             fontSize: isBanner ? '0.98rem' : '0.85rem',
             width: isBanner ? '100%' : '180px',
             fontFamily: 'inherit'
@@ -144,7 +145,7 @@ export default function LocationSearch({
             style={{
               background: 'transparent',
               border: 'none',
-              color: '#94a3b8',
+              color: 'var(--text-secondary)',
               cursor: 'pointer',
               padding: '2px',
               display: 'flex',
@@ -208,15 +209,16 @@ export default function LocationSearch({
       {/* Autocomplete Dropdown List */}
       {isOpen && (
         <div
+          className="location-search-dropdown"
           style={{
             position: 'absolute',
             top: 'calc(100% + 8px)',
             left: 0,
             right: 0,
-            background: 'rgba(10, 20, 16, 0.96)',
-            border: '1px solid rgba(0, 245, 160, 0.25)',
+            background: 'var(--bg-secondary, #ffffff)',
+            border: '1px solid var(--border-color)',
             borderRadius: '16px',
-            boxShadow: '0 20px 45px rgba(0, 0, 0, 0.7), 0 0 25px rgba(0, 245, 160, 0.1)',
+            boxShadow: 'var(--shadow-lg)',
             backdropFilter: 'blur(20px)',
             zIndex: 100,
             maxHeight: '340px',
@@ -224,12 +226,12 @@ export default function LocationSearch({
             padding: '8px'
           }}
         >
-          <div style={{ padding: '6px 10px', fontSize: '0.72rem', fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+          <div style={{ padding: '6px 10px', fontSize: '0.72rem', fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
             {query.trim() ? `Matching Stations (${filteredCities.length})` : 'Popular Monitoring Hubs'}
           </div>
 
           {filteredCities.length === 0 ? (
-            <div style={{ padding: '16px', textAlign: 'center', color: '#94a3b8', fontSize: '0.85rem' }}>
+            <div style={{ padding: '16px', textAlign: 'center', color: 'var(--text-secondary)', fontSize: '0.85rem' }}>
               No monitoring station matched "{query}". Try Chennai, Delhi, Mumbai, Bengaluru...
             </div>
           ) : (
@@ -254,7 +256,7 @@ export default function LocationSearch({
                     marginBottom: '4px'
                   }}
                   onMouseEnter={(e) => {
-                    if (!isSelected) e.currentTarget.style.background = 'rgba(255, 255, 255, 0.05)';
+                    if (!isSelected) e.currentTarget.style.background = 'var(--bg-card-hover, rgba(255, 255, 255, 0.05))';
                   }}
                   onMouseLeave={(e) => {
                     if (!isSelected) e.currentTarget.style.background = 'transparent';
@@ -265,19 +267,19 @@ export default function LocationSearch({
                       width: '32px',
                       height: '32px',
                       borderRadius: '8px',
-                      background: 'rgba(255, 255, 255, 0.06)',
+                      background: 'var(--bg-card-hover, rgba(255, 255, 255, 0.06))',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
-                      color: '#00f5a0'
+                      color: 'var(--accent-cyan)'
                     }}>
                       <MapPin size={16} />
                     </div>
                     <div>
-                      <div style={{ fontWeight: 700, color: '#f8fafc', fontSize: '0.92rem' }}>
+                      <div style={{ fontWeight: 700, color: 'var(--text-primary)', fontSize: '0.92rem' }}>
                         {item.city}
                       </div>
-                      <div style={{ fontSize: '0.74rem', color: '#94a3b8' }}>
+                      <div style={{ fontSize: '0.74rem', color: 'var(--text-secondary)' }}>
                         {item.state ? `${item.state}, ` : ''}{item.country || 'India'}
                       </div>
                     </div>
@@ -285,7 +287,7 @@ export default function LocationSearch({
 
                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                     <div style={{ textAlign: 'right' }}>
-                      <div style={{ fontSize: '0.72rem', color: '#94a3b8', fontWeight: 600 }}>AQI</div>
+                      <div style={{ fontSize: '0.72rem', color: 'var(--text-secondary)', fontWeight: 600 }}>AQI</div>
                       <div style={{ fontSize: '0.95rem', fontWeight: 800, color: aqiStatus.color }}>
                         {item.aqi || '--'}
                       </div>

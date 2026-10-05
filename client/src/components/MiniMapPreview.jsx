@@ -23,12 +23,12 @@ export default function MiniMapPreview({ currentCity = 'Delhi', currentAqi = 150
     <section 
       className="mini-map-preview-card"
       style={{
-        background: 'linear-gradient(135deg, rgba(8, 20, 14, 0.95) 0%, rgba(4, 10, 7, 0.98) 100%)',
-        border: '1px solid rgba(0, 245, 160, 0.25)',
+        background: 'var(--bg-card)',
+        border: '1px solid var(--border-color)',
         borderRadius: '20px',
         padding: '24px',
         marginBottom: '2.5rem',
-        boxShadow: '0 12px 30px rgba(0, 0, 0, 0.4)',
+        boxShadow: 'var(--shadow-card)',
         position: 'relative',
         overflow: 'hidden'
       }}
@@ -37,12 +37,12 @@ export default function MiniMapPreview({ currentCity = 'Delhi', currentAqi = 150
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem', flexWrap: 'wrap', gap: '10px' }}>
         <div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <MapPin size={20} style={{ color: '#00f5a0' }} />
-            <h2 style={{ fontSize: '1.35rem', fontWeight: 800, color: '#f8fafc', margin: 0 }}>
+            <MapPin size={20} style={{ color: 'var(--accent-cyan)' }} />
+            <h2 style={{ fontSize: '1.35rem', fontWeight: 800, color: 'var(--text-primary)', margin: 0 }}>
               Regional Air Quality Map Preview
             </h2>
           </div>
-          <p style={{ color: '#94a3b8', fontSize: '0.84rem', margin: '4px 0 0' }}>
+          <p style={{ color: 'var(--text-secondary)', fontSize: '0.84rem', margin: '4px 0 0' }}>
             Geospatial dispersion radar across metropolitan stations &bull; Click any hub to switch location
           </p>
         </div>
@@ -199,17 +199,17 @@ export default function MiniMapPreview({ currentCity = 'Delhi', currentAqi = 150
             alignItems: 'center',
             gap: '8px',
             fontSize: '0.72rem',
-            color: '#cbd5e1'
+            color: 'var(--text-secondary)'
           }}
         >
-          <span style={{ width: '7px', height: '7px', borderRadius: '50%', background: '#00f5a0', display: 'inline-block' }} />
-          <span>Active Hub: <strong style={{ color: '#00f5a0' }}>{currentCity}</strong> ({currentAqi} AQI) &bull; Cleanest Corridor Navigation</span>
+          <span style={{ width: '7px', height: '7px', borderRadius: '50%', background: 'var(--accent-cyan)', display: 'inline-block' }} />
+          <span>Active Hub: <strong style={{ color: 'var(--accent-cyan)' }}>{currentCity}</strong> ({currentAqi} AQI) &bull; Cleanest Corridor Navigation</span>
         </div>
       </div>
 
       {/* Bottom Color Scale Legend */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: '12px', flexWrap: 'wrap', gap: '8px', fontSize: '0.74rem' }}>
-        <span style={{ color: '#94a3b8', fontWeight: 700 }}>AQI Scale:</span>
+        <span style={{ color: 'var(--text-secondary)', fontWeight: 700 }}>AQI Scale:</span>
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
           {[
             { label: 'Good (0-50)', color: '#10b981' },
@@ -220,7 +220,7 @@ export default function MiniMapPreview({ currentCity = 'Delhi', currentAqi = 150
           ].map(leg => (
             <div key={leg.label} style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
               <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: leg.color }} />
-              <span style={{ color: '#cbd5e1' }}>{leg.label}</span>
+              <span style={{ color: 'var(--text-secondary)' }}>{leg.label}</span>
             </div>
           ))}
         </div>

@@ -159,8 +159,8 @@ export default function PollutantCard({ name, fullName, value, unit, typeKey }) 
           <div>
             <div className="pollutant-top">
               <div>
-                <div className="pollutant-name" style={{ fontSize: '1.05rem', fontWeight: 800 }}>{name}</div>
-                <div className="pollutant-fullname" style={{ color: '#94a3b8', fontSize: '0.72rem' }}>{fullName}</div>
+                <div className="pollutant-name" style={{ fontSize: '1.05rem', fontWeight: 800, color: 'var(--text-primary)' }}>{name}</div>
+                <div className="pollutant-fullname" style={{ color: 'var(--text-secondary)', fontSize: '0.72rem' }}>{fullName}</div>
               </div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                 <span 
@@ -182,11 +182,11 @@ export default function PollutantCard({ name, fullName, value, unit, typeKey }) 
                   onClick={toggleFlip}
                   title="3D Flip for Chemical & Health Impact"
                   style={{
-                    background: 'rgba(255, 255, 255, 0.08)',
-                    border: '1px solid rgba(255, 255, 255, 0.15)',
+                    background: 'var(--bg-card-hover, rgba(255, 255, 255, 0.08))',
+                    border: '1px solid var(--border-color, rgba(255, 255, 255, 0.15))',
                     borderRadius: '6px',
                     padding: '3px 6px',
-                    color: '#94a3b8',
+                    color: 'var(--text-secondary)',
                     cursor: 'pointer',
                     display: 'flex',
                     alignItems: 'center'
@@ -199,15 +199,15 @@ export default function PollutantCard({ name, fullName, value, unit, typeKey }) 
 
             <div className="pollutant-value-row" style={{ margin: '0.85rem 0 0.4rem' }}>
               {isUnavailable ? (
-                <span className="pollutant-unavailable" style={{ fontSize: '1.05rem', fontWeight: 600, color: '#94a3b8', fontStyle: 'italic' }}>
+                <span className="pollutant-unavailable" style={{ fontSize: '1.05rem', fontWeight: 600, color: 'var(--text-secondary)', fontStyle: 'italic' }}>
                   Data unavailable
                 </span>
               ) : (
                 <>
-                  <span className="pollutant-value" style={{ fontSize: '1.85rem', fontWeight: 800, color: '#f8fafc', letterSpacing: '-0.02em' }}>
+                  <span className="pollutant-value" style={{ fontSize: '1.85rem', fontWeight: 800, color: 'var(--text-primary)', letterSpacing: '-0.02em' }}>
                     {value}
                   </span>
-                  <span className="pollutant-unit" style={{ fontSize: '0.85rem', color: '#94a3b8', marginLeft: '4px', fontWeight: 600 }}>
+                  <span className="pollutant-unit" style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', marginLeft: '4px', fontWeight: 600 }}>
                     {unit}
                   </span>
                 </>
@@ -216,7 +216,7 @@ export default function PollutantCard({ name, fullName, value, unit, typeKey }) 
           </div>
 
           <div style={{ marginTop: '0.65rem' }}>
-            <div className="pollutant-bar-bg" style={{ height: '6px', background: 'rgba(255, 255, 255, 0.08)', borderRadius: '9999px', overflow: 'hidden' }}>
+            <div className="pollutant-bar-bg" style={{ height: '6px', background: 'var(--border-color, rgba(255, 255, 255, 0.08))', borderRadius: '9999px', overflow: 'hidden' }}>
               <div 
                 className="pollutant-bar-fill" 
                 style={{ 
@@ -226,9 +226,9 @@ export default function PollutantCard({ name, fullName, value, unit, typeKey }) 
                 }}
               />
             </div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '4px', fontSize: '0.68rem', color: '#64748b' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '4px', fontSize: '0.68rem', color: 'var(--text-muted)' }}>
               <span>{isUnavailable ? 'Offline' : 'Safe: 0'}</span>
-              <span style={{ cursor: 'pointer', color: '#94a3b8' }} onClick={toggleFlip}>3D Flip ↗</span>
+              <span style={{ cursor: 'pointer', color: 'var(--text-secondary)' }} onClick={toggleFlip}>3D Flip ↗</span>
               <span>{isUnavailable ? 'N/A' : `Max: ${maxRef} ${unit}`}</span>
             </div>
           </div>

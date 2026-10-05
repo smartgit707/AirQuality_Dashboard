@@ -25,7 +25,8 @@ export default function CigaretteEquivalenceCard({ pm25 }) {
       style={{
         padding: '1.25rem 1.5rem',
         borderLeft: `4px solid ${severityColor}`,
-        background: 'linear-gradient(135deg, rgba(15, 23, 42, 0.75) 0%, rgba(30, 41, 59, 0.5) 100%)',
+        background: 'var(--bg-card)',
+        border: '1px solid var(--border-color)',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
@@ -50,21 +51,21 @@ export default function CigaretteEquivalenceCard({ pm25 }) {
 
         <div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <span style={{ fontSize: '0.82rem', fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+            <span style={{ fontSize: '0.82rem', fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
               Berkeley Earth Inhalation Equivalence
             </span>
             <span style={{ fontSize: '0.72rem', padding: '2px 6px', borderRadius: '4px', backgroundColor: `${severityColor}22`, color: severityColor, fontWeight: 700 }}>
               PM2.5: {pmVal} µg/m³
             </span>
           </div>
-          <p style={{ margin: '4px 0 0', color: '#e2e8f0', fontSize: '0.92rem' }}>
+          <p style={{ margin: '4px 0 0', color: 'var(--text-primary)', fontSize: '0.92rem' }}>
             Breathing today's ambient air continuously over 24 hours imparts a lung particulate burden roughly equal to passively smoking{' '}
             <strong style={{ color: severityColor, fontSize: '1.05rem' }}>~{cigs} cigarette{cigs === 1 ? '' : 's'}</strong>.
           </p>
         </div>
       </div>
 
-      <div style={{ fontSize: '0.75rem', color: '#64748b', fontStyle: 'italic', maxWidth: '320px', textAlign: 'right' }}>
+      <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontStyle: 'italic', maxWidth: '320px', textAlign: 'right' }}>
         * Based on published Berkeley Earth research (Muller & Rohde: 22 µg/m³ PM2.5 ≈ 1 cigarette/day). For academic environmental visualization.
       </div>
     </div>

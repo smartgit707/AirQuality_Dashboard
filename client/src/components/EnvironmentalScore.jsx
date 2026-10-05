@@ -111,8 +111,8 @@ export default function EnvironmentalScore({ data, loading }) {
               alignItems: 'center',
               justifyContent: 'center'
             }}>
-              <span style={{ fontSize: '2rem', fontWeight: 800, color: '#fff', lineHeight: 1 }}>{score}</span>
-              <span style={{ fontSize: '0.7rem', color: '#94a3b8', fontWeight: 600 }}>/100</span>
+              <span style={{ fontSize: '2rem', fontWeight: 800, color: 'var(--text-primary)', lineHeight: 1 }}>{score}</span>
+              <span style={{ fontSize: '0.7rem', color: 'var(--text-secondary)', fontWeight: 600 }}>/100</span>
             </div>
           </div>
 
@@ -120,7 +120,7 @@ export default function EnvironmentalScore({ data, loading }) {
             <div style={{ fontSize: '1.1rem', fontWeight: 700, color, marginBottom: '4px' }}>
               {status} Environmental Wellness
             </div>
-            <p className="score-summary-desc" style={{ color: '#cbd5e1', fontSize: '0.88rem', lineHeight: 1.5 }}>
+            <p className="score-summary-desc" style={{ color: 'var(--text-secondary)', fontSize: '0.88rem', lineHeight: 1.5 }}>
               {description}
             </p>
           </div>
