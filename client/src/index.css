@@ -1629,4 +1629,199 @@ body {
   }
 }
 
+/* ============================================================
+   LIGHT MODE DESIGN SYSTEM
+   ============================================================ */
+:root[data-theme="light"],
+body.light-mode {
+  --bg-primary: #f8fafc;
+  --bg-secondary: #ffffff;
+  --bg-card: rgba(255, 255, 255, 0.96);
+  --bg-card-hover: rgba(248, 250, 252, 1);
+  --border-color: rgba(226, 232, 240, 0.95);
+  --border-subtle: rgba(16, 185, 129, 0.18);
+  
+  --text-primary: #0f172a;
+  --text-secondary: #475569;
+  --text-muted: #64748b;
+  
+  --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 14px -2px rgba(0, 0, 0, 0.06), 0 2px 6px -1px rgba(0, 0, 0, 0.04);
+  --shadow-lg: 0 12px 28px -4px rgba(0, 0, 0, 0.08), 0 4px 12px -2px rgba(0, 0, 0, 0.04);
+  --shadow-card: 0 4px 20px -2px rgba(0, 0, 0, 0.05), inset 0 1px 0 0 rgba(255, 255, 255, 1);
+}
+
+body.light-mode,
+[data-theme="light"] body {
+  background-color: #f1f5f9 !important;
+  color: #0f172a !important;
+  background-image: 
+    radial-gradient(circle at 50% -20%, rgba(16, 185, 129, 0.14) 0%, transparent 60%),
+    radial-gradient(circle at 90% 25%, rgba(56, 189, 248, 0.1) 0%, transparent 45%),
+    radial-gradient(circle at 10% 80%, rgba(245, 158, 11, 0.06) 0%, transparent 50%) !important;
+  background-attachment: fixed !important;
+}
+
+/* Light Mode Navbar */
+body.light-mode .navbar,
+[data-theme="light"] .navbar {
+  background: rgba(255, 255, 255, 0.92) !important;
+  border-bottom: 1px solid rgba(226, 232, 240, 0.95) !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04) !important;
+}
+
+body.light-mode .brand-title,
+[data-theme="light"] .brand-title {
+  color: #0f172a !important;
+}
+
+body.light-mode .brand-subtitle,
+[data-theme="light"] .brand-subtitle {
+  color: #64748b !important;
+}
+
+body.light-mode .nav-tab-button,
+[data-theme="light"] .nav-tab-button {
+  color: #475569 !important;
+}
+
+body.light-mode .nav-tab-button:hover,
+[data-theme="light"] .nav-tab-button:hover {
+  background: rgba(16, 185, 129, 0.1) !important;
+  color: #059669 !important;
+}
+
+body.light-mode .nav-tab-button.active,
+[data-theme="light"] .nav-tab-button.active {
+  background: rgba(16, 185, 129, 0.18) !important;
+  color: #059669 !important;
+  border-color: rgba(16, 185, 129, 0.35) !important;
+}
+
+/* Light Mode Cards & Surfaces */
+body.light-mode .card,
+[data-theme="light"] .card,
+body.light-mode .metric-card,
+[data-theme="light"] .metric-card,
+body.light-mode .condition-card,
+[data-theme="light"] .condition-card,
+body.light-mode .homepage-hero-banner,
+[data-theme="light"] .homepage-hero-banner,
+body.light-mode .selected-location-header,
+[data-theme="light"] .selected-location-header,
+body.light-mode .rankings-preview-section,
+[data-theme="light"] .rankings-preview-section,
+body.light-mode .mini-map-preview-card,
+[data-theme="light"] .mini-map-preview-card,
+body.light-mode .pollutant-card,
+[data-theme="light"] .pollutant-card,
+body.light-mode .pollutant-card-front,
+[data-theme="light"] .pollutant-card-front,
+body.light-mode .pollutant-card-back,
+[data-theme="light"] .pollutant-card-back {
+  background: #ffffff !important;
+  border: 1px solid rgba(226, 232, 240, 0.95) !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04) !important;
+  color: #0f172a !important;
+}
+
+/* Light Mode Headings and Typography */
+body.light-mode h1,
+[data-theme="light"] h1,
+body.light-mode h2,
+[data-theme="light"] h2,
+body.light-mode h3,
+[data-theme="light"] h3,
+body.light-mode h4,
+[data-theme="light"] h4 {
+  color: #0f172a !important;
+}
+
+body.light-mode p,
+[data-theme="light"] p,
+body.light-mode .section-subtitle,
+[data-theme="light"] .section-subtitle,
+body.light-mode .card-subtitle,
+[data-theme="light"] .card-subtitle {
+  color: #475569 !important;
+}
+
+body.light-mode .card-numeric-value,
+[data-theme="light"] .card-numeric-value {
+  color: #0f172a !important;
+}
+
+body.light-mode .condition-value,
+[data-theme="light"] .condition-value {
+  color: #0f172a !important;
+}
+
+body.light-mode .condition-label,
+[data-theme="light"] .condition-label,
+body.light-mode .stat-summary-label,
+[data-theme="light"] .stat-summary-label {
+  color: #64748b !important;
+}
+
+/* Light Mode Form Elements & Dropdowns */
+body.light-mode .location-search-input,
+[data-theme="light"] .location-search-input,
+body.light-mode select,
+[data-theme="light"] select {
+  background: #ffffff !important;
+  border: 1px solid rgba(203, 213, 225, 0.9) !important;
+  color: #0f172a !important;
+}
+
+body.light-mode .location-search-input::placeholder,
+[data-theme="light"] .location-search-input::placeholder {
+  color: #94a3b8 !important;
+}
+
+body.light-mode .location-search-dropdown,
+[data-theme="light"] .location-search-dropdown {
+  background: #ffffff !important;
+  border: 1px solid rgba(226, 232, 240, 0.95) !important;
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.08) !important;
+  color: #0f172a !important;
+}
+
+body.light-mode .location-search-item,
+[data-theme="light"] .location-search-item {
+  color: #0f172a !important;
+  border-bottom: 1px solid rgba(241, 245, 249, 0.9) !important;
+}
+
+body.light-mode .location-search-item:hover,
+[data-theme="light"] .location-search-item:hover {
+  background: rgba(16, 185, 129, 0.08) !important;
+}
+
+/* Light Mode Tables */
+body.light-mode table,
+[data-theme="light"] table {
+  color: #1e293b !important;
+}
+
+body.light-mode th,
+[data-theme="light"] th {
+  color: #475569 !important;
+  border-bottom: 1px solid rgba(226, 232, 240, 0.95) !important;
+}
+
+body.light-mode td,
+[data-theme="light"] td {
+  border-bottom: 1px solid rgba(241, 245, 249, 0.95) !important;
+  color: #1e293b !important;
+}
+
+/* Light Mode Footer */
+body.light-mode .dashboard-footer,
+[data-theme="light"] .dashboard-footer {
+  background: #ffffff !important;
+  border-top: 1px solid rgba(226, 232, 240, 0.95) !important;
+  color: #475569 !important;
+}
+
+
 

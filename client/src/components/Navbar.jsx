@@ -24,7 +24,9 @@ import {
   ChevronDown,
   Layers,
   Menu,
-  X
+  X,
+  Sun,
+  Moon
 } from 'lucide-react';
 import LocationSearch from './LocationSearch';
 import { useAuth } from '../context/AuthContext';
@@ -37,7 +39,9 @@ export default function Navbar({
   loading,
   isApiConnected,
   viewMode = 'dashboard',
-  onViewModeChange
+  onViewModeChange,
+  theme = 'dark',
+  onToggleTheme
 }) {
   const { user, isAuthenticated, isAdmin, logout } = useAuth();
   const [moreDropdownOpen, setMoreDropdownOpen] = useState(false);
@@ -266,6 +270,31 @@ export default function Navbar({
             <RefreshCw size={15} className={loading ? 'spin' : ''} />
           </button>
 
+          {/* Theme Mode Toggle (Light / Dark) */}
+          {onToggleTheme && (
+            <button
+              type="button"
+              onClick={onToggleTheme}
+              className="theme-toggle-btn"
+              title={theme === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+              aria-label="Toggle theme mode"
+              style={{
+                background: theme === 'light' ? 'rgba(0, 0, 0, 0.06)' : 'rgba(255, 255, 255, 0.06)',
+                border: theme === 'light' ? '1px solid rgba(0, 0, 0, 0.12)' : '1px solid rgba(255, 255, 255, 0.12)',
+                borderRadius: '10px',
+                padding: '7px',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: theme === 'light' ? '#d97706' : '#38bdf8',
+                transition: 'all 0.2s ease'
+              }}
+            >
+              {theme === 'light' ? <Moon size={15} color="#475569" /> : <Sun size={15} color="#fbbf24" />}
+            </button>
+          )}
+
           {/* User Account / Role / Sign-in */}
           {isAuthenticated ? (
             <div style={{
@@ -407,6 +436,38 @@ export default function Navbar({
               variant="banner"
             />
           </div>
+
+          {/* Mobile Theme Toggle */}
+          {onToggleTheme && (
+            <div style={{ marginBottom: '16px' }}>
+              <button
+                type="button"
+                onClick={onToggleTheme}
+                style={{
+                  width: '100%',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  padding: '12px 16px',
+                  borderRadius: '12px',
+                  background: theme === 'light' ? 'rgba(0, 0, 0, 0.05)' : 'rgba(255, 255, 255, 0.05)',
+                  border: theme === 'light' ? '1px solid rgba(0, 0, 0, 0.12)' : '1px solid rgba(255, 255, 255, 0.12)',
+                  color: theme === 'light' ? '#0f172a' : '#f8fafc',
+                  fontSize: '0.9rem',
+                  fontWeight: 700,
+                  cursor: 'pointer'
+                }}
+              >
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                  {theme === 'light' ? <Moon size={18} color="#d97706" /> : <Sun size={18} color="#fbbf24" />}
+                  <span>{theme === 'light' ? 'Switch to Dark Mode' : 'Switch to Light Mode'}</span>
+                </div>
+                <span style={{ fontSize: '0.75rem', color: '#94a3b8', textTransform: 'uppercase' }}>
+                  {theme.toUpperCase()}
+                </span>
+              </button>
+            </div>
+          )}
 
           <div style={{ fontSize: '0.75rem', fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase', marginBottom: '8px' }}>
             Main Navigation

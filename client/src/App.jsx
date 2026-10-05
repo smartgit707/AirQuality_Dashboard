@@ -50,6 +50,31 @@ export default function App() {
   const [isDbConnected, setIsDbConnected] = useState(false);
   const [lastRefreshedAt, setLastRefreshedAt] = useState('Live Telemetry');
 
+  // Theme state ('dark' | 'light')
+  const [theme, setTheme] = useState(() => {
+    try {
+      return localStorage.getItem('ecosense_theme') || 'dark';
+    } catch (_) {
+      return 'dark';
+    }
+  });
+
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', theme);
+    if (theme === 'light') {
+      document.body.classList.add('light-mode');
+    } else {
+      document.body.classList.remove('light-mode');
+    }
+    try {
+      localStorage.setItem('ecosense_theme', theme);
+    } catch (_) {}
+  }, [theme]);
+
+  const toggleTheme = () => {
+    setTheme(prev => (prev === 'dark' ? 'light' : 'dark'));
+  };
+
   // Load telemetry from Express backend API
   const loadCityData = useCallback(async (city, isRefresh = false) => {
     if (isRefresh) setLoading(true);
@@ -295,6 +320,8 @@ export default function App() {
         isApiConnected={isApiConnected}
         viewMode={viewMode}
         onViewModeChange={setViewMode}
+        theme={theme}
+        onToggleTheme={toggleTheme}
       />
 
       {/* Main View Router */}
