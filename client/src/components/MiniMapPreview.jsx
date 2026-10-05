@@ -1,85 +1,30 @@
-import React, { useMemo } from 'react';
-import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
-import L from 'leaflet';
-import 'leaflet/dist/leaflet.css';
-import { MapPin, Navigation, ArrowRight, Layers, ShieldCheck } from 'lucide-react';
+import React from 'react';
+import { MapPin, Navigation, ArrowRight, Layers, ShieldCheck, Compass, Radio } from 'lucide-react';
 import { getAqiCategory } from '../utils/calculations';
 
-// Coordinates for primary metropolitan stations
-const CITY_COORDS = {
-  Delhi: [28.6139, 77.2090],
-  Mumbai: [19.0760, 72.8777],
-  Bengaluru: [12.9716, 77.5946],
-  Chennai: [13.0827, 80.2707],
-  Hyderabad: [17.3850, 78.4867],
-  Kolkata: [22.5726, 88.3639],
-  Pune: [18.5204, 73.8567],
-  Ahmedabad: [23.0225, 72.5714],
-  Jaipur: [26.9124, 75.7873],
-  Lucknow: [26.8467, 80.9462],
-  Chandigarh: [30.7333, 76.7794],
-  Kochi: [9.9312, 76.2673],
-  Patna: [25.5941, 85.1376],
-  London: [51.5074, -0.1278],
-  'New York': [40.7128, -74.0060],
-  Tokyo: [35.6762, 139.6503],
-  Paris: [48.8566, 2.3522],
-  Dubai: [25.2048, 55.2708]
-};
-
-// Hub baseline AQIs for immediate display
-const METRO_HUBS = [
-  { name: 'Delhi', aqi: 245 },
-  { name: 'Mumbai', aqi: 95 },
-  { name: 'Bengaluru', aqi: 62 },
-  { name: 'Chennai', aqi: 78 },
-  { name: 'Hyderabad', aqi: 112 },
-  { name: 'Kolkata', aqi: 168 },
-  { name: 'Pune', aqi: 88 },
-  { name: 'Ahmedabad', aqi: 154 }
+// Key metropolitan hubs positioned on a normalized 0-100% geospatial canvas of India/Region
+const REGIONAL_STATIONS = [
+  { name: 'Delhi', aqi: 245, x: 40, y: 28 },
+  { name: 'Jaipur', aqi: 128, x: 34, y: 34 },
+  { name: 'Lucknow', aqi: 182, x: 50, y: 35 },
+  { name: 'Patna', aqi: 198, x: 62, y: 38 },
+  { name: 'Kolkata', aqi: 168, x: 74, y: 48 },
+  { name: 'Ahmedabad', aqi: 154, x: 25, y: 46 },
+  { name: 'Mumbai', aqi: 95, x: 28, y: 58 },
+  { name: 'Pune', aqi: 88, x: 31, y: 63 },
+  { name: 'Hyderabad', aqi: 112, x: 44, y: 64 },
+  { name: 'Bengaluru', aqi: 62, x: 42, y: 78 },
+  { name: 'Chennai', aqi: 78, x: 50, y: 79 },
+  { name: 'Kochi', aqi: 54, x: 39, y: 88 }
 ];
 
 export default function MiniMapPreview({ currentCity = 'Delhi', currentAqi = 150, onNavigate, onCityChange }) {
-  const currentCoords = CITY_COORDS[currentCity] || CITY_COORDS['Delhi'];
-
-  const createIcon = (aqi, isCurrent) => {
-    const { color } = getAqiCategory(aqi);
-    const borderStyle = isCurrent ? `3px solid #ffffff` : `2px solid rgba(255,255,255,0.7)`;
-    const ringAnimation = isCurrent ? 'box-shadow: 0 0 16px rgba(0,245,160,0.8), 0 0 24px rgba(0,245,160,0.5);' : `box-shadow: 0 0 8px ${color}88;`;
-
-    return L.divIcon({
-      className: 'custom-mini-map-marker',
-      html: `
-        <div style="
-          background: ${color};
-          color: #03150d;
-          font-weight: 900;
-          font-size: 11px;
-          padding: 3px 7px;
-          border-radius: 9999px;
-          display: flex;
-          align-items: center;
-          gap: 3px;
-          border: ${borderStyle};
-          ${ringAnimation}
-          transform: translate(-50%, -50%);
-          white-space: nowrap;
-          cursor: pointer;
-        ">
-          <span>${aqi}</span>
-        </div>
-      `,
-      iconSize: [36, 20],
-      iconAnchor: [18, 10]
-    });
-  };
-
   return (
     <section 
       className="mini-map-preview-card"
       style={{
-        background: 'rgba(12, 24, 18, 0.72)',
-        border: '1px solid rgba(255, 255, 255, 0.08)',
+        background: 'linear-gradient(135deg, rgba(8, 20, 14, 0.95) 0%, rgba(4, 10, 7, 0.98) 100%)',
+        border: '1px solid rgba(0, 245, 160, 0.25)',
         borderRadius: '20px',
         padding: '24px',
         marginBottom: '2.5rem',
@@ -93,17 +38,18 @@ export default function MiniMapPreview({ currentCity = 'Delhi', currentAqi = 150
         <div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
             <MapPin size={20} style={{ color: '#00f5a0' }} />
-            <h2 style={{ fontSize: '1.4rem', fontWeight: 800, color: '#f8fafc', margin: 0 }}>
+            <h2 style={{ fontSize: '1.35rem', fontWeight: 800, color: '#f8fafc', margin: 0 }}>
               Regional Air Quality Map Preview
             </h2>
           </div>
-          <p style={{ color: '#94a3b8', fontSize: '0.85rem', margin: '4px 0 0' }}>
-            Geospatial dispersion surrounding {currentCity} &bull; Click any station or launch full navigation
+          <p style={{ color: '#94a3b8', fontSize: '0.84rem', margin: '4px 0 0' }}>
+            Geospatial dispersion radar across metropolitan stations &bull; Click any hub to switch location
           </p>
         </div>
 
         {onNavigate && (
           <button
+            type="button"
             onClick={() => onNavigate('map')}
             style={{
               display: 'inline-flex',
@@ -114,7 +60,7 @@ export default function MiniMapPreview({ currentCity = 'Delhi', currentAqi = 150
               background: 'linear-gradient(135deg, #00f5a0 0%, #00d9f5 100%)',
               border: 'none',
               color: '#022013',
-              fontSize: '0.84rem',
+              fontSize: '0.82rem',
               fontWeight: 800,
               cursor: 'pointer',
               boxShadow: '0 4px 15px rgba(0, 245, 160, 0.35)',
@@ -128,93 +74,155 @@ export default function MiniMapPreview({ currentCity = 'Delhi', currentAqi = 150
         )}
       </div>
 
-      {/* Map Container */}
+      {/* Interactive GIS Radar Map Canvas */}
       <div 
         style={{ 
-          height: '240px', 
+          height: '260px', 
           width: '100%', 
           borderRadius: '14px', 
           overflow: 'hidden', 
           position: 'relative',
+          background: 'radial-gradient(ellipse at center, rgba(12, 32, 22, 0.9) 0%, rgba(5, 13, 9, 0.98) 100%)',
           border: '1px solid rgba(255, 255, 255, 0.08)' 
         }}
       >
-        <MapContainer
-          key={`mini-map-${currentCity}`}
-          center={currentCoords}
-          zoom={5}
-          zoomControl={false}
-          scrollWheelZoom={false}
-          doubleClickZoom={false}
-          attributionControl={false}
-          style={{ height: '100%', width: '100%', background: '#09130e' }}
+        {/* Radar Rings & Grid Lines */}
+        <svg 
+          style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', pointerEvents: 'none', opacity: 0.2 }}
         >
-          <TileLayer
-            url="https://{s}.basemaps.cartocdn.com/rastertiles/dark_all/{z}/{x}/{y}{r}.png"
-            maxZoom={19}
-            subdomains="abcd"
-          />
+          <circle cx="50%" cy="50%" r="40%" fill="none" stroke="#00f5a0" strokeWidth="1" strokeDasharray="4 4" />
+          <circle cx="50%" cy="50%" r="25%" fill="none" stroke="#00f5a0" strokeWidth="1" strokeDasharray="2 2" />
+          <circle cx="50%" cy="50%" r="10%" fill="none" stroke="#00f5a0" strokeWidth="1" />
+          <line x1="0" y1="50%" x2="100%" y2="50%" stroke="#00f5a0" strokeWidth="0.8" />
+          <line x1="50%" y1="0" x2="50%" y2="100%" stroke="#00f5a0" strokeWidth="0.8" />
+        </svg>
 
-          {/* Current City Highlight Marker */}
-          <Marker
-            position={currentCoords}
-            icon={createIcon(currentAqi, true)}
-          >
-            <Popup>
-              <div style={{ color: '#0f172a', fontWeight: 700, fontSize: '0.85rem' }}>
-                {currentCity}: {currentAqi} AQI (Current Selection)
-              </div>
-            </Popup>
-          </Marker>
+        {/* Ambient Topography Silhouettes */}
+        <div style={{ position: 'absolute', top: '12px', right: '16px', display: 'flex', alignItems: 'center', gap: '6px', color: '#64748b', fontSize: '0.72rem' }}>
+          <Radio size={13} color="#00f5a0" />
+          <span>Live Sensor Telemetry Ingestion</span>
+        </div>
 
-          {/* Surrounding Major Hub Markers */}
-          {METRO_HUBS.map((hub) => {
-            if (hub.name.toLowerCase() === currentCity.toLowerCase()) return null;
-            const coords = CITY_COORDS[hub.name];
-            if (!coords) return null;
+        {/* Interactive Station Markers */}
+        {REGIONAL_STATIONS.map((station) => {
+          const isSelected = station.name.toLowerCase() === currentCity.toLowerCase();
+          const displayAqi = isSelected ? (currentAqi || station.aqi) : station.aqi;
+          const { color } = getAqiCategory(displayAqi);
 
-            return (
-              <Marker
-                key={hub.name}
-                position={coords}
-                icon={createIcon(hub.aqi, false)}
-                eventHandlers={{
-                  click: () => {
-                    if (onCityChange) onCityChange(hub.name);
-                  }
+          return (
+            <div
+              key={station.name}
+              onClick={() => onCityChange && onCityChange(station.name)}
+              style={{
+                position: 'absolute',
+                left: `${station.x}%`,
+                top: `${station.y}%`,
+                transform: 'translate(-50%, -50%)',
+                cursor: 'pointer',
+                zIndex: isSelected ? 30 : 10,
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                transition: 'transform 0.2s ease'
+              }}
+              title={`${station.name}: ${displayAqi} AQI (Click to inspect)`}
+            >
+              {/* AQI Pill */}
+              <div
+                style={{
+                  background: color,
+                  color: '#03150d',
+                  fontWeight: 900,
+                  fontSize: '0.72rem',
+                  padding: '2px 7px',
+                  borderRadius: '999px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '2px',
+                  border: isSelected ? '2px solid #ffffff' : '1px solid rgba(255, 255, 255, 0.4)',
+                  boxShadow: isSelected ? `0 0 16px ${color}, 0 0 24px rgba(0, 245, 160, 0.6)` : `0 0 8px ${color}88`,
+                  transform: isSelected ? 'scale(1.15)' : 'scale(1)'
                 }}
               >
-                <Popup>
-                  <div style={{ color: '#0f172a', fontWeight: 700, fontSize: '0.85rem' }}>
-                    {hub.name}: {hub.aqi} AQI
-                  </div>
-                </Popup>
-              </Marker>
-            );
-          })}
-        </MapContainer>
+                <span>{displayAqi}</span>
+              </div>
 
-        {/* Quick Map Floating Badge */}
+              {/* Station Label */}
+              <span
+                style={{
+                  color: isSelected ? '#00f5a0' : '#cbd5e1',
+                  fontSize: '0.68rem',
+                  fontWeight: isSelected ? 800 : 600,
+                  marginTop: '2px',
+                  background: 'rgba(5, 12, 8, 0.75)',
+                  padding: '1px 5px',
+                  borderRadius: '4px',
+                  whiteSpace: 'nowrap',
+                  textShadow: '0 1px 3px rgba(0,0,0,0.8)'
+                }}
+              >
+                {station.name}
+              </span>
+
+              {/* Pulse Indicator for Active City */}
+              {isSelected && (
+                <div 
+                  style={{
+                    position: 'absolute',
+                    top: '4px',
+                    width: '32px',
+                    height: '32px',
+                    borderRadius: '50%',
+                    border: '2px solid #00f5a0',
+                    animation: 'ping 1.5s cubic-bezier(0, 0, 0.2, 1) infinite',
+                    pointerEvents: 'none'
+                  }} 
+                />
+              )}
+            </div>
+          );
+        })}
+
+        {/* Floating Bottom Status Bar */}
         <div 
           style={{
             position: 'absolute',
-            bottom: '12px',
+            bottom: '10px',
             left: '12px',
-            zIndex: 1000,
-            background: 'rgba(10, 20, 16, 0.88)',
-            backdropFilter: 'blur(10px)',
-            border: '1px solid rgba(255, 255, 255, 0.1)',
+            zIndex: 40,
+            background: 'rgba(5, 12, 8, 0.85)',
+            backdropFilter: 'blur(8px)',
+            border: '1px solid rgba(255, 255, 255, 0.08)',
             borderRadius: '8px',
-            padding: '5px 12px',
+            padding: '4px 10px',
             display: 'flex',
             alignItems: 'center',
             gap: '8px',
-            fontSize: '0.74rem',
+            fontSize: '0.72rem',
             color: '#cbd5e1'
           }}
         >
-          <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#00f5a0', display: 'inline-block' }} />
-          <span>Centered on <strong>{currentCity}</strong> &bull; EcoRoute enabled</span>
+          <span style={{ width: '7px', height: '7px', borderRadius: '50%', background: '#00f5a0', display: 'inline-block' }} />
+          <span>Active Hub: <strong style={{ color: '#00f5a0' }}>{currentCity}</strong> ({currentAqi} AQI) &bull; Cleanest Corridor Navigation</span>
+        </div>
+      </div>
+
+      {/* Bottom Color Scale Legend */}
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: '12px', flexWrap: 'wrap', gap: '8px', fontSize: '0.74rem' }}>
+        <span style={{ color: '#94a3b8', fontWeight: 700 }}>AQI Scale:</span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
+          {[
+            { label: 'Good (0-50)', color: '#10b981' },
+            { label: 'Moderate (51-100)', color: '#fbbf24' },
+            { label: 'Poor (101-150)', color: '#f97316' },
+            { label: 'Unhealthy (151-200)', color: '#ef4444' },
+            { label: 'Hazardous (201+)', color: '#8b5cf6' }
+          ].map(leg => (
+            <div key={leg.label} style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+              <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: leg.color }} />
+              <span style={{ color: '#cbd5e1' }}>{leg.label}</span>
+            </div>
+          ))}
         </div>
       </div>
     </section>
